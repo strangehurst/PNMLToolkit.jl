@@ -1,2 +1,4 @@
+name = "PNMLToolbox"
+
 [workspace]
-projects = ["docs", "benchmark", "examples", "profile"]
+projects = ["docs", "benchmark", "examples", "profile", "PNML", "PNet"]
