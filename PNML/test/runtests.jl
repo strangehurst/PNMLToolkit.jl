@@ -128,7 +128,7 @@ const FAILFAST = parse(Bool, get(ENV, "JULIA_TEST_FAILFAST", "true"))
 
     if select(("ALL", "DOC"), ("!DOC",))
         println("# DOC #")
-        @testset "doctest" begin doctest(PNML, manual = true) end
+        @testset "doctest" begin doctest(PNML; manual=false) end
     end
 end
 end # time

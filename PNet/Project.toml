@@ -23,7 +23,7 @@ TermInterface = "8ea1fca8-c5ef-4a55-8b96-4e9afe9c9a3c"
 XMLDict = "228000da-037f-5747-90a9-8195ccbf91a5"
 
 [sources]
-PNML = {path = ".."}
+PNML = {path = "../PNML"}
 
 [compat]
 AutoHashEquals = "2.2.0"

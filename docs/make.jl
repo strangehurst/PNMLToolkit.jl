@@ -1,24 +1,16 @@
-push!(LOAD_PATH, "../src/")
-using Pkg, Documenter, DocumenterPlantUML, PNML
+#push!(LOAD_PATH, "../src/")
+using Documenter, Pkg
+#using DocumenterInterLinks
+using DocumenterPlantUML
+using PNML
 
 the_repo() =  if isempty(get(ENV, "DOCUMENTER_KEY", ""))
     "github.com/strangehurst/PNML.jl"
 else
-    "/home/jeff/Jules/PNML"
+    "/home/jeff/Jules/PNML/PNML"
 end
 
 DocMeta.setdocmeta!(PNML, :DocTestSetup, :(using PNML); recursive=true)
-
-#println("Build documentation, repo = $(to_repo())")
-# mathengine = MathJax3(Dict(:loader => Dict("load" => ["[tex]/physics"]),
-#                            :tex => Dict("inlineMath" => [["\$", "\$"],
-#                                                          ["\\(", "\\)"]],
-#                                         "tags" => "ams",
-#                                         "packages" => ["base",
-#                                                        "ams",
-#                                                        "autoload",
-#                                                        "physics"],
-#                         ),))
 
 mathengine = MathJax3(Dict(:loader => Dict("load" => ["[tex]/require", "[tex]/mathtools"]),
     :tex => Dict("inlineMath" => [["\$", "\$"], ["\\(", "\\)"]],
@@ -52,6 +44,7 @@ pages=[
 ]
 #todo include("pages.jl")
 
+#links = Interlinks("PNML" => joinpath(@__DIR__, "inventories", "Julia.toml"))
 
 ################################################################################
 # Building HTML documentation with Documenter
@@ -65,9 +58,8 @@ makedocs(sitename="PNML.jl",
          #repo="/home/jeff/Jules/PNML/{path}",
          #repo = Documenter.Remotes.GitHub("strangehurst","PNML.jl"),
          warnonly = [:docs_block, :missing_docs, :cross_references],
-
          checkdocs = :all,
-
+         # plugins = [links]
          format=Documenter.HTML(;
                                 #edit_link=nothing,
                                 # CI means publish documentation on GitHub.
@@ -75,6 +67,7 @@ makedocs(sitename="PNML.jl",
                                 canonical = "https://strangehurst.github.io/PNML.jl",
                                 size_threshold_ignore = ["library.md"],
                                 mathengine,
+                                inventory_version = "",
                                 ),
          pages=pages,
          )

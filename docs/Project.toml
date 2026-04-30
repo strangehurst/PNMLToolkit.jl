@@ -4,18 +4,21 @@ name = "PNML-Docs"
 AbstractTrees = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterInterLinks = "d12716ef-a0f6-4df4-a9f1-a5a34e75c656"
 DocumenterPlantUML = "ee5590a8-faa9-47ff-a03b-b69c10a769fd"
 EzXML = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
 Metatheory = "e9d8d322-4543-424a-9be4-0cc815abe26c"
 NamedTupleTools = "d9ec5142-1e00-5aa0-9d6a-321866360f50"
 PNML = "1f34f301-fe8c-4464-8328-ff2334f05424"
+PNet = "b17e8b3e-4e57-4399-9a85-41e87fede9cd"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 SciMLLogging = "a6db7da4-7206-11f0-1eab-35f2a5dbe1d1"
 
 [sources]
-PNML = {path = ".."}
+PNML = {path = "../PNML"}
+PNet = {path = "../PNet"}
 
 [compat]
 Documenter = "1"
 Metatheory = "2, 3"
-julia = "1.11"
+julia = "1.12"
