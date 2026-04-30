@@ -1,4 +1,7 @@
-name = "PNMLToolbox"
+name = "PNMLToolkit"
+uuid = "dac70dd6-33d3-459d-b234-9c773ca429d0"
+version = "0.1.0"
+authors = ["Jeff Hurst <strangehurst@users.noreply.github.com>"]
 
 [workspace]
-projects = ["docs", "benchmark", "examples", "profile", "PNML", "PNet"]
+projects = ["docs", "benchmark", "examples", "profile", "PNML", "PNet", "test"]
