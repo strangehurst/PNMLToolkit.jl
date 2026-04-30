@@ -23,7 +23,7 @@ ProfileView = "c46f51b8-102a-5cf2-8d2c-8597cb0e0da7"
 SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
 
 [sources]
-PNML = {path = "/home/jeff/Jules/PNML"}
+PNML = {path = "/home/jeff/Jules/PNML/PNML"}
 
 [compat]
 AbstractTrees = "0.4"

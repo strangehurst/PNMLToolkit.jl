@@ -27,7 +27,7 @@ PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 TestEnv = "1e6cf692-eddd-4d53-88a5-2d735e33781b"
 
 [sources]
-PNML = {path = ".."}
+PNML = {path = "../PNML"}
 
 [compat]
 AbstractTrees = "0.4.5"
