@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Type Hierarchies · PNML.jl</title><meta name="title" content="Type Hierarchies · PNML.jl"/><meta property="og:title" content="Type Hierarchies · PNML.jl"/><meta property="twitter:title" content="Type Hierarchies · PNML.jl"/><meta name="description" content="Documentation for PNML.jl."/><meta property="og:description" content="Documentation for PNML.jl."/><meta property="twitter:description" content="Documentation for PNML.jl."/><meta property="og:url" content="https://strangehurst.github.io/PNML.jl/structure/type_hierarchies/"/><meta property="twitter:url" content="https://strangehurst.github.io/PNML.jl/structure/type_hierarchies/"/><link rel="canonical" href="https://strangehurst.github.io/PNML.jl/structure/type_hierarchies/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">PNML.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Petri Net Markup Language</a></li><li><a class="tocitem" href="../../status/">Status</a></li><li><span class="tocitem">Structure</span><ul><li><a class="tocitem" href="../layers/">Intermediate Representation</a></li><li><a class="tocitem" href="../pntd/">Petri Net Type Definition</a></li><li><a class="tocitem" href="../high_level/">High Level Concepts</a></li><li><a class="tocitem" href="../labels/">Labels</a></li><li><a class="tocitem" href="../traits/">Traits</a></li><li class="is-active"><a class="tocitem" href>Type Hierarchies</a><ul class="internal"><li><a class="tocitem" href="#AbstractPnmlType-Petri-Net-Type-Definition-(PNTD)"><span>AbstractPnmlType - Petri Net Type Definition (PNTD)</span></a></li><li><a class="tocitem" href="#PNet.AbstractPetriNet"><span>PNet.AbstractPetriNet</span></a></li><li><a class="tocitem" href="#AbstractPnmlObject"><span>AbstractPnmlObject</span></a></li><li><a class="tocitem" href="#AbstractLabel"><span>AbstractLabel</span></a></li><li><a class="tocitem" href="#PnmlException"><span>PnmlException</span></a></li><li class="toplevel"><a class="tocitem" href="#Many-sorted-Algebra-Concepts"><span>Many-sorted Algebra Concepts</span></a></li><li><a class="tocitem" href="#AbstractDeclaration"><span>AbstractDeclaration</span></a></li><li><a class="tocitem" href="#AbstractSort"><span>AbstractSort</span></a></li><li><a class="tocitem" href="#AbstractTerm"><span>AbstractTerm</span></a></li><li><a class="tocitem" href="#PnmlExpr"><span>PnmlExpr</span></a></li></ul></li><li><a class="tocitem" href="../interface/">Interfaces</a></li><li><a class="tocitem" href="../mathematics/">Math</a></li><li><a class="tocitem" href="../defaults/">Default Values</a></li><li><a class="tocitem" href="../parser/">Parser</a></li><li><a class="tocitem" href="../enabling_firing/">Enabling &amp; Firing Rules</a></li></ul></li><li><a class="tocitem" href="../../library/">Docstrings</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Structure</a></li><li class="is-active"><a href>Type Hierarchies</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Type Hierarchies</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/strangehurst/PNML.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/strangehurst/PNML.jl/blob/main/docs/src/structure/type_hierarchies.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><p>Overview of some type hierarchies.</p><h2 id="AbstractPnmlType-Petri-Net-Type-Definition-(PNTD)"><a class="docs-heading-anchor" href="#AbstractPnmlType-Petri-Net-Type-Definition-(PNTD)">AbstractPnmlType - Petri Net Type Definition (PNTD)</a><a id="AbstractPnmlType-Petri-Net-Type-Definition-(PNTD)-1"></a><a class="docs-heading-anchor-permalink" href="#AbstractPnmlType-Petri-Net-Type-Definition-(PNTD)" title="Permalink"></a></h2><p>See <a href="../../library/#PNML.PnmlTypes"><code>PnmlTypes</code></a> module page.</p><p>There are levels:  Core (Place-Transition), Continuous and High-Level PNG (HLPNG).</p><p><a href="../../library/#PNML.PnmlTypes.PnmlCoreNet"><code>PnmlCoreNet</code></a> is a concrete subtype of <a href="../../library/#PNML.PnmlTypes.AbstractPnmlType"><code>AbstractPnmlType</code></a>. <code>PnmlCoreNet</code> is used by some <code>PNet.AbstractPetriNet</code> concrete types (<code>PNet.SimpleNet</code>).</p><p><a href="../../library/#PNML.PnmlTypes.ContinuousNet"><code>ContinuousNet</code></a> is a concrete type of <a href="../../library/#PNML.PnmlTypes.AbstractContinuousNet"><code>AbstractContinuousNet</code></a>. <code>ContinuousNet</code> uses floating point marking and inscriptions. It is a nonstandard extension to the ISO standard.</p><p><a href="../../library/#PNML.PnmlTypes.HLCoreNet"><code>HLCoreNet</code></a> is a concrete subtype of <a href="../../library/#PNML.PnmlTypes.AbstractHLCore"><code>AbstractHLCore</code></a>. <code>HLCoreNet</code> is used by some <code>PNet.AbstractPetriNet</code> concrete types (<code>PNet.HLPetriNet</code>). Think of it as a testable implementation of <code>AbstractHLCore</code>.</p><p>Tries to represent the model (all models) at a structural level. Tries to avoid imposing semantics. It is a toolkit with a wide range of behavior. Those semantics should be part of <code>PNet.AbstractPetriNet</code>. Yes, the <a href="../../library/#PNML.PnmlTypes.AbstractPnmlType"><code>AbstractPnmlType</code></a> in use selects some semantics and affects the toolkit.</p><pre class="documenter-example-output"><code class="nohighlight hljs ansi">AbstractPnmlType
+├─ AbstractContinuousNet
+│  └─ ContinuousNet
+├─ AbstractHLCore
+│  ├─ HLCoreNet
+│  ├─ HLPNG
+│  ├─ PT_HLPNG
+│  └─ SymmetricNet
+└─ AbstractPnmlCore
+   ├─ PTNet
+   └─ PnmlCoreNet</code></pre><table><tr><th style="text-align: left">PnmlType</th><th style="text-align: left">Description</th></tr><tr><td style="text-align: left">PnmlCoreNet</td><td style="text-align: left">Core structure. Only defined label is &lt;name&gt;.</td></tr><tr><td style="text-align: left">PTNet</td><td style="text-align: left">Using &lt;initialMarking&gt;, &lt;inscription&gt; labels that have a &lt;text&gt; containing a number.</td></tr><tr><td style="text-align: left">HLCoreNet</td><td style="text-align: left">HL Petri Net Graphs structure. Using &lt;hlinitialMarking&gt;, &lt;hlinscription&gt; labels with &lt;structure&gt;. Multisorted algebra.</td></tr><tr><td style="text-align: left">PT-HLPNG</td><td style="text-align: left">Restrict sort to dot, condition always true.</td></tr><tr><td style="text-align: left">SymmetricNet</td><td style="text-align: left">Restrict sorts to finite, annotations have &lt;structure&gt;.</td></tr><tr><td style="text-align: left">HLNet</td><td style="text-align: left">Unrestricted, Arbitrary Sorts, Operators, Lists, Strings.</td></tr><tr><td style="text-align: left">Stochastic</td><td style="text-align: left">Extended PNML. Use &lt;rate&gt; label</td></tr><tr><td style="text-align: left">Timed</td><td style="text-align: left">Extended PNML.</td></tr><tr><td style="text-align: left">Open</td><td style="text-align: left">Extended PNML .</td></tr></table><p>Todo: Continuous Petri Net</p><h2 id="PNet.AbstractPetriNet"><a class="docs-heading-anchor" href="#PNet.AbstractPetriNet">PNet.AbstractPetriNet</a><a id="PNet.AbstractPetriNet-1"></a><a class="docs-heading-anchor-permalink" href="#PNet.AbstractPetriNet" title="Permalink"></a></h2><p><code>PNet.AbstractPetriNet</code> uses the Intermediate Representation&#39;s <a href="../../library/#PNML.PnmlNet"><code>PnmlNet</code></a> and <code>AbstractPnmlType</code> to implement a Petri Net Graph (PNG).</p><h2 id="AbstractPnmlObject"><a class="docs-heading-anchor" href="#AbstractPnmlObject">AbstractPnmlObject</a><a id="AbstractPnmlObject-1"></a><a class="docs-heading-anchor-permalink" href="#AbstractPnmlObject" title="Permalink"></a></h2><p><a href="../../library/#PNML.Page"><code>Page</code></a>, <a href="../../library/#PNML.Arc"><code>Arc</code></a>, <a href="../../library/#PNML.Place"><code>Place</code></a>, <a href="../../library/#PNML.Transition"><code>Transition</code></a> define the graph of a <a href="../../library/#PNML.PnmlNet"><code>PnmlNet</code></a>.</p><pre class="documenter-example-output"><code class="nohighlight hljs ansi">AbstractPnmlObject
+├─ AbstractPnmlNode
+│  ├─ Arc
+│  ├─ Place
+│  └─ Transition
+├─ ReferenceNode
+│  ├─ RefPlace
+│  └─ RefTransition
+└─ Page</code></pre><h3 id="Structure"><a class="docs-heading-anchor" href="#Structure">Structure</a><a id="Structure-1"></a><a class="docs-heading-anchor-permalink" href="#Structure" title="Permalink"></a></h3><p>Fields expected of every subtype of <a href="#AbstractPnmlObject"><code>AbstractPnmlObject</code></a>:</p><table><tr><th style="text-align: left">Name</th><th style="text-align: left">Description</th></tr><tr><td style="text-align: left">id</td><td style="text-align: left">Symbol, see <a href="../../library/#PNML.REFID">&#39;REFID</a></td></tr><tr><td style="text-align: left">pntd</td><td style="text-align: left">&lt;: <a href="../../library/#PNML.PnmlTypes.AbstractPnmlType"><code>AbstractPnmlType</code></a> identifies the meta-model of a net.</td></tr><tr><td style="text-align: left">name</td><td style="text-align: left">Optional <a href="../../library/#PNML.Labels.Name"><code>Name</code></a> label.</td></tr><tr><td style="text-align: left">labels</td><td style="text-align: left">Optional <a href="../parser/#PnmlLabel"><code>PnmlLabel</code></a> collection of unclaimed labels.</td></tr><tr><td style="text-align: left">toolspecinfos</td><td style="text-align: left">Optional <a href="../interface/#ToolInfo"><code>ToolInfo</code></a> collection of tool specific content.</td></tr></table><p>Note that subtypes may have additional fields. For example, Page has a subpages field.</p><h3 id="ADT"><a class="docs-heading-anchor" href="#ADT">ADT</a><a id="ADT-1"></a><a class="docs-heading-anchor-permalink" href="#ADT" title="Permalink"></a></h3><pre><code class="language-julia hljs">using Moshi.Data: @data
+
+@data NetNode{PNTD,} begin
+    Arc
+    Place
+    Transition
+    RefPlace
+    RefTransition
+    Page
+end</code></pre><h2 id="AbstractLabel"><a class="docs-heading-anchor" href="#AbstractLabel">AbstractLabel</a><a id="AbstractLabel-1"></a><a class="docs-heading-anchor-permalink" href="#AbstractLabel" title="Permalink"></a></h2><p><a href="#AbstractLabel"><code>AbstractLabel</code></a>s are attached to <code>AbstractPnmlObject</code>s. Kinds of label include: marking, inscription, condition and declarations, sort, and ad-hoc. Ad-hoc is where we assume any undefined element attached to a <code>AbstractPnmlObject</code> instance is a label and add it to a collection of &#39;other labels&#39;. Some &#39;other labels&#39; can be accessed using: <a href="../../library/#PNML.Labels.rate_value-Tuple{Any}"><code>rate_value</code></a>, <a href="../../library/#PNML.Labels.delay_value-Tuple{Any}"><code>delay_value</code></a>.</p><p><strong>Some Labels of Interest</strong></p><table><tr><th style="text-align: left">Full Name</th><th style="text-align: left">Node</th><th style="text-align: left">Label Description</th></tr><tr><td style="text-align: left">Marking</td><td style="text-align: left">Place</td><td style="text-align: left">Value is a number or ground term.</td></tr><tr><td style="text-align: left">Inscription</td><td style="text-align: left">Arc</td><td style="text-align: left">Value is a number or ground term.</td></tr><tr><td style="text-align: left">Condition</td><td style="text-align: left">Transition</td><td style="text-align: left">Value is a boolean term.</td></tr><tr><td style="text-align: left">Rate</td><td style="text-align: left">Transition</td><td style="text-align: left">Value is a floating point number.</td></tr><tr><td style="text-align: left">Priority</td><td style="text-align: left">Transition</td><td style="text-align: left">Firing order of enabled transitions.</td></tr><tr><td style="text-align: left">Weight</td><td style="text-align: left">Transition</td><td style="text-align: left">Firing tiebreaker.</td></tr></table><p>Note that <em>Rate</em>, <em>Priority</em> and <em>Weight</em> are not part of base standard. See <a href="../parser/#Unclaimed-Labels">Unclaimed Labels</a></p><pre class="documenter-example-output"><code class="nohighlight hljs ansi">AbstractLabel
+├─ Annotation
+│  ├─ ArcType
+│  ├─ Declaration
+│  ├─ Marking
+│  ├─ Name
+│  ├─ PnmlLabel
+│  ├─ Priority
+│  ├─ Rate
+│  ├─ SortType
+│  └─ Time
+└─ HLAnnotation
+   ├─ Condition
+   ├─ HLLabel
+   └─ Inscription</code></pre><div class="admonition is-info" id="Difference-between-Object-and-Label-df046b33555da5cd"><header class="admonition-header">Difference between Object and Label<a class="admonition-anchor" href="#Difference-between-Object-and-Label-df046b33555da5cd" title="Permalink"></a></header><div class="admonition-body"><ul><li>Objects have <em>id</em>s and <code>Name</code>s.</li><li>Labels are attached to Objects.</li><li>Some Labels (attributes) do not have <code>Graphics</code>.</li><li>Labels are extendable.</li><li>Labels are named by the xml tag. Any &quot;unknown&quot; tag of an Object is presumed to be a label.</li></ul></div></div><h2 id="PnmlException"><a class="docs-heading-anchor" href="#PnmlException">PnmlException</a><a id="PnmlException-1"></a><a class="docs-heading-anchor-permalink" href="#PnmlException" title="Permalink"></a></h2><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PnmlException
+├─ MalformedException
+└─ MissingIDException</code></pre><h1 id="Many-sorted-Algebra-Concepts"><a class="docs-heading-anchor" href="#Many-sorted-Algebra-Concepts">Many-sorted Algebra Concepts</a><a id="Many-sorted-Algebra-Concepts-1"></a><a class="docs-heading-anchor-permalink" href="#Many-sorted-Algebra-Concepts" title="Permalink"></a></h1><p>The PNML Standard builds the High-level Petri Net Graph as a layer using a Core layer (PnmlCore). The main feature of the HL layer (HLCore) is to require all annotation labels to have &lt;text&gt; and &lt;structure&gt; elements. All meaning is required to reside in a single child of &lt;structure&gt;. With the &lt;text&gt; for human/documentation use.</p><p>Implemented so that it is mostly part of the PnmlCore implementation. At which level, both &lt;text&gt; and &lt;structure&gt; are optional.</p><p>The &lt;type&gt; label of a <a href="../../library/#PNML.Place"><code>Place</code></a> is meant to be a <em>sort</em> of a <em>many-sorted algebra</em>. We call it <em>sorttype</em> to reduce the confusion.</p><p>PNML.jl allows/requires all net type&#39;s places to have <em>sorttype</em> objects. Only high-level PNML input is expected to contain a &lt;type&gt; tag. For other nets we interpret the <a href="../../library/#PNML.Labels.SortType"><code>SortType</code></a> to be <a href="../../library/#PNML.Sorts.IntegerSort"><code>IntegerSort</code></a> or <a href="../../library/#PNML.Sorts.RealSort"><code>RealSort</code></a> based on PNTD. And <a href="../../library/#PNML.Labels.Marking"><code>Marking</code></a> values of non-high-level nets are interpreted as multisets with airity of 1. This allows more common implementation in the core layer.</p><p>For high-level nets the sorttype object is an <a href="../../library/#PNML.Labels.SortType"><code>SortType</code></a> <code>HLAnnotation</code> subtype containing an <a href="#AbstractSort"><code>AbstractSort</code></a>.</p><h2 id="AbstractDeclaration"><a class="docs-heading-anchor" href="#AbstractDeclaration">AbstractDeclaration</a><a id="AbstractDeclaration-1"></a><a class="docs-heading-anchor-permalink" href="#AbstractDeclaration" title="Permalink"></a></h2><p>Labels attached to <a href="../../library/#PNML.PnmlNet"><code>PnmlNet</code></a> and/or <a href="../../library/#PNML.Page"><code>Page</code></a>. The <a href="../../library/#PNML.Labels.Declaration"><code>Declaration</code></a>s contained in a &lt;declarations&gt; apply to the whole net even when attached to a <code>Page</code>.</p><pre class="documenter-example-output"><code class="nohighlight hljs ansi">AbstractDeclaration
+├─ UnknownDeclaration
+└─ VariableDeclaration</code></pre><h2 id="AbstractSort"><a class="docs-heading-anchor" href="#AbstractSort">AbstractSort</a><a id="AbstractSort-1"></a><a class="docs-heading-anchor-permalink" href="#AbstractSort" title="Permalink"></a></h2><p>Each <code>Place</code> has a sorttype containing an <code>AbstractSort</code>.</p><pre class="documenter-example-output"><code class="nohighlight hljs ansi">AbstractSort
+├─ OperatorDeclaration
+│  ├─ ArbitraryOperator
+│  ├─ NamedOperator
+│  └─ PartitionElement
+├─ SortDeclaration
+│  ├─ ArbitrarySort
+│  ├─ NamedSort
+│  └─ PartitionSort
+├─ BoolSort
+├─ DotSort
+├─ EnumerationSort
+│  ├─ CyclicEnumerationSort
+│  └─ FiniteEnumerationSort
+├─ FiniteIntRangeSort
+├─ ListSort
+├─ MultisetSort
+├─ NumberSort
+│  ├─ IntegerSort
+│  ├─ NaturalSort
+│  ├─ NullSort
+│  ├─ PositiveSort
+│  └─ RealSort
+├─ ProductSort
+└─ StringSort</code></pre><h2 id="AbstractTerm"><a class="docs-heading-anchor" href="#AbstractTerm">AbstractTerm</a><a id="AbstractTerm-1"></a><a class="docs-heading-anchor-permalink" href="#AbstractTerm" title="Permalink"></a></h2><p>Part of the <em>many-sorted algebra</em> of a High-level net. See <a href="../../library/#PNML.AbstractOperator"><code>AbstractOperator</code></a>. <a href="../../library/#PNML.Variable"><code>Variable</code></a></p><pre class="documenter-example-output"><code class="nohighlight hljs ansi">AbstractTerm
+├─ AbstractOperator
+│  ├─ BooleanConstant
+│  ├─ DotConstant
+│  ├─ FEConstant
+│  ├─ FiniteIntRangeConstant
+│  ├─ NumberConstant
+│  ├─ Operator
+│  └─ UserOperator
+└─ AbstractVariable
+   └─ Variable</code></pre><h2 id="PnmlExpr"><a class="docs-heading-anchor" href="#PnmlExpr">PnmlExpr</a><a id="PnmlExpr-1"></a><a class="docs-heading-anchor-permalink" href="#PnmlExpr" title="Permalink"></a></h2><p>Expressions of the <em>many-sorted algebra</em> are part of a petri net&#39;s dynamic behavior. <a href="#PnmlExpr"><code>PnmlExpr</code></a> are <code>TermInterface</code> compatible. Used to do variable substitution before evaluation of mutisorted algebra expressions in enabling and firing rules. Ground terms contain no variables and therefore do not depend on the current marking of the net.</p><pre class="documenter-example-output"><code class="nohighlight hljs ansi">PnmlExpr
+├─ AbstractBoolExpr
+│  ├─ And
+│  ├─ BooleanEx
+│  ├─ Contains
+│  ├─ Equality
+│  ├─ GreaterThan
+│  ├─ GreaterThanOrEqual
+│  ├─ Imply
+│  ├─ Inequality
+│  ├─ LessThan
+│  ├─ LessThanOrEqual
+│  ├─ Not
+│  ├─ Or
+│  ├─ PartitionGreaterThan
+│  ├─ PartitionLessThan
+│  ├─ StringGreaterThan
+│  ├─ StringGreaterThanOrEqual
+│  ├─ StringLessThan
+│  └─ StringLessThanOrEqual
+├─ AbstractOpExpr
+│  ├─ NamedOperatorEx
+│  ├─ PartitionElementOp
+│  └─ UserOperatorEx
+├─ Add
+├─ Addition
+├─ Append
+├─ Bag
+├─ Cardinality
+├─ CardinalityOf
+├─ Concatenation
+├─ Division
+├─ DotConstantEx
+├─ ListAppend
+├─ ListConcatenation
+├─ ListEx
+├─ ListLength
+├─ MemberAtIndex
+├─ Modulo
+├─ Multiplication
+├─ NumberEx
+├─ PartitionElementOf
+├─ PnmlTupleEx
+├─ Predecessor
+├─ ScalarProduct
+├─ StringLength
+├─ Sublist
+├─ SubstringEx
+├─ Subtract
+├─ Subtraction
+├─ Successor
+└─ VariableEx</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../traits/">« Traits</a><a class="docs-footer-nextpage" href="../interface/">Interfaces »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 1 May 2026 20:44">Friday 1 May 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
