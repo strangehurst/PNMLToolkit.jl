@@ -5,3 +5,7 @@ authors = ["Jeff Hurst <strangehurst@users.noreply.github.com>"]
 
 [workspace]
 projects = ["docs", "benchmark", "examples", "profile", "PNML", "PNet", "test"]
+
+[deps]
+PNML = "1f34f301-fe8c-4464-8328-ff2334f05424"
+PNet = "b17e8b3e-4e57-4399-9a85-41e87fede9cd"
