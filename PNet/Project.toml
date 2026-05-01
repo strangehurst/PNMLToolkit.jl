@@ -1,6 +1,6 @@
 name = "PNet"
 uuid = "b17e8b3e-4e57-4399-9a85-41e87fede9cd"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jeff <strangehurst@gmail.com>"]
 
 [workspace]
