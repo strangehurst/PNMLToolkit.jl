@@ -38,6 +38,7 @@ jobs:
             https://github.com/strangehurst/SHLocalRegistry.git
       - uses: julia-actions/julia-runtest@latest
       - uses: julia-actions/julia-processcoverage@v1
+        with:
           directories: PNML, PNet
       - uses: codecov/codecov-action@v5
         with:
