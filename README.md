@@ -20,7 +20,7 @@ Features that work:
   - pnml core: can read & print Model Checking Contest (MCC) models, abet with some warnings & exceptions due to incomplete implementation.
   - MetaGraphNext.SimpleDiGraphFromIterator used to create a graph with labels.
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://strangehurst.github.io/PNML.jl/stable)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://strangehurst.github.io/PNML.jl/dev)
-[![Build Status](https://github.com/strangehurst/PNML.jl/workflows/CI/badge.svg)](https://github.com/strangehurst/PNML.jl/actions)
-[![codecov](https://codecov.io/gh/strangehurst/PNML.jl/graph/badge.svg?token=7uARCtHrK9)](https://codecov.io/gh/strangehurst/PNML.jl)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://strangehurst.github.io/PNMLToolkit.jl/stable)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://strangehurst.github.io/PNMLToolkit.jl/dev)
+[![Build Status](https://github.com/strangehurst/PNMLToolkit.jl/workflows/CI/badge.svg)](https://github.com/strangehurst/PNMLToolkit.jl/actions)
+[![codecov](https://codecov.io/gh/strangehurst/PNMLToolkit.jl/graph/badge.svg?token=7uARCtHrK9)](https://codecov.io/gh/strangehurst/PNMLToolkit.jl)
