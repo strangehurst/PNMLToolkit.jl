@@ -17,7 +17,7 @@ Features that are not complete:
 
 Features that work:
   - stochastic petri nets (examples/lotka-volterra.jl) via rate labels for transitions.
-  - pnml core: can read & print Model Checking Contest (MCC) models, abet with some warnings & exceptions due to incomplete implementation.
+  - pnml core: can read & print most Model Checking Contest (MCC) models.
   - MetaGraphNext.SimpleDiGraphFromIterator used to create a graph with labels.
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://strangehurst.github.io/PNMLToolkit.jl/stable)
