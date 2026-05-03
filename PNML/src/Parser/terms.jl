@@ -64,7 +64,7 @@ function subterms(node, net::APN; vars)
         end
     end
     return sts, vars
-    return (Tuple(sts), vars) # Change vector into tuple.
+    return (Tuple(sts), vars) #TODO Change vector into tuple.
 end
 
 
@@ -210,7 +210,7 @@ function parse_term(::Val{:numberconstant}, node::XMLNode, net::APN; vars)
 end
 
 # Dot is the high-level concept of an integer 1.
-function parse_term(::Val{:dotconstant}, node::XMLNode, net::APN; vars)
+function parse_term(::Val{:dotconstant}, _node::XMLNode, _net::APN; vars)
     return TermJunk(DotConstantEx(), NamedSortRef(:dot), vars)
 end
 
@@ -624,11 +624,9 @@ end
 function parse_term(::Val{:gtp}, node::XMLNode, net::APN; vars)
     sts, vars = subterms(node, net; vars)
     @assert length(sts) == 2
-    #@show sts # PartitionElementOps
-    pe = PartitionGreaterThan(sts...) #! We have PnmlExpr elements at this point.
-    #@show first(sts).refpartition Iterators.map(x->x.refpartition, sts)
-    @assert all(==(first(sts).refpartition), Iterators.map(x->x.refpartition, sts))
-    return TermJunk(pe, PartitionSortRef(first(sts).refpartition), vars) #todo! when can we map to partition
+    @assert sts[1].refpartition == sts[2].refpartition "all partitions must be of the same sort"
+    pgt = PartitionGreaterThan(sts...)
+    return TermJunk(pgt, PartitionSortRef(sts[1].refpartition), vars)
 end
 
 #====================================================================================#

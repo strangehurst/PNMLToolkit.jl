@@ -140,7 +140,6 @@ Update varsubs
 """
 function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
                                 tr_var_binding_set, vars, varsubs)
-    enabled = true
     for place_id in preset(net, transition_id)
         ar = arc(net, place_id, transition_id)
         mark = mark_dict[place_id]
@@ -173,7 +172,7 @@ function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
             isempty(varsubs) && return false # no sunstitution found
         end
     end
-    return true
+    return true # transition is enabled
 end
 
 """
