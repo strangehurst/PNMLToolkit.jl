@@ -3,10 +3,10 @@
 
 `parse_term` returns a triple of: PnmlExpr, SortRef, NTuple{N,REFID}
 """
-struct TermJunk{N}
-    exp::Union{PnmlExpr,SortRef}
+struct TermJunk{N,T <: Union{PnmlExpr,SortRef}}
+    exp::T # see `parse_sorttype_term` for why SortRef. #TODO make sortref PnmlExpr?
     ref::SortRef
-    vars::NTuple{N,REFID}
+    vars::NTuple{N,Symbol}
 end
 
 # See `TermInterface.jl`, `Metatheory.jl`
@@ -45,9 +45,9 @@ function parse_term(node::XMLNode, net::APN; vars)
 end
 
 """
-    subterms(node, net; vars) -> Vector{PnmlExpr} || Tuple{<:PnmlExpr}
+    subterms(node, net; vars) -> Vector{PnmlExpr}
 
-Unwrap each `<subterm>` and parse into a [`PnmlExpr`](@ref) term in a tuple..
+Unwrap each `<subterm>` and parse into a [`PnmlExpr`](@ref) term in a vector.
 """
 function subterms(node, net::APN; vars)
     sts = Vector{PnmlExpr}()
@@ -55,7 +55,7 @@ function subterms(node, net::APN; vars)
         if EzXML.nodename(subterm) == "subterm"
             tag, stnode = unwrap_subterm(subterm) # Used to dispatch on `Val(tag)`.
             subterm_tj = parse_term(Val(tag), stnode, net; vars)::TermJunk
-            isnothing(subterm_tj) && throw(MalformedException("subterm is nothing"))
+            isnothing(subterm_tj) && throw(MalformedException("subterm_tj is nothing"))
             vars = subterm_tj.vars
             push!(sts, subterm_tj.exp::PnmlExpr)
         else
@@ -64,7 +64,6 @@ function subterms(node, net::APN; vars)
         end
     end
     return sts, vars
-    return (Tuple(sts), vars) #TODO Change vector into tuple.
 end
 
 
@@ -572,7 +571,7 @@ end
 # </structure>
 # See also `parse_namedoperator`
 function parse_term(::Val{:useroperator}, node::XMLNode, net::APN; vars)
-    errmsg = "<useroperator> missing declaration refid"
+    errmsg = "<useroperator> missing declaration attribute"
     uo = UserOperatorEx(Symbol(attribute(node, "declaration", errmsg)))
     usort = sortref(operator(net, uo.refid))
     return TermJunk(uo, usort, vars)
