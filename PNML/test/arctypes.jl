@@ -21,7 +21,7 @@ using PNML: is_normal, is_inhibitor, is_read, is_reset
     node = xmlnode(str)
 
     a = parse_arc(node, net)::Arc
-    atl = PNML.arctypelabel(a)
+    atl = PNML.type_label(a)
     arct = PNML.Labels.arctype(atl)
 
     @test length(Base.findall([is_normal(a), is_inhibitor(a), is_read(a), is_reset(a)])) == 1

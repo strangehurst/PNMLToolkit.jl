@@ -130,7 +130,7 @@ $(TYPEDFIELDS)
     source::RefValue{Symbol} # IDREF
     target::RefValue{Symbol} # IDREF
     inscription::Inscription{N,T} #! expression label
-    arctypelabel::ArcType
+    type_label::ArcType
     namelabel::Maybe{Name}
     graphics::Maybe{Graphics}
     toolspecinfos::Maybe{Vector{ToolInfo}}
@@ -151,18 +151,18 @@ end
 #TODO Move extensions/enhancements to ISO 150909-1:2004 (1st ED.) to own file.
 
 """
-    arctypelabel(arc::Arc) -> ArcType
+    type_label(arc::Arc) -> ArcType
 
 Access arctype label of arc.
 """
-function arctypelabel(arc::Arc)
-    arc.arctypelabel # label
+function type_label(arc::Arc)
+    arc.type_label # label
 end
 
-is_normal(arc::Arc)    = is_normal(arctypelabel(arc))
-is_inhibitor(arc::Arc) = is_inhibitor(arctypelabel(arc))
-is_read(arc::Arc)      = is_read(arctypelabel(arc))
-is_reset(arc::Arc)     = is_reset(arctypelabel(arc))
+is_normal(arc::Arc)    = is_normal(type_label(arc))
+is_inhibitor(arc::Arc) = is_inhibitor(type_label(arc))
+is_read(arc::Arc)      = is_read(type_label(arc))
+is_reset(arc::Arc)     = is_reset(type_label(arc))
 
 is_normal(label::ArcType)    = is_normal(arctype(label))
 is_inhibitor(label::ArcType) = is_inhibitor(arctype(label))
@@ -194,7 +194,7 @@ function Base.show(io::IO, arc::Arc)
           ", ", repr(source(arc)),
           ", ", repr(target(arc)),
           ", ", repr(inscription(arc)),
-          ", ", repr(arctypelabel(arc)))
+          ", ", repr(type_label(arc)))
     print(io, ")")
 end
 

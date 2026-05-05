@@ -298,7 +298,7 @@ function parse_arc(node::XMLNode, net::APN)
     end
 
     Arc(; id=arc_id, source=Ref(source), target=Ref(target),
-        inscription, arctypelabel=arc_type_label, namelabel, graphics,
+        inscription, type_label=arc_type_label, namelabel, graphics,
         toolspecinfos, extralabels, net)
 end
 
