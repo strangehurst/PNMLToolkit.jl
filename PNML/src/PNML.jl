@@ -97,7 +97,7 @@ export @xml_str, xmlnode, D
 @public pnmlmodel
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
 @public namedsort, Coordinate
-@public rates, mcontains, to_sort
+@public basis, rates, mcontains, to_sort
 @public is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
 
 Multisets.set_key_value_show()
