@@ -12,31 +12,31 @@ export ArcType, ArcTypeEnum
 export Rate, Priority, Time
 export validate_toolinfos, variables
 
-using Base: Fix1, Fix2, @kwdef, RefValue, isempty, length
+using Base: @kwdef, isempty, length
 using DocStringExtensions
 using NamedTupleTools
 using Logging, LoggingExtras
 using SciMLLogging: @SciMLMessage
-using Moshi.Data: @data, isa_variant, is_data_type
+#using Moshi.Data: @data, isa_variant, is_data_type
 
 import Base: eltype
 import AutoHashEquals: @auto_hash_equals
 import Multisets
-import OrderedCollections: OrderedDict, LittleDict, freeze, OrderedSet
+#import OrderedCollections: OrderedDict, LittleDict, freeze, OrderedSet
 
 using PNML
-using PNML: Maybe, AnyElement, D, indent, inc_indent, pntd
+using PNML: Maybe, AnyElement, D, indent, pntd
 using PNML: AbstractPnmlNode, AbstractLabel, Annotation, HLAnnotation
-using PNML: DeclDict
-using PNML: BooleanConstant, PnmlMultiset
+#using PNML: DeclDict
+using PNML: BooleanConstant
 using PNML: namedsort
 using PNML: ToolParser
 
 import PNML: name, Coordinate
 import PNML: value_type, number_value
 import PNML: value, term, graphics, toolinfos, refid, tag, elements
-import PNML: has_graphics, get_label, labels, declarations
-import PNML:  arctype, is_normal, is_inhibitor, is_read, is_reset, verify!
+import PNML: has_graphics, get_label
+import PNML: verify!
 
 using ..PnmlTypes # PNML PNTD
 
@@ -45,7 +45,7 @@ import ..Expressions: toexpr, PnmlExpr, expr_sortref
 
 using ..Sorts
 # Some labels implement the Sort interface
-import PNML: basis, sortref, sortelements, sortdefinition, version
+import PNML: arctype, basis, sortdefinition, sortelements, sortref, version
 
 include("toolinfos.jl") # labels and nodes can both have tool specific information.
 include("toolinfo_content.jl") # Some infos have known content.
