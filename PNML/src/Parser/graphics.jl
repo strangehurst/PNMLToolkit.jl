@@ -16,12 +16,13 @@ Arcs, Annotations and Nodes have different graphics semantics.
 Return a [`Graphics`](@ref PnmlGraphics.Graphics) holding the union of possibilities.
 """
 function parse_graphics(node, pntd)
-    nn = check_nodename(node, "graphics")
+    check_nodename(node, "graphics")
     args = Dict()
     _positions = Coordinate[]
+    #TODO Add these to labelparsers (though these are not "Labels")
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
-        if tag ==   "dimension"
+        if tag == "dimension"
             args[:dimension] = parse_graphics_coordinate(child, pntd)
         elseif tag == "fill"
             args[:fill] = parse_graphics_fill(child, pntd)
@@ -38,13 +39,13 @@ function parse_graphics(node, pntd)
         end
     end
     args[:positions] = _positions
-    Graphics{eltype(Coordinate)}(; pairs(args)...)
+    Graphics(; pairs(args)...)
 end
 
 "Add XMLNode attribute, value pair to dictionary."
 function kw!(args::AbstractDict, node::XMLNode, key::AbstractString)
-    sym = Symbol(replace(key, "-" => "_")) # make proper identifier for readibility
     if EzXML.haskey(node, key)
+        sym = Symbol(replace(key, "-" => "_")) # make proper identifier for readibility
         args[sym] = node[key]
     end
 end
@@ -91,7 +92,7 @@ Return [`Fill`](@ref PnmlGraphics.Fill)
 """
 function parse_graphics_fill(node, _pntd)
     check_nodename(node, "fill")
-    args = Dict{Symbol,Union{String,SubString{String}}}()
+    args = Dict{Symbol, Union{String, SubString{String}}}()
     for key in ["color", "image", "gradient-color", "gradient-rotation"]
         kw!(args, node, key)
     end

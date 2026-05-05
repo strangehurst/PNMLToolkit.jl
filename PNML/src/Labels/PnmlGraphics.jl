@@ -95,7 +95,7 @@ PNML Graphics can be attached to 'AbstractPnmlObject`s and
 $(TYPEDEF)
 $(TYPEDFIELDS)
 """
-@kwdef struct Graphics{T <: eltype(Coordinate)}
+@kwdef struct Graphics
     dimension::Coordinate = Coordinate(one(eltype(Coordinate)), one(eltype(Coordinate)))
     fill::Fill = Fill(; color = "black")
     font::Font = Font(; weight = "black")
@@ -116,19 +116,19 @@ function Base.show(io::IO, g::Graphics)
 end
 
 
-@kwdef struct ArcGraphics{T <: eltype(Coordinate)}
+@kwdef struct ArcGraphics
     line::Line = Line(; color = "black")
     positions::Vector{Coordinate} = Vector{Coordinate}[] # ordered collection
 end
 
-@kwdef struct NodeGraphics{T <: eltype(Coordinate)}
-    postion::Coordinate = Coordinate()
+@kwdef struct NodeGraphics
+    postion::Coordinate = Coordinate(zero(eltype(Coordinate)), zero(eltype(Coordinate)))
     dimension::Coordinate = Coordinate(one(eltype(Coordinate)), one(eltype(Coordinate)))
     line::Line = Line(; color = "black")
     fill::Fill = Fill(; color = "black")
 end
 
-@kwdef struct AnnotationGraphics{T <: eltype(Coordinate)}
+@kwdef struct AnnotationGraphics
     fill::Fill = Fill(; color = "black")
     offset::Coordinate = Coordinate(zero(eltype(Coordinate)), zero(eltype(Coordinate)))
     line::Line = Line(; color = "black")
