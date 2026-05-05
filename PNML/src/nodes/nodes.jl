@@ -9,9 +9,9 @@ M is a "multiset sort denoting a collection of tokens".
 A "multiset sort over a basis sort is interpreted as
 "the set of multisets over the type associated with the basis sort".
 """
-@kwdef mutable struct Place{N <: APN}  <: AbstractPnmlNode
+@kwdef mutable struct Place{N <: APN, T <: PnmlExpr}  <: AbstractPnmlNode
     id::Symbol
-    initialMarking::Marking{N} # Expression as value. Used to create marking vector.
+    initialMarking::Marking{N, T} # Expression as value. Used to create marking vector.
 
     # For each place, a sort defines the type of the marking tokens of the place (sorttype).
     # The inscription of an arc to or from a place defines which tokens are added or removed
@@ -69,9 +69,9 @@ Transition node of a Petri Net Markup Language graph.
 $(TYPEDEF)
 $(TYPEDFIELDS)
 """
-mutable struct Transition{N <: APN}  <: AbstractPnmlNode
+mutable struct Transition{N <: APN, T <: PnmlExpr}  <: AbstractPnmlNode
     id::Symbol
-    condition::Labels.Condition{N} #! booleran expression label
+    condition::Labels.Condition{N, T} #! booleran expression label
     namelabel::Maybe{Name}
     graphics::Maybe{Graphics}
     toolspecinfos::Maybe{Vector{ToolInfo}}
