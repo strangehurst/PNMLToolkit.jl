@@ -7,7 +7,7 @@ export      VariableDeclaration, UnknownDeclaration
 
 export element_ids, verify_partition
 
-using Base: Fix1, Fix2, @kwdef, RefValue, isempty, length
+using Base: isempty, length
 import Base: eltype
 import AutoHashEquals: @auto_hash_equals
 using DocStringExtensions
