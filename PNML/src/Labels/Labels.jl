@@ -2,7 +2,6 @@ module Labels
 
 export Inscription, Marking, Condition
 export Name, PnmlLabel, SortType, Declaration
-export HLLabel
 export Graphics, PnmlGraphics
 export ToolInfo
 export text, get_label, label_value, rate_value, priority_value, delay_value

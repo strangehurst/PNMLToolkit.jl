@@ -73,24 +73,6 @@ graphics(l::AbstractLabel) =  l.graphics
 has_tools(l::AbstractLabel) = hasproperty(l, :toolspecinfos) && !isnothing(l.toolspecinfos)
 toolinfos(l::AbstractLabel) = l.toolspecinfos
 
-#--------------------------------------------
-
-"""
-$(TYPEDEF)
-$(TYPEDFIELDS)
-
-High-level pnml labels are expected to have <text> and <structure> elements.
-This concrete type is for "unclaimed" labels in a high-level petri net.
-"""
-struct HLLabel{PNTD} <: HLAnnotation
-    text::Maybe{String}
-    structure::Maybe{AnyElement}
-    graphics::Maybe{Graphics}
-    toolspecinfos::Maybe{Vector{ToolInfo}}
-    #TODO validate in constructor: must have text or structure (depends on pntd?)
-    #TODO make all labels have text &/or structure?
-end
-
 #------------------------------------------------------------------------------
 # Pnml Label
 #------------------------------------------------------------------------------
