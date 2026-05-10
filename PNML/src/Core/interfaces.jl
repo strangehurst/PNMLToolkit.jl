@@ -220,6 +220,20 @@ See also [`src_arcs`](@ref), [`tgt_arcs`](@ref).
 function all_arcs end
 
 """
+    source(arc) -> Symbol
+
+Return identity symbol of source of `arc`.
+"""
+function source end
+
+"""
+    target(arc) -> Symbol
+
+Return identity symbol of target of `arc`.
+"""
+function target end
+
+"""
 $(TYPEDSIGNATURES)
 
 Return arcs that have a source of transition `id`.

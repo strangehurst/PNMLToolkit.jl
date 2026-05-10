@@ -174,18 +174,7 @@ is_inhibitor(e::ArcTypeEnum.T) = e == ArcTypeEnum.Inhibitor
 is_read(e::ArcTypeEnum.T)      = e == ArcTypeEnum.Read
 is_reset(e::ArcTypeEnum.T)     = e == ArcTypeEnum.Reset
 
-"""
-    source(arc) -> Symbol
-
-Return identity symbol of source of `arc`.
-"""
 source(arc::Arc)::Symbol = arc.source[]
-
-"""
-    target(arc) -> Symbol
-
-Return identity symbol of target of `arc`.
-"""
 target(arc::Arc)::Symbol = arc.target[]
 
 function Base.show(io::IO, arc::Arc)
