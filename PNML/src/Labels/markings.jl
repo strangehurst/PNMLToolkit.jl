@@ -87,7 +87,7 @@ Used to initialize a marking vector that will then be updated by firing a transi
 """
 (mark::Marking)() = eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net))
 
-basis(m::Marking)   = sortref(term(m))::SortRef
+basis(m::Marking) = sortref(term(m))::SortRef
 sortref(m::Marking) = expr_sortref(term(m), m.net)::SortRef
 
 function Base.show(io::IO, ptm::Marking)

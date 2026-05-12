@@ -1,7 +1,8 @@
 #=
 A label may be associated with a node, an arc, or the net itself.
 
-Things that are not labels (will be found as part of label's content) include Terms, Sorts.
+Things that are not labels (will be found as part of label's content) include:
+Graphics, Terms, Sorts.
 
 Declarations are global labels of a High-level Petri Net attached to net or page and
 used for defining variables, and user-defined sorts and operators.
@@ -81,7 +82,7 @@ $(TYPEDEF)
 $(TYPEDFIELDS)
 
 Wrap a PNML Label as parsed by `XMLDict`.
-Use the XML tag as identifier.
+Usees the XML tag as identifier.
 
 Used for "unclaimed" labels that do not have, or we choose not to use,
 a dedicated parse method. Claimed labels will have a type/parser defined to make use
@@ -93,7 +94,7 @@ while `PnmlLabel` is restricted to PNML Labels.
 @auto_hash_equals struct PnmlLabel{N <: APN, T} <: Annotation
     # XMLDict uses symbols for attribute keys and string for elements/children keys.
     tag::Union{Symbol, String, SubString{String}}
-    elements::T #! Union{XmlDictType, String, SubString{String}, Vector{Any}} # is Any better?
+    elements::T
     net::N
 end
 
