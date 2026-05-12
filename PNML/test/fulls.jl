@@ -1,4 +1,4 @@
-using PNML, JET, OrderedCollections
+using JET, OrderedCollections, PNML, Test
 
 include("TestUtils.jl")
 using .TestUtils

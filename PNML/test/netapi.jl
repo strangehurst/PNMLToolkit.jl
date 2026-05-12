@@ -1,4 +1,4 @@
-using PNML, JET
+using PNML, JET, Test
 
 include("TestUtils.jl")
 using .TestUtils
