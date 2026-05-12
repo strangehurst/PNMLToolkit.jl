@@ -191,7 +191,7 @@ function get_variable_substitutions!(binding_sets, net::APN, transition_id, tr_v
         ar = arc(net, place_id, transition_id)
         isnothing(ar) && error("did not find arc: $place_id -> $transition_id")
         mark = unwrap_pmset(mark_dict[place_id])
-        arc_vars = Multiset(variables(PNML.inscription(ar))...) # Count variables.
+        arc_vars = Multiset(PNML.Labels.variables(PNML.inscription(ar))...) # Count variables.
         isempty(arc_vars) || union!(tr_vars, keys(arc_vars)) # Cache variable ids.
 
         place_sort = sortref(place(net, place_id))
