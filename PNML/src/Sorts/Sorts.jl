@@ -32,28 +32,22 @@ Notes:
 """
 module Sorts
 
-using Base: Fix1, Fix2, @kwdef, RefValue, isempty, length
-using DocStringExtensions
-using NamedTupleTools
-using Logging, LoggingExtras
-using Moshi.Match: @match
-using Moshi.Data: isa_variant, variant_type
-using SciMLLogging: @SciMLMessage
-
-import Base: eltype
 import AutoHashEquals: @auto_hash_equals
-import Multisets: Multisets, Multiset
+import Base: eltype
+import PNML: basis, fill_sort_tag!, inc_indent, indent, refid, sortdefinition, sortelements,
+    sortref, unwrap_namedsort
 
+using Base: Fix2, length
+using DocStringExtensions
+using Logging
+using LoggingExtras
+using Moshi.Data: isa_variant, variant_type
+using Moshi.Match: @match
+using NamedTupleTools
 using PNML
-using PNML: DeclDict, multisetsorts, find_valuekey, to_sort, DotConstant
-using PNML: AbstractSort, namedsort, namedsorts, productsort, productsorts
-using PNML: is_normal, is_inhibitor, is_read, is_reset, indent, inc_indent
-using PNML: is_usersort, is_namedsort, is_partitionsort, is_productsort
-using PNML: is_multisetsort, is_arbitrarysort
-
-import PNML: sortref, sortelements, sortdefinition, basis
-import PNML: value, term, tag, pid, refid
-import PNML: fill_sort_tag!, unwrap_namedsort, indent, inc_indent
+using PNML: AbstractSort, DotConstant, find_valuekey, inc_indent, indent, is_multisetsort,
+    is_namedsort, namedsort, productsort, to_sort
+using SciMLLogging: @SciMLMessage
 
 export AbstractSort, MultisetSort, ProductSort
 export DotSort, BoolSort, NumberSort, IntegerSort, PositiveSort, NaturalSort, RealSort

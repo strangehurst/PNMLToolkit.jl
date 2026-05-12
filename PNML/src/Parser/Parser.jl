@@ -4,61 +4,50 @@ Parser module of PNML.
 See [`LabelParser`](@ref), (`ToolParser`)(@ref).
 """
 module Parser
-import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
-import Base: eltype
 import AutoHashEquals: @auto_hash_equals
+import Base: eltype
 import EzXML
-import XMLDict
 import Multisets: Multisets, Multiset
+import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
+import PNML: adjacent_place, netdata, refid, sortdefinition, sortelements, sortref, tag, verify!
+import XMLDict
 
-using Base: Fix1, Fix2, @kwdef, RefValue, isempty, length
-using DocStringExtensions
-using NamedTupleTools
-using TermInterface
-using Logging, LoggingExtras
-using Moshi.Data: @data, isa_variant, is_data_type
-using Moshi.Match: @match
-using SciMLLogging: @SciMLMessage
-using SciMLPublic: @public
-
-using PNML
+using ..Declarations
 using ..Expressions
 using ..IDRegistrys
-using ..PnmlTypes
 using ..Labels
 using ..Labels: validate_toolinfos
+using ..PnmlTypes
 using ..Sorts
-using ..Sorts: make_sortref, equalSorts
-using ..Declarations
-
-using PNML: Maybe, CONFIG, AnyElement, PnmlLabel, D, registry_of, verify
-using PNML: Graphics, Coordinate, coordinate_type, elements
-using PNML: ToolInfo, XmlDictType
-using PNML: DeclDict, PnmlNetData, PnmlNetKeys, decldict
-using PNML: PartitionElement, PnmlMultiset, BooleanConstant, pnmlmultiset
-using PNML: AbstractTerm, AbstractOperator, AbstractVariable, UserOperator, Operator
-using PNML: FEConstant, feconstants, has_feconstant
-using PNML: pid, fill_builtin_labelparsers!, fill_builtin_sorts!, fill_builtin_toolparsers!
-using PNML: ToolParser, LabelParser, NamedSort, Operator
-using PNML: fill_sort_tag!, fill_builtin_enabled_filters!
-using PNML: namedsort, multisetsort, partitionsort, productsort, variabledecl, variabledecls
-using PNML: namedoperators, operator
-using PNML: has_namedsort, has_multisetsort, has_partitionsort, has_productsort, has_arbitrarysort
-using PNML: namedsorts, multisetsorts, partitionsorts, productsorts, arbitrarysorts
-using PNML: pagedict, placedict, transitiondict, arcdict, refplacedict, reftransitiondict
-using PNML: page_idset, place_idset, transition_idset, arc_idset, refplace_idset, reftransition_idset
-using PNML: netsets, toolinfos, value_type, number_value
-using PNML: NamedSortRef, PartitionSortRef, ProductSortRef, MultisetSortRef, ArbitrarySortRef
-using PNML: to_sort
-using PNML: PnmlException, MissingIDException, DuplicateIDException, MalformedException
-using PNML: is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
-using PNML: is_normal, is_inhibitor, is_read, is_reset
-using PNML: has_place, place, pntd
-
-# Methods implemented in this module.
-import PNML: adjacent_place
-import PNML: basis, sortref, sortelements, sortdefinition
-import PNML: refid, netdata, tag, verify!
+using ..Sorts: equalSorts, make_sortref
+using Base: isempty, length
+using DocStringExtensions
+using Logging
+using LoggingExtras
+using Moshi.Data: @data, is_data_type, isa_variant
+using Moshi.Match: @match
+using NamedTupleTools
+using PNML
+using PNML: AbstractPnmlNet, AnyElement, ArbitrarySortRef, BooleanConstant, CONFIG,
+    Coordinate, D, DeclDict, DuplicateIDException, FEConstant, Graphics, LabelParser,
+    MalformedException, Maybe, MissingIDException, MultisetSortRef, NamedSort, NamedSortRef,
+    Operator, PartitionElement, PartitionSortRef, PnmlException, PnmlLabel, PnmlMultiset,
+    PnmlNetData, PnmlNetKeys, ProductSortRef, ToolInfo, ToolParser, UserOperator,
+    XmlDictType, arbitrarysorts, arc_idset, arcdict, arctype, basis, coordinate_type,
+    decldict, elements, feconstants, fill_builtin_enabled_filters!,
+    fill_builtin_labelparsers!, fill_builtin_sorts!, fill_builtin_toolparsers!,
+    fill_sort_tag!, has_arbitrarysort, has_feconstant, has_multisetsort, has_namedsort,
+    has_partitionsort, has_place, has_productsort, is_arbitrarysort, is_inhibitor,
+    is_multisetsort, is_namedsort, is_normal, is_partitionsort, is_productsort, is_read,
+    is_reset, is_usersort, multisetsort, multisetsorts, namedoperators, namedsort,
+    namedsorts, netsets, number_value, operator, page_idset, pagedict, partitionsort,
+    partitionsorts, pid, place, place_idset, placedict, pnmlmultiset, pntd, productsort,
+    productsorts, refplace_idset, refplacedict, reftransition_idset, reftransitiondict,
+    registry_of, to_sort, toolinfos, transition_idset, transitiondict, value_type,
+    variabledecl, variabledecls, verify
+using SciMLLogging: @SciMLMessage
+using SciMLPublic: @public
+using TermInterface
 
 include("xmlutils.jl")
 include("parseutils.jl")

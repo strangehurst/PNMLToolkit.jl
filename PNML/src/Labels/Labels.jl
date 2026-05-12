@@ -1,50 +1,30 @@
 module Labels
 
-export Inscription, Marking, Condition
-export Name, PnmlLabel, SortType, Declaration
-export Graphics, PnmlGraphics
-export ToolInfo
-export text, get_label, label_value, rate_value, priority_value, delay_value
-export def_sort_element
-export ToolParser
-export ArcType, ArcTypeEnum
-export Rate, Priority, Time
-export validate_toolinfos, variables
+export Condition, Declaration, Inscription, Marking, Name, PnmlLabel, SortType
+export Graphics, PnmlGraphics, ToolInfo
+export delay_value, get_label, label_value, priority_value, rate_value, text
+export ArcType, ArcTypeEnum, Priority, Rate, Time, ToolParser
 
-using Base: @kwdef, isempty, length
-using DocStringExtensions
-using NamedTupleTools
-using Logging, LoggingExtras
-using SciMLLogging: @SciMLMessage
-#using Moshi.Data: @data, isa_variant, is_data_type
-
-import Base: eltype
+import ..Expressions: PnmlExpr, expr_sortref, toexpr
 import AutoHashEquals: @auto_hash_equals
+import Base: eltype
 import Multisets
-#import OrderedCollections: OrderedDict, LittleDict, freeze, OrderedSet
-
-using PNML
-using PNML: Maybe, AnyElement, D, indent, pntd
-using PNML: AbstractPnmlNode, AbstractLabel, Annotation, HLAnnotation
-#using PNML: DeclDict
-using PNML: BooleanConstant
-using PNML: namedsort
-using PNML: ToolParser
-
-import PNML: name, Coordinate
-import PNML: value_type, number_value
-import PNML: value, term, graphics, toolinfos, refid, tag, elements
-import PNML: has_graphics, get_label
-import PNML: verify!
-
-using ..PnmlTypes # PNML PNTD
+import PNML: Coordinate, arctype, basis, elements, get_label, graphics, has_graphics, name,
+    number_value, refid, sortdefinition, sortelements, sortref, tag, term, toolinfos, value,
+    value_type, verify!, version
 
 using ..Expressions
-import ..Expressions: toexpr, PnmlExpr, expr_sortref
-
+using ..PnmlTypes
 using ..Sorts
-# Some labels implement the Sort interface
-import PNML: arctype, basis, sortdefinition, sortelements, sortref, version
+using Base: @kwdef, isempty, length
+using DocStringExtensions
+using Logging
+using LoggingExtras
+using NamedTupleTools
+using PNML
+using PNML: AbstractLabel, AbstractPnmlNode, Annotation, AnyElement, BooleanConstant, D,
+    HLAnnotation, Maybe, ToolParser, indent, namedsort, pntd
+using SciMLLogging: @SciMLMessage
 
 include("toolinfos.jl") # labels and nodes can both have tool specific information.
 include("toolinfo_content.jl") # Some infos have known content.
