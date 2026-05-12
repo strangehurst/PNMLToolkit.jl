@@ -67,6 +67,20 @@ function default(::Type{<:Marking}, net::PnmlNet{T}, placetype::SortType) where 
 end
 
 """
+    def_sort_element(x)
+
+Return an arbitrary element of sort `x`.
+All sorts are expected to be iteratable and non-empty, so we return `first`.
+Uses include default inscription value and default initial marking value sorts.
+
+`x` can be anything with a `sortelements(x, net)` method that returns an iterator with length.
+See [`AbstractSort`](@ref), [`SortType`](@ref PNML.Labels.SortType).
+"""
+function def_sort_element(placetype::SortType)
+    first(sortelements(placetype, placetype.net))
+end
+
+"""
 $(TYPEDSIGNATURES)
 """
 function parse_place(node::XMLNode, net::APN)
@@ -124,7 +138,7 @@ function parse_place(node::XMLNode, net::APN)
     end
 
     if isnothing(sorttype) # Infer sortype of place from mark.
-        D()&& @warn("$pntd parse_place $(repr(placeid)) infer sorttype ", mark)
+        #D()&& @warn("$pntd parse_place $(repr(placeid)) infer sorttype ", mark)
         sorttype = SortType("default", basis(mark)::SortRef, net)
     end
     Place(placeid, mark, sorttype, namelabel, graphics, toolspecinfos, extralabels, net)
