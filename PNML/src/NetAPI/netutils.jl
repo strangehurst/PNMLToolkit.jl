@@ -1,8 +1,5 @@
 # PnmlNet Utilities.
 
-adjacent_place(net::AbstractPnmlNet, a::Arc) = adjacent_place(netdata(net), a)
-adjacent_place(netdata::PnmlNetData, a::Arc) = adjacent_place(netdata, source(a), target(a))
-
 #-----------------------------------------------------------------
 # Given x ∈ S ∪ T
 #   - the set •x = {y | (y, x) ∈ F } is the preset of x.

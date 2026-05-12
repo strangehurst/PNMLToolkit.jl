@@ -86,14 +86,14 @@ function parse_arctype(node::XMLNode, net::APN; parentid)
     end
 
     #@show text
-    arctype = @match text begin
+    arc_type = @match text begin
         "inhibitor" => ArcTypeEnum.Inhibitor
         "read" => ArcTypeEnum.Read
         "reset" => ArcTypeEnum.Reset
         _ => ArcTypeEnum.Normal
     end
-    #@show arctype
-    return ArcType(; text, arctype, graphics, toolspecinfos)
+    #@show arc_type
+    return ArcType(; text, arc_type, graphics, toolspecinfos)
 end
 
 
@@ -458,6 +458,8 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::APN)
     return tj
 end
 
+adjacent_place(net::AbstractPnmlNet, a::Arc) = adjacent_place(netdata(net), a)
+adjacent_place(netdata::PnmlNetData, a::Arc) = adjacent_place(netdata, source(a), target(a))
 function adjacent_place(netdata::PnmlNetData, source::REFID, target::REFID, strict=true)
     # `strict` means enforce Meta-model constraint for Petri nets
     # that arcs must be between place and transition.
