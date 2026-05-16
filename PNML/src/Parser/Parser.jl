@@ -1,6 +1,8 @@
 """
 Parser module of PNML.
 
+Exports: [`@xml_str`(@ref)], [`XMLNode`](@ref), [`pnmlmodel`](@ref), [`xmlnode`](@ref).
+
 See [`LabelParser`](@ref), (`ToolParser`)(@ref).
 """
 module Parser
@@ -48,6 +50,8 @@ using PNML: AbstractPnmlNet, AnyElement, ArbitrarySortRef, BooleanConstant, CONF
 using SciMLPublic: @public
 using TermInterface
 
+export @xml_str, XMLNode, pnmlmodel, xmlnode
+
 include("xmlutils.jl")
 include("parseutils.jl")
 include("anyelement.jl")
@@ -59,8 +63,5 @@ include("graphics.jl")
 include("declarations.jl")
 include("terms.jl")
 include("toolspecific.jl")
-
-export XMLNode, xmlnode, @xml_str
-export pnmlmodel
 
 end

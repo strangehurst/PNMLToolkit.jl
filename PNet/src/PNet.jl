@@ -1,3 +1,5 @@
+"""
+"""
 module PNet
 __precompile__(true)
 
@@ -23,9 +25,8 @@ using PNML.PnmlTypes
 using PNML.Sorts
 using TermInterface
 
-export AbstractPetriNet, SimpleNet
-export input_matrix, output_matrix, transition_function, pnmlnet
-export labeled_transitions, counted_transitions
+export AbstractPetriNet, SimpleNet, counted_transitions, input_matrix, labeled_transitions,
+    output_matrix, pnmlnet, transition_function
 
 include("petrinet.jl")
 include("transition_function.jl")
