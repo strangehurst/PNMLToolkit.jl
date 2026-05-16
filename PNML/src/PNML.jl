@@ -27,72 +27,45 @@ It is also where other Net constructs can be defined over `PnmlNet`s. Perhaps as
 module PNML
 __precompile__(true)
 
-using Accessors
-using Preferences: load_preference, set_preferences!
 import AutoHashEquals: @auto_hash_equals
-import Base: eltype, keys, *, +, -, <, >,>=, <=, zero, length, iterate
+import Base: *, +, -, <, <=, >, >=, eltype, iterate, keys, length, zero
+import DataStructures
+import ExproniconLite
+import EzXML
 import FunctionWrappers
 import Graphs
-import MetaGraphsNext
 import MacroTools
-import DataStructures
-import OrderedCollections: OrderedDict, LittleDict, freeze, OrderedSet
-import EzXML
-import XMLDict
-import Multisets: Multisets, Multiset
-import Moshi
-import Moshi.Match: @match
-import Moshi.Data: @data, isa_variant, is_data_type, variant_type
-import Moshi.Derive: @derive
-import SciMLPublic: @public
+import MetaGraphsNext
 import Metatheory
-import ExproniconLite
+import Moshi
+import Moshi.Data: @data, is_data_type, isa_variant, variant_type
+import Moshi.Derive: @derive
+import Moshi.Match: @match
+import Multisets: Multisets, Multiset
+import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
+import SciMLPublic: @public
+import XMLDict
 
-#= ExproniconLite_exports = NoDefault,
-    JLCall, JLExpr, JLFor, JLIfElse, JLFunction, JLField, JLKwField, JLStruct, JLKwStruct,
-    @expr, @test_expr, compare_expr, AnalysisError, SyntaxError,
-    is_function, is_kw_function, is_struct, is_tuple, is_splat, is_ifelse, is_for,
-    is_field, is_field_default, is_datatype_expr, is_matrix_expr,
-    split_function, split_function_head, split_anonymous_function_head,
-    split_struct, split_struct_name, split_ifelse, split_signature,
-    arg2type, uninferrable_typevars, has_symbol,
-    is_literal, is_gensym,
-    alias_gensym, has_kwfn_constructor, has_plain_constructor,
-    guess_type, guess_module, guess_value, Substitute, no_default,
-    prettify, rm_lineinfo, flatten_blocks, name_only, annotations_only,
-    rm_annotations, rm_single_block, rm_nothing, substitute,
-    eval_interp, eval_literal, renumber_gensym, expr_map, nexprs,
-    codegen_ast, codegen_ast_kwfn, codegen_ast_kwfn_plain, codegen_ast_kwfn_infer,
-    codegen_ast_struct, codegen_ast_struct_head, codegen_ast_struct_body,
-    struct_name_plain, struct_name_without_inferable,
-    xtuple, xnamedtuple, xcall, xpush, xgetindex, xfirst, xlast,
-    xprint, xprintln, xmap, xmapreduce, xiterate,
-    print_inline, print_expr, sprint_expr
-=#
-using ExproniconLite: JLCall, JLExpr, JLFor, JLIfElse, JLFunction,
-                      JLField, JLKwField, JLStruct, JLKwStruct
-using ExproniconLite: xtuple, xnamedtuple, xcall, xpush, xgetindex, xfirst, xlast,
-                      xprint, xprintln, xmap, xmapreduce, xiterate
-
-using Logging
-using LoggingExtras
-using Base: Fix1, Fix2, @kwdef, RefValue, isempty, length
-using TermInterface
-using Graphs: SimpleDiGraphFromIterator, Edge
-using MetaGraphsNext: MetaGraph
-using NamedTupleTools
+using Accessors
+using Base: @kwdef, Fix1, Fix2, RefValue, isempty, length
 using DocStringExtensions
 using EnumX: @enumx
+using ExproniconLite: JLCall, JLExpr, JLField, JLFor, JLFunction, JLIfElse, JLKwField,
+    JLKwStruct, JLStruct, xcall, xfirst, xgetindex, xiterate, xlast, xmap, xmapreduce,
+    xnamedtuple, xprint, xprintln, xpush, xtuple
+using Graphs: Edge, SimpleDiGraphFromIterator
+using Logging
+using LoggingExtras
+using MetaGraphsNext: MetaGraph
+using NamedTupleTools
+using Preferences: load_preference, set_preferences!
+using TermInterface
 
 # EXPORTS
 
-export PnmlModel, APN, PnmlNet, Page
-export Place, RefPlace, Transition, RefTransition, Arc
-export REFID, SortRefImpl, SortRef, ArcTypeEnum
-export UserSortRef # From SortRefImpl ADT
-export NamedSortRef, ProductSortRef, PartitionSortRef, MultisetSortRef, ArbitrarySortRef
-export decldict
-export @xml_str, xmlnode, D
+export @xml_str, APN, ArbitrarySortRef, Arc, ArcTypeEnum, D, MultisetSortRef, NamedSortRef,
+    Page, PartitionSortRef, Place, PnmlModel, PnmlNet, ProductSortRef, REFID, RefPlace,
+    RefTransition, SortRef, SortRefImpl, Transition, UserSortRef, decldict, xmlnode
 
 @public pnmlmodel
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
@@ -185,25 +158,19 @@ using .Labels
 
 # Nodes #TODO make into a module?
 include("nodes/nodes.jl") # Concrete place, transition, arc.
-include("nodes/page.jl") # Contains nodes.
+include("nodes/page.jl") # place, transition, Contains nodes.
 include("nodes/net.jl") # PnmlNet holds pages
 include("nodes/model.jl") # Holds multiple PnmlNets.
 include("nodes/flatten.jl") # Flatten pages of PnmlNet
 
-include("NetAPI/netutils.jl") # API for Petri nets, graphs, et al.
-include("NetAPI/enable_filters.jl")
-include("NetAPI/enabling_rule.jl")
-include("NetAPI/firing_rule.jl")
-include("NetAPI/metagraph.jl")
+include("NetAPI/NetAPI.jl") # API for Petri nets, graphs, et al.
+using .NetAPI
+
+include("Core/enable_filters.jl")
 
 # PARSE
 include("Parser/Parser.jl")
 using .Parser
-
-# API Facade:
-#! 2026-01-12 Split PNet into a package
-#! include("PNet/PNet.jl")
-#! using .PNet
 
 include("precompile.jl")
 

@@ -1,4 +1,4 @@
-using PNML, JET, OrderedCollections
+using PNML, JET, Test, OrderedCollections
 
 include("TestUtils.jl")
 using .TestUtils
@@ -13,8 +13,8 @@ println("-----------------------------------------")
     summary(stdout, model)
     n = first(PNML.nets(model))
     n = PNML.flatten_pages!(n)
-    @test PNML.vertex_codes(n) isa AbstractDict
-    @test PNML.vertex_labels(n) isa AbstractDict
+    @test vertex_codes(n) isa AbstractDict
+    @test vertex_labels(n) isa AbstractDict
     if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
         @test_throws ArgumentError PNML.metagraph(n)
     else
@@ -34,8 +34,8 @@ println("-----------------------------------------")
     summary(stdout, model)
     n = first(PNML.nets(model))
     n = PNML.flatten_pages!(n)
-    @test PNML.vertex_codes(n) isa AbstractDict
-    @test PNML.vertex_labels(n) isa AbstractDict
+    @test vertex_codes(n) isa AbstractDict
+    @test vertex_labels(n) isa AbstractDict
     if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
         @test_throws ArgumentError PNML.metagraph(n)
     else

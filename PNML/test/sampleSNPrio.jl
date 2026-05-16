@@ -15,8 +15,8 @@ println("-----------------------------------------"); flush(stdout)
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #first(PNML.nets(model)))
     n = first(PNML.nets(model))::PnmlNet
-    @test PNML.vertex_codes(n) isa AbstractDict
-    @test PNML.vertex_labels(n) isa AbstractDict
+    @test vertex_codes(n) isa AbstractDict
+    @test vertex_labels(n) isa AbstractDict
     PNML.show_sorts(n)
 
     if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
@@ -37,8 +37,8 @@ println("-----------------------------------------")
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #first(PNML.nets(model)))
     n = first(PNML.nets(model))::PnmlNet
-    @test PNML.vertex_codes(n) isa AbstractDict
-    @test PNML.vertex_labels(n) isa AbstractDict
+    @test vertex_codes(n) isa AbstractDict
+    @test vertex_labels(n) isa AbstractDict
     if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
         @test_throws ArgumentError PNML.metagraph(n)
     else

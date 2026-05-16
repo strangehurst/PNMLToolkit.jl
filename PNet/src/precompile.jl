@@ -25,7 +25,7 @@ PrecompileTools.@setup_workload begin
 
             let pntds = ["hlcore", "hlnet", "pt_hlpng", "symmetricnet"]
                 for pntd in pntds
-                     PNML.metagraph(SimpleNet(xmlnode("""<?xml version="1.0"?>
+                     PNML.NetAPI.metagraph(SimpleNet(xmlnode("""<?xml version="1.0"?>
                         <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
                         <net id="smallnet_$pntd" type="$pntd">
                         <name> <text>Some Net</text> </name>
@@ -80,7 +80,7 @@ PrecompileTools.@setup_workload begin
 
             let pntds = ["continuous"]
                 for pntd in pntds
-                    PNML.metagraph(SimpleNet(xmlnode("""<?xml version="1.0"?>
+                    PNML.NetAPI.metagraph(SimpleNet(xmlnode("""<?xml version="1.0"?>
                         <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
                         <net id="smallnet_$pntd" type="$pntd">
                         <name> <text>Some Net</text> </name>

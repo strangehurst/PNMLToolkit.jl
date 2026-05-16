@@ -47,7 +47,7 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPnmlType}
 
     MetaGraph(graph, vlabel, vdata,
                 edge_data, # edge metadata is an `Arc`
-                name(net), # graph metadata
+                PNML.name(net), # graph metadata
                 weight_function,
                 default_weight)
 end

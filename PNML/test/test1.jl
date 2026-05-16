@@ -1,4 +1,4 @@
-using PNML, JET, OrderedCollections
+using PNML, JET, Test, OrderedCollections
 
 include("TestUtils.jl")
 using .TestUtils
@@ -26,8 +26,8 @@ println("-----------------------------------------\n")
         @test PNML.verify(net, false)
         PNML.flatten_pages!(net; verbose=false)
         @test PNML.verify(net, false)
-        vc = PNML.vertex_codes(net)::AbstractDict
-        vl = PNML.vertex_labels(net)::AbstractDict
+        vc = vertex_codes(net)::AbstractDict
+        vl = vertex_labels(net)::AbstractDict
         for a in arcs(net)
             @test vl[vc[PNML.source(a)]] == PNML.source(a)
             @test vl[vc[PNML.target(a)]] == PNML.target(a)

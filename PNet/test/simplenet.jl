@@ -4,7 +4,9 @@ using PNML: @xml_str, Arc, Page, Place, PnmlModel, PnmlNet, Transition, arc, arc
     enabled, firstpage, has_arc, has_place, has_transition, initial_marking,
     initial_markings, inscription, narcs, nets, nplaces, ntransitions, pages, pid, place,
     places, pnmlmodel, pntd, rates, transition, transitions, xmlnode
-using PNML.Parser: xmlnode
+using PNML.Parser
+:xmlnode
+using PNML.NetAPI
 
 const t_modules = (PNML,PNet)
 

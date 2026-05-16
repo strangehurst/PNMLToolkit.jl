@@ -410,20 +410,8 @@ function version end
 
 function fill_sort_tag! end
 
-"""
-    input_matrix(petrinet::AbstractPetriNet) -> Matrix{value_type(Inscription, ::APNTD))}
-    input_matrix(pnmlnet::PnmlNet) -> Matrix{value_type(Inscription, ::APNTD)}
-
-Create and return a ntransitions x nplaces matrix.
-"""
-function input_matrix end
-
-"""
-    output_matrix(petrinet::AbstractPetriNet) -> Matrix{value_type(Inscription, ::APNTD)}
-    output_matrix(pnmlnet::PnmlNet) -> Matrix{value_type(Inscription, ::APNTD)}
-
-Create and return a ntransitions x nplaces matrix.
-"""
+# Create and return a ntransitions x nplaces matrix.
+# """
 function output_matrix end
 
 """

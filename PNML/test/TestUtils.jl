@@ -21,6 +21,7 @@ Multisets.set_key_value_show()
 @reexport using PNML.Parser: to_sort, anyelement, xmldict
 @reexport using PNML.Parser
 @reexport using PNML.Parser: firstchild, allchildren, default
+@reexport using PNML.NetAPI
 @reexport using PNML.Declarations
 @reexport using PNML.IDRegistrys
 @reexport using PNML.PnmlTypes
@@ -70,7 +71,7 @@ Multisets.set_key_value_show()
 
 @reexport using PNML: sortref, sortdefinition, sortelements, namedsort, initial_marking
 
-@reexport using PNML: metagraph, vertex_codes, vertex_labels
+@reexport using PNML.NetAPI: metagraph, vertex_codes, vertex_labels
 
 @reexport using PNML: FEConstant, NumberConstant, BooleanConstant, DotConstant, DotConstantEx, zero
 @reexport using PNML: AbstractTerm, AbstractVariable, AbstractOperator, inputs
