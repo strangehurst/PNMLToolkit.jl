@@ -4,6 +4,7 @@
 module NetAPI
 import AutoHashEquals: @auto_hash_equals
 import Multisets: Multiset, Multisets
+import PNML: varsubs
 
 using Base: Fix2, length
 using DocStringExtensions
@@ -20,6 +21,7 @@ using PNML.Graphs
 using PNML: APNTD, AbstractHLCore, AbstractPnmlNet, AbstractPnmlType, Arc, Inscription,
     Marking, Maybe, PT_HLPNG, Place, PnmlMultiset, arc, arcdict, arcs, cardinality,
     condition, filters, initial_marking, inscription, is_collective_token, is_productsort,
+    multiset,
     narcs, nets, nplaces, ntransitions, pid, place, place_idset, places, pntd, sortref,
     source, src_arcs, target, term, tgt_arcs, toexpr, transition, transition_idset,
     transitiondict, transitions, value_type, zero_marking
