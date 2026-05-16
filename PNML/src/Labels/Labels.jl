@@ -24,7 +24,6 @@ using NamedTupleTools
 using PNML
 using PNML: AbstractLabel, AbstractPnmlNode, Annotation, AnyElement, BooleanConstant, D,
     HLAnnotation, Maybe, ToolParser, indent, namedsort, pntd
-using SciMLLogging: @SciMLMessage
 
 include("toolinfos.jl") # labels and nodes can both have tool specific information.
 include("toolinfo_content.jl") # Some infos have known content.

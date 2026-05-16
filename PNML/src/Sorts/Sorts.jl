@@ -47,13 +47,11 @@ using NamedTupleTools
 using PNML
 using PNML: AbstractSort, DotConstant, find_valuekey, inc_indent, indent, is_multisetsort,
     is_namedsort, namedsort, productsort, to_sort
-using SciMLLogging: @SciMLMessage
 
-export AbstractSort, MultisetSort, ProductSort
-export DotSort, BoolSort, NumberSort, IntegerSort, PositiveSort, NaturalSort, RealSort
-export EnumerationSort, CyclicEnumerationSort, FiniteEnumerationSort, FiniteIntRangeSort
-export ListSort, StringSort
-export make_sortref, equalSorts
+export AbstractSort, BoolSort, CyclicEnumerationSort, DotSort, EnumerationSort,
+    FiniteEnumerationSort, FiniteIntRangeSort, IntegerSort, ListSort, MultisetSort,
+    NaturalSort, NumberSort, PositiveSort, ProductSort, RealSort, StringSort, equalSorts,
+    make_sortref
 
 include("sorts.jl")
 include("dots.jl")

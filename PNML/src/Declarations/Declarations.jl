@@ -12,7 +12,6 @@ import Base: eltype
 import AutoHashEquals: @auto_hash_equals
 using DocStringExtensions
 using Logging, LoggingExtras
-using SciMLLogging: @SciMLMessage
 
 using PNML
 using PNML: REFID, AnyElement, DotConstant, toexpr, indent, inc_indent

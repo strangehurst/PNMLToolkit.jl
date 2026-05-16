@@ -45,7 +45,6 @@ using PNML: AbstractPnmlNet, AnyElement, ArbitrarySortRef, BooleanConstant, CONF
     productsorts, refplace_idset, refplacedict, reftransition_idset, reftransitiondict,
     registry_of, to_sort, toolinfos, transition_idset, transitiondict, value_type,
     variabledecl, variabledecls, verify
-using SciMLLogging: @SciMLMessage
 using SciMLPublic: @public
 using TermInterface
 

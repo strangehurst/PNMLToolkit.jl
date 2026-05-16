@@ -180,9 +180,6 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
 
     #~ Evaluate expressions to create a mutable vector of markings.
     #^ Marking vector is used in enabling and firing rules.
-    #m₀ = PNML.PNet.initial_markings(net)
-    #PNML.enabledXXX(net, m₀) # enabling rule?
-
     return net
 end #= function parse_net =#
 
