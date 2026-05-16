@@ -6,6 +6,8 @@
 
 Return pnml id symbol of `x`. An id's value is unique in the XML model of PNML.
 [`REFID`](@ref) is used for refrences to pnml ids.
+
+$(METHODLIST)
 """
 function pid end
 
@@ -14,6 +16,8 @@ function pid end
 
 Return tag symbol. Multiple objects may hold the same tag value.
 Often used to refer to an XML tag.
+
+$(METHODLIST)
 """
 function tag end
 
@@ -22,6 +26,8 @@ function tag end
     refid(x) -> REFID
 
 Return reference id symbol. Multiple objects may hold the same refid value.
+
+$(METHODLIST)
 """
 function refid end
 
@@ -29,6 +35,8 @@ function refid end
     name(x) -> String
 
 Return name String. Default to empty string.
+
+$(METHODLIST)
 """
 function name end
 
@@ -40,6 +48,8 @@ function name end
     labels(x) -> Iterateable
 
 Return iterator of labels attached to `x`.
+
+$(METHODLIST)
 """
 function labels end
 
@@ -47,6 +57,8 @@ function labels end
     get_label(x, tag::Union{Symbol, String, SubString{String}}) -> PnmlLabel
 
 Return first label of `x` with a matching `tagvalue`.
+
+$(METHODLIST)
 """
 function get_label end
 
@@ -61,6 +73,8 @@ Return the [`APNTD`](@ref) subtype representing the flavor (or pntd) of this kin
 Petri Net Graph.
 
 See also [`pnmltype`](@ref PnmlTypes.pnmltype)
+
+$(METHODLIST)
 """
 function nettype end
 
@@ -74,6 +88,8 @@ When there is only one `page` in the `net`, or all pages are owned by the 'net' 
 'allpages' and 'pages` behave the same.
 
 Maintains order (insertion order).
+
+$(METHODLIST)
 """
 function pages end
 
@@ -81,6 +97,8 @@ function pages end
     netdata(x) -> PnmlNetData
 
 Access PnmlNet-level data structure.
+
+$(METHODLIST)
 """
 function netdata end
 
@@ -92,6 +110,8 @@ function netdata end
 $(TYPEDSIGNATURES)
 
 Return iterator of all places.
+
+$(METHODLIST)
 """
 function places end
 
@@ -99,6 +119,8 @@ function places end
 $(TYPEDSIGNATURES)
 
 Return iterator of all place IDs.
+
+$(METHODLIST)
 """
 function place_idset end
 
@@ -106,6 +128,8 @@ function place_idset end
 $(TYPEDSIGNATURES)
 
 Return `true` if there is any place with `id`?
+
+$(METHODLIST)
 """
 function has_place end
 
@@ -113,6 +137,8 @@ function has_place end
 $(TYPEDSIGNATURES)
 
 Return the place with `id`.
+
+$(METHODLIST)
 """
 function place end
 
@@ -120,6 +146,8 @@ function place end
 $(TYPEDSIGNATURES)
 
 Return the initial marking of a place.
+
+$(METHODLIST)
 """
 function initial_marking end
 
@@ -129,6 +157,8 @@ function initial_marking end
 """
 $(TYPEDSIGNATURES)
 Return iterator of all transitions.
+
+$(METHODLIST)
 """
 function transitions end
 
@@ -136,16 +166,22 @@ function transitions end
 $(TYPEDSIGNATURES)
 
 Is there a transition with `id`?
+
+$(METHODLIST)
 """
 function has_transition end
 
 """
 $(TYPEDSIGNATURES)
+
+$(METHODLIST)
 """
 function transition end
 
 """
 $(TYPEDSIGNATURES)
+
+$(METHODLIST)
 """
 function transition_idset end
 
@@ -153,6 +189,8 @@ function transition_idset end
     inscriptions(net::PnmlNet) -> Iterator
 
 Return iterator over REFID => inscription(arc) pairs of `net`. This is the same order as `arcs`.
+
+$(METHODLIST)
 """
 function inscriptions end
 
@@ -161,6 +199,8 @@ function inscriptions end
 
 Return iterator  over REFID => condition(transaction) pairs of `net`.
 This is the same order as `transactions`.
+
+$(METHODLIST)
 """
 function conditions end
 
@@ -171,6 +211,8 @@ Return iterator over REFID => rate_value(transaction) pairs of `net`.
 This is the same order as `transactions`.
 
 We allow all PNML nets to be stochastic Petri nets. See [`rate_value`](@ref).
+
+$(METHODLIST)
 """
 function rates end
 
@@ -178,6 +220,8 @@ function rates end
 $(TYPEDSIGNATURES)
 
 Return condition's value of `transition`.
+
+$(METHODLIST)
 """
 function condition end
 
@@ -189,18 +233,24 @@ function condition end
     arcs(p::AbstractPetriNet) -> iterator
 
 Return iterator over arc ids.
+
+$(METHODLIST)
 """
 function arcs end
 """
 $(TYPEDSIGNATURES)+
 
 Return `true` if any `arc` has `id`.
+
+$(METHODLIST)
 """
 function has_arc end
 
 """
 $(TYPEDSIGNATURES)
 Return arc with `id` if found, otherwise `nothing`.
+
+$(METHODLIST)
 """
 function arc end
 
@@ -208,6 +258,8 @@ function arc end
 $(TYPEDSIGNATURES)
 
 Return iterator over arc ids.
+
+$(METHODLIST)
 """
 function arc_idset end
 
@@ -216,6 +268,8 @@ $(TYPEDSIGNATURES)
 Return arcs that have a source or target of transition `id`.
 
 See also [`src_arcs`](@ref), [`tgt_arcs`](@ref).
+
+$(METHODLIST)
 """
 function all_arcs end
 
@@ -223,6 +277,8 @@ function all_arcs end
     source(arc) -> Symbol
 
 Return identity symbol of source of `arc`.
+
+$(METHODLIST)
 """
 function source end
 
@@ -230,6 +286,8 @@ function source end
     target(arc) -> Symbol
 
 Return identity symbol of target of `arc`.
+
+$(METHODLIST)
 """
 function target end
 
@@ -239,6 +297,8 @@ $(TYPEDSIGNATURES)
 Return arcs that have a source of transition `id`.
 
 See also [`all_arcs`](@ref), [`tgt_arcs`](@ref).
+
+$(METHODLIST)
 """
 function src_arcs end
 
@@ -248,6 +308,8 @@ $(TYPEDSIGNATURES)
 Return arcs that have a target of transition `id`.
 
 See also [`all_arcs`](@ref), [`src_arcs`](@ref).
+
+$(METHODLIST)
 """
 function tgt_arcs end
 
@@ -262,6 +324,8 @@ function is_reset end
 """
 $(TYPEDSIGNATURES)
 Return incription value of `arc`.
+
+$(METHODLIST)
 """
 function inscription end
 
@@ -271,22 +335,30 @@ function inscription end
 """
 $(TYPEDSIGNATURES)
 Return vector of all reference places.
+
+$(METHODLIST)
 """
 function refplaces end
 
 """
 $(TYPEDSIGNATURES)
 Return vector of all reference transitions.
+
+$(METHODLIST)
 """
 function reftransitions end
 
 """
 $(TYPEDSIGNATURES)
+
+$(METHODLIST)
 """
 function has_refplace end
 
 """
 $(TYPEDSIGNATURES)
+
+$(METHODLIST)
 """
 function has_reftransition end
 
@@ -294,6 +366,8 @@ function has_reftransition end
     refplace_idset(x) -> OrderedSet{Symbol}
 
 Return reference place pnml ids.
+
+$(METHODLIST)
 """
 function refplace_idset end
 
@@ -301,18 +375,24 @@ function refplace_idset end
     reftransition_idset(x) -> OrderedSet{Symbol}
 
 Return reference transition pnml ids.
+
+$(METHODLIST)
 """
 function reftransition_idset end
 
 """
 $(TYPEDSIGNATURES)
 Return reference place matching `id`.
+
+$(METHODLIST)
 """
 function refplace end
 
 """
 $(TYPEDSIGNATURES)
 Return reference transition matching `id`.
+
+$(METHODLIST)
 """
 function reftransition end
 
@@ -320,17 +400,23 @@ function reftransition end
     value(x)
 Return value of x. Can be a wrapped value or a derived value.
 May return an Expr that returns the value when eval'ed.
+
+$(METHODLIST)
 """
 function value end
 
 """
     term(x)
 Return 'PnmlExpr` term of x.
+
+$(METHODLIST)
 """
 function term end
 
 """
     coordinate_type(x) -> Type(Coordinate)
+
+$(METHODLIST)
 """
 function coordinate_type end
 
@@ -338,6 +424,8 @@ function coordinate_type end
     value_type(::Type{<AbstractLabel}, ::APNTD) -> Type
 
 Return the `Type` of a label's value.
+
+$(METHODLIST)
 """
 function value_type end
 
@@ -352,6 +440,8 @@ MultisetSort,  SortType,
 NumberConstant, Int64, Integer, Float64,
 FEConstant, FiniteIntRangeConstant, DotConstant, BooleanConstant,
 PnmlMultiset, Operator, Variable,
+
+$(METHODLIST)
 """
 function sortref end
 
@@ -364,6 +454,8 @@ Dictionaries in a network-level [`DeclDict`](@ref) hold, among other things,
 `NamedSort`, `ArbitrarySort` and `PartitionSort` declarations.
 These declarations add an ID and name to a concrete sort,
 with the ID symbol used as the dictionary key.
+
+$(METHODLIST)
 """
 function sortdefinition end
 
@@ -373,6 +465,8 @@ function sortdefinition end
 Return SortRef referencing a NamedSort, ArbitrarySort or PartitionSort declaration.
 `MultisetSort`, `Multiset`, `List` have a `basis` sort.
 Place marking & sorttype, arc inscriptions have a `basis` sort.
+
+$(METHODLIST)
 """
 function basis end
 
@@ -381,6 +475,8 @@ function basis end
     sortelements(x, net) -> Iterator
 
 Return iterator over elements of the sort of `x` in `net`.
+
+$(METHODLIST)
 """
 function sortelements end
 
@@ -400,11 +496,15 @@ function adjacent_place end
     decldict(net::APN) -> DeclDict
 
 Access net-level `DeclDict`.
+
+$(METHODLIST)
 """
 function decldict end
 
 """
 "Version of tool for this tool specific information element and its parser."
+
+$(METHODLIST)
 """
 function version end
 
@@ -416,6 +516,8 @@ function output_matrix end
 
 """
     verify!(errors::Vector{String}, x, verbose::Bool, net::APN)
+
+$(METHODLIST)
 """
 function verify! end
 
