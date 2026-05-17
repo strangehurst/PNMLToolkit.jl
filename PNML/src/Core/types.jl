@@ -267,5 +267,7 @@ An EnumX.jl enum used to distinguish arc types.
 
 Return `Expr` constructed from `ex`. Calls `toexpr` on any contained terms.
 `varsubs` used to replace variables in expressions with values from current marking vector.
+
+$(METHODLIST)
 """
 function toexpr end
