@@ -58,7 +58,9 @@ Return vector of booleans where `true` means the matching transition
 is enabled at current `marking`. Has the same order as the `transitions` dictionary.
 Used in the firing rule.
 
-Update tr.vars Set and tr.varsubs, NamedTuple.
+Update net's vars and varsubs for each transition.
+
+$(METHODLIST)
 """
 function enabled end
 
@@ -72,12 +74,13 @@ function enabled(net::AbstractPnmlNet, marking)
 
    for tr in transitions(net)
         transition_id = pid(tr)
-        empty!(tr.varsubs) #~ clear cached NamedTuple[]
+        haskey(net.varsubs, transition_id) &&
+            empty!(net.varsubs[transition_id]) #~ clear cached NamedTuple[]
         enabled_dict[transition_id] || continue
         #TODO other filters reducing work done by token_load! Cannot use variables.
 
-        # Build tr.varsubs while accessing token sufficency part of enabling rule.
-        enabled = sufficient_tokens!(mark_dict, net, transition_id, tr.vars, tr.varsubs)
+        # Build varsubs while accessing token sufficency part of enabling rule.
+        enabled = sufficient_tokens!(mark_dict, net, transition_id) #!, tr.vars, tr.varsubs)
         enabled_dict[transition_id] &= enabled
         enabled_dict[transition_id] || continue
 
@@ -100,16 +103,23 @@ and trasnsition guard is true.
 """
 function sufficient_tokens! end
 
-function sufficient_tokens!(mark_dict::AbstractDict, net::AbstractPnmlNet,
-                            transition_id, _vars, _varsubs)
+function sufficient_tokens!(mark_dict::AbstractDict, net::AbstractPnmlNet, transition_id)
     # There are no varibles possible here and the guard is `true`.
     # Evaluate preset inscription expressions, compare to mark value.
     all(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
                                          for place_id in preset(net, transition_id))
 end
 
-function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet{T},
-                            transition_id, vars, varsubs) where (T <: AbstractHLCore)
+function sufficient_tokens!(mark_dict::AbstractDict,
+                            net::PnmlNet{T}, transition_id) where (T <: AbstractHLCore)
+    tr_vars = haskey(net.vars, transition_id) ? net.vars[transition_id] : Set{Symbol}()
+    tr_varsubs = haskey(net.varsubs, transition_id) ? net.varsubs[transition_id] : Vector{NamedTuple}()
+    sufficient_tokens2!(mark_dict, net, transition_id,tr_vars, tr_varsubs)
+end
+
+function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{T}, transition_id,
+                            tr_vars::Set{Symbol},
+                            tr_varsubs::Vector{NamedTuple}) where (T <: AbstractHLCore)
     # During enabling rule, tr_var_binding_set maps variable to a set of elements.
     tr_var_binding_set = OrderedDict{REFID, Any}()
     #~ marking = PnmlMultiset{B, T}(Multiset(T() => 1)) singleton
@@ -118,19 +128,19 @@ function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet{T},
     # Multiset type set from first use
 
     # Get transition variable substitution from preset arcs.
-    # Update tr.vars, tr_var_binding_set.
+    # Update vars.
     get_variable_substitutions!(tr_var_binding_set, net, transition_id,
-                                vars, mark_dict) || return false # no substution found
+                                tr_vars, mark_dict) || return false # no substution found
     #^--------------------------------------------------------------------------------
     #& XXX variable substitutions fully specified by preset of transition XXX
     #& tr.vars is complete. tr_var_binding_set has valid substitutions for all variables.
     #^--------------------------------------------------------------------------------
 
     # Return enabled status based on comparing mark and inscription.
-    # Update tr.varsubs, a vector of possible substitutions.
+    # Update varsubs, a vector of possible substitutions.
     comp_mark_inscription(net, mark_dict, transition_id,
                             term(condition(transition(net, transition_id))),
-                            tr_var_binding_set, vars, varsubs)
+                            tr_var_binding_set, tr_vars, tr_varsubs)
     #! REMEMBER marking multiset element may be a PnmlMultiset.
 end
 
@@ -139,12 +149,12 @@ Evaluate preset inscription expressions, compare to mark value.
 Update varsubs
 """
 function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
-                                tr_var_binding_set, vars, varsubs)
+                                tr_var_binding_set, tr_vars, tr_varsubs)
     for place_id in preset(net, transition_id)
         ar = arc(net, place_id, transition_id)
         mark = mark_dict[place_id]
 
-        if isempty(vars) # 0-ary operators or constants
+        if isempty(tr_vars) # 0-ary operators or constants
             # This includes the non-HL net types that do not have variables.
             eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
             inscription_val = _cvt_inscription_value(pntd(net), ar,
@@ -160,16 +170,16 @@ function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
             vsubiter = Iterators.product(sub1...)
             for candidate_params in vsubiter
                 # Assume order of tr_var_binding_set and product are the same.
-                vsub = namedtuple(vids, candidate_params)
+                tr_vsub = namedtuple(vids, candidate_params)
                 # condition expression may contain variables.
-                eval(toexpr(cond_term, vsub, net)) || continue #! XXX CACHE eval
+                eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
                 inscription_val = _cvt_inscription_value(pntd(net), ar,
-                                    zero_marking(place(net, place_id)), vsub)
+                                    zero_marking(place(net, place_id)), tr_vsub)
                 mark = unwrap_pmset(mark)
                 issubset(inscription_val, mark) || continue # not a valid substitution
-                push!(varsubs, vsub)
+                push!(tr_varsubs, tr_vsub)
             end
-            isempty(varsubs) && return false # no sunstitution found
+            isempty(tr_varsubs) && return false # no sunstitution found
         end
     end
     return true # transition is enabled

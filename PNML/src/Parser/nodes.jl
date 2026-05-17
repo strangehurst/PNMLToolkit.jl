@@ -182,9 +182,7 @@ function parse_transition(node::XMLNode, net::APN)
 
     Transition(transitionid,
             something(cond, default(Labels.Condition, net)),
-            namelabel, graphics, toolspecinfos, extralabels,
-            Set{REFID}(),
-            NamedTuple[], net)
+            namelabel, graphics, toolspecinfos, extralabels, net)
 end #= function parse_transition =#
 
 function default(::Type{<:Inscription}, net::APN)

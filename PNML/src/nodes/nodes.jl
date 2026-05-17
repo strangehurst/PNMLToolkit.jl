@@ -77,9 +77,10 @@ mutable struct Transition{N <: APN, T <: PnmlExpr}  <: AbstractPnmlNode
     toolspecinfos::Maybe{Vector{ToolInfo}}
     extralabels::LittleDict{Symbol,Any}
 
-    vars::Set{REFID}
-    "Cache of variable substitutons for this transition"
-    varsubs::Vector{NamedTuple}
+    #! Move to net as dictionaries keyed by transition id 2026-05-16
+    # vars::Set{REFID}
+    # "Cache of variable substitutons for this transition"
+    # varsubs::Vector{NamedTuple}
     net::N
 end
 
@@ -93,7 +94,7 @@ Cache value in transition field as part of enabling rule phase of a Petri net li
 """
 function varsubs end
 
-varsubs(transition::Transition) = transition.varsubs
+varsubs(transition::Transition) = transition.net.varsubs[pid(transition)]
 
 """
     condition(::Transition) -> Condition

@@ -48,8 +48,17 @@ $(FIELDS)
                 LittleDict{String, LittleDict{String, Any}}()
 
     # Collection of filters used by enabling rule.
-    enabled_filters::LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
-end
+    enabled_filters::LittleDict{Symbol, Any} = LittleDict{Symbol, Any}()
+
+    # keys are transition ids, values are sets of variable ids
+    "Cache of variable ids used by expressions related to the transition."
+    vars::LittleDict{Symbol, Set{Symbol}} = LittleDict{Symbol, Set{Symbol}}()
+
+    # keys are transition ids, values are vectors of substution namedtuples
+    "Cache of variable substitutons for this transition"
+    varsubs::LittleDict{Symbol, Vector{NamedTuple}} = LittleDict{Symbol, Vector{NamedTuple}}()
+
+end #= mutable struct PnmlNet =#
 
 "Iterate enable filters"
 function filters(net::AbstractPnmlNet)
