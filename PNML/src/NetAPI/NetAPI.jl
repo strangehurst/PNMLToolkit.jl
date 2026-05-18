@@ -3,7 +3,9 @@
 """
 module NetAPI
 import AutoHashEquals: @auto_hash_equals
+import Graphs
 import Multisets: Multiset, Multisets
+import OrderedCollections
 import PNML: varsubs
 
 using Base: Fix2, length
@@ -17,7 +19,7 @@ using Moshi.Match: @match
 using NamedTupleTools
 using OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 using PNML
-using PNML.Graphs
+using PNML.PnmlGraphics
 using PNML: APNTD, AbstractHLCore, AbstractPnmlNet, AbstractPnmlType, Arc, Inscription,
     Marking, Maybe, PT_HLPNG, Place, PnmlMultiset, arc, arcdict, arcs, cardinality,
     condition, filters, initial_marking, inscription, is_collective_token, is_productsort,
