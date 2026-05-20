@@ -1,28 +1,22 @@
 module Declarations
-
-export AbstractDeclaration
-export      SortDeclaration, NamedSort, ArbitrarySort, PartitionSort
-export      OperatorDeclaration, NamedOperator, ArbitraryOperator, PartitionElement
-export      VariableDeclaration, UnknownDeclaration
-
-export element_ids, verify_partition
-
-using Base: isempty, length
-import Base: eltype
 import AutoHashEquals: @auto_hash_equals
-using DocStringExtensions
-using Logging, LoggingExtras
+import Base: eltype
+import PNML: name, pid, sortdefinition, sortelements, sortref, verify!
 
-using PNML
-using PNML: REFID, AnyElement, DotConstant, toexpr, indent, inc_indent
-using PNML: namedsort, partitionsort
-
-import PNML: sortref, sortdefinition, sortelements#, basis # Sort related
-import PNML: name, pid, verify!
-
-using ..Sorts
-using ..Sorts: equalSorts
 using ..IDRegistrys
+using ..Sorts
+using Base: isempty, length
+using DocStringExtensions
+using Logging
+using LoggingExtras
+using PNML
+using PNML:
+    AnyElement, DotConstant, REFID, inc_indent, indent, namedsort, partitionsort, toexpr
+
+export AbstractDeclaration, ArbitraryOperator, ArbitrarySort, NamedOperator, NamedSort,
+    OperatorDeclaration, PartitionElement, PartitionSort, SortDeclaration,
+    UnknownDeclaration, VariableDeclaration, element_ids, verify_partition
+
 
 include("declarations.jl")
 include("partitions.jl")

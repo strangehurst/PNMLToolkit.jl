@@ -1,4 +1,5 @@
-using PNML, Test, JET, InteractiveUtils, Printf
+using PNML, Test, JET
+import InteractiveUtils
 
 include("TestUtils.jl")
 using .TestUtils

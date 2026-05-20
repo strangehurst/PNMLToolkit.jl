@@ -1,6 +1,5 @@
 using PNML, Test, JET
-using InteractiveUtils
-using Printf
+import InteractiveUtils
 
 include("TestUtils.jl")
 using .TestUtils
@@ -231,7 +230,7 @@ function _subtypes!(out, type::Type)
     if !isabstracttype(type)
         push!(out, type)
     else
-        foreach(Base.Fix1(_subtypes!, out), subtypes(type))
+        foreach(Base.Fix1(_subtypes!, out), InteractiveUtils.subtypes(type))
     end
     return out
 end

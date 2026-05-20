@@ -1,10 +1,5 @@
 module Labels
 
-export Condition, Declaration, Inscription, Marking, Name, PnmlLabel, SortType
-export Graphics, PnmlGraphics, ToolInfo
-export delay_value, get_label, label_value, priority_value, rate_value, text
-export ArcType, ArcTypeEnum, Priority, Rate, Time, ToolParser
-
 import ..Expressions: PnmlExpr, expr_sortref, toexpr
 import AutoHashEquals: @auto_hash_equals
 import Base: eltype
@@ -24,6 +19,10 @@ using NamedTupleTools
 using PNML
 using PNML: AbstractLabel, AbstractPnmlNode, Annotation, AnyElement, BooleanConstant, D,
     HLAnnotation, Maybe, ToolParser, indent, namedsort, pntd
+
+export ArcType, ArcTypeEnum, Condition, Declaration, Graphics, Inscription, Marking, Name,
+    PnmlGraphics, PnmlLabel, Priority, Rate, SortType, Time, ToolInfo, ToolParser,
+    delay_value, get_label, label_value, priority_value, rate_value, text
 
 include("toolinfos.jl") # labels and nodes can both have tool specific information.
 include("toolinfo_content.jl") # Some infos have known content.

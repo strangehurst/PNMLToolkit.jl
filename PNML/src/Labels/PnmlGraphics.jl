@@ -4,12 +4,13 @@
 """
 module PnmlGraphics
 
-import Base: eltype
 import AutoHashEquals: @auto_hash_equals
+import Base: eltype
+
 using DocStringExtensions
 using PNML: Coordinate
 
-export Graphics, ArcGraphics, NodeGraphics, AnnotationGraphics #, Line, Fill, Font
+export AnnotationGraphics, ArcGraphics, Graphics, NodeGraphics #, Line, Fill, Font
 
 #-------------------
 """

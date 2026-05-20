@@ -7,11 +7,12 @@ using DocStringExtensions
 using SciMLLogging: @SciMLMessage
 
 # Abstract Types
-export APNTD, AbstractPnmlType, AbstractPnmlCore, AbstractHLCore, AbstractContinuousNet
+export APNTD, AbstractContinuousNet, AbstractHLCore, AbstractPnmlCore, AbstractPnmlType
 # Concrete Types
-export PnmlCoreNet, PTNet, HLCoreNet, PT_HLPNG, SymmetricNet, HLPNG, ContinuousNet
+export ContinuousNet, HLCoreNet, HLPNG, PTNet, PT_HLPNG, PnmlCoreNet, SymmetricNet
 # Functions
-export pnmltype, is_discrete, is_continuous, is_highlevel, is_collective_token, is_individual_token
+export is_collective_token, is_continuous, is_discrete, is_highlevel, is_individual_token,
+    pnmltype
 
 """
 $(TYPEDEF)
