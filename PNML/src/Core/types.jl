@@ -139,7 +139,8 @@ end
 #--------------------------------------------
 """
 $(TYPEDEF)
-Petri Net Graph nodes are [`Place`](@ref), [`Transition`](@ref).
+Petri Net Graph nodes are [`Place`](@ref), [`Transition`](@ref),
+[`RefPlace`](@ref), [`RefTransition`](@ref).
 They are the source or target of an [`Arc`](@ref)
 """
 abstract type AbstractPnmlNode <: AbstractPnmlObject end
