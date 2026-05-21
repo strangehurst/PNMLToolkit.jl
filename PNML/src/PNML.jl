@@ -99,14 +99,10 @@ using .IDRegistrys
 include("Core/exceptions.jl")
 include("Core/utils.jl")
 include("Core/coordinates.jl")
-
-include("context.jl")
-
 include("Core/interfaces.jl") # Function docstrings mostly.
 include("Core/anyelement.jl") # AnyElement, XmlDictType, XDVT
 include("Core/types.jl") # Abstract Types with docstrings.
 include("Core/sortref.jl")
-
 include("Core/toolparser.jl")
 include("Core/labelparser.jl")
 
@@ -142,7 +138,6 @@ using .Expressions
 
 include("terms/operators.jl")
 
-include("terms/terms.jl") # Variables and AbstractOperators preceed this.
 include("Core/rewrite.jl")
 
 include("Core/pnmlnetdata.jl") # Used by page, net; holds places, transitions, arcs.
