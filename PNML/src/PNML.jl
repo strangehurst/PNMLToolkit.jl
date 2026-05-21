@@ -109,7 +109,7 @@ include("Core/labelparser.jl")
 # Parts of Labels and Nodes.
 
 include("Core/decldictcore.jl") # define structure filled by Sorts, Declarations
-include("terms/constterm.jl")
+include("Core/constterm.jl")
 
 include("Sorts/Sorts.jl") # used in Variables, Operators, Places
 using .Sorts
@@ -129,14 +129,14 @@ using .Declarations: VariableDeclaration
 # include("Core/decldictcore.jl") # define structure filled by Sorts, Declarations
 include("Core/parse_context.jl") # parse context has id registry and DeclDict
 
-include("terms/multisets.jl")
-include("terms/variables.jl")
+include("Core/multisets.jl")
+include("Core/variables.jl")
 
-include("terms/expressions.jl")
+include("Core/expressions.jl")
 using .Expressions
 #!using .Expressions: toexpr, PnmlExpr, AbstractBoolExpr, AbstractOpExpr
 
-include("terms/operators.jl")
+include("Core/operators.jl")
 
 include("Core/rewrite.jl")
 
