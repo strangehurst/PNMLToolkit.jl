@@ -17,12 +17,8 @@ using DocStringExtensions
 using Logging
 using LoggingExtras
 using NamedTupleTools
-using PNML.Declarations
-using PNML.Labels
 using PNML.NetAPI
-using PNML.PnmlGraphics
-using PNML.PnmlTypes
-using PNML.Sorts
+using PNML.PnmlTypes: APNTD, AbstractPnmlType
 using TermInterface
 
 export AbstractPetriNet, SimpleNet, counted_transitions, input_matrix, labeled_transitions,
