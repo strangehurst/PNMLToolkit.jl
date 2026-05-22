@@ -212,3 +212,6 @@ function initial_markings(net::PnmlNet{<:AbstractHLCore})
     [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
     #! FIFO places use queues, will co-exist with multisets from regular HL places.
 end
+    # Use <fifoinitialMarking><structure><makelist> expression for initial queue contents.
+    # DataStructures.Queue{sorttype} will be an element in the marking vector.
+    #? Do we segregate  FIFO from HL markings by a new xml tag?
