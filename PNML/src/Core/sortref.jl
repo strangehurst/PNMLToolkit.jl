@@ -135,6 +135,7 @@ function refid(s::SortRef)
         SortRefImpl.ProductSortRef(; refid) => refid
         SortRefImpl.MultisetSortRef(; refid) => refid
         SortRefImpl.ArbitrarySortRef( ;refid) => refid
+        _ => error("no match for: $s")
     end
 end
 
@@ -150,7 +151,7 @@ function to_sort(sr::SortRef, net::APN)
         SortRefImpl.MultisetSortRef(refid)  => multisetsort(net, refid) #! named sort
         SortRefImpl.PartitionSortRef(refid) => partitionsort(net, refid)
         SortRefImpl.ArbitrarySortRef(refid) => arbitrarysort(net, refid)
-        _ => error("to_sort SortRefImpl not expected: $sr")
+        _ => error("to_sort no match for: $sr")
     end
     return s
 end
