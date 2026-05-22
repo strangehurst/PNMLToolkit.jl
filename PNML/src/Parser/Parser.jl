@@ -43,7 +43,7 @@ using PNML: AbstractPnmlNet, AnyElement, BooleanConstant, CONFIG, Coordinate, D,
     partitionsorts, pid, place, place_idset, placedict, pntd, productsorts,
     refplace_idset, refplace_idset, refplacedict, reftransition_idset, reftransitiondict,
     registry_of, to_sort, toolinfos, transition_idset, transitiondict, value_type,
-    variabledecl, variabledecls, variabledecls, verify
+    variabledecl, variabledecls, verify
 
 using SciMLPublic: @public
 using TermInterface
