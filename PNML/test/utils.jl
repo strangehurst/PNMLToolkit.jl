@@ -1,7 +1,10 @@
-using PNML, Test, JET, XMLDict, OrderedCollections
-using SciMLLogging: SciMLLogging, @SciMLMessage
-import EzXML
-import InteractiveUtils
+using PNML
+using EzXML
+using InteractiveUtils
+using JET
+using OrderedCollections
+using Test
+using XMLDict
 
 include("TestUtils.jl")
 using .TestUtils
