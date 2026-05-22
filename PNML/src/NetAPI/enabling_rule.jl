@@ -235,7 +235,7 @@ function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
 
         # Verify variable sort matches placesort.
         if is_productsort(placesort)
-            any(==(v_refid), Sorts.sorts(placesort, net)) ||
+            any(==(v_refid), sorts(placesort, net)) ||
                     error("none of product sorts are '$v_refid': ", repr(placesort))
         else
             placesort !== v_sortref &&
