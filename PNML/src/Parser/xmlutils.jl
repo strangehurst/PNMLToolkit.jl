@@ -32,6 +32,8 @@ xmlnode(s::AbstractString) = EzXML.root(EzXML.parsexml(s))::XMLNode
 Return first immediate child of `el` that is a `tag` or nothing.
 """
 function firstchild(node::XMLNode, tag::AbstractString, namespace::AbstractString = pnml_ns)
+    @assert !isnothing(tag)
+    @assert !isnothing(namespace)
     # '.'  is short for self::node(), '/' selects direct child
     EzXML.findfirst("./x:$tag | ./$tag", node, ("x" => namespace,))::Maybe{XMLNode}
     # `("x" => namespace,)` optional prefix defaults to `pnml_ns`.
@@ -40,7 +42,7 @@ end
 """
     allchildren(node::XMLNode, tag::AbstractString) -> Vector{XMLNode}
 
-Return vector of `el`'s immediate children with `tag`.
+Return vector of `node`'s immediate children that have a name of `tag`.
 """
 function allchildren(node::XMLNode, tag::AbstractString, namespace::AbstractString = pnml_ns)
     # '.' is short for self::node(), '/' selects direct child
@@ -50,7 +52,7 @@ end
 """
     alldecendents(node::XMLNode, tag::AbstractString) -> Vector{XMLNode}
 
-Return vector of node's immediate children and decendents with `tag`.
+Return vector of `node`'s immediate children and their  decendents with  a name of `tag`.
 """
 function alldecendents(node::XMLNode, tag::AbstractString, namespace::AbstractString = pnml_ns)
     # '.'  is short for self::node(), '//' selects any decendent
