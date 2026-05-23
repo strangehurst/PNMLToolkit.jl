@@ -8,7 +8,7 @@ import AutoHashEquals: @auto_hash_equals
 import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import PNML
-import PNML: PnmlModel, PnmlMultiset, PnmlNet,
+import PNML: PnmlMultiset,
     initial_marking, initial_markings, metagraph, nettype, pid,
     pnmlmodel, pntd, rates
 import XMLDict
@@ -17,6 +17,7 @@ using DocStringExtensions
 using Logging
 using LoggingExtras
 using NamedTupleTools
+using PNML
 using PNML.NetAPI
 using PNML.PnmlTypes: APNTD, AbstractPnmlType
 using TermInterface
