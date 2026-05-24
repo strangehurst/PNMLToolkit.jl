@@ -50,18 +50,6 @@ function parse_declaration!(net::APN, nodes::Vector{XMLNode})
 end
 
 """
-    parse_declarations!(net::APN, node::XMLNode) -> Declaration
-
-Collect a vector of `<declaration>` `XMLNodes`. Serves as function barrier.
-NB: This is NOT where `<declarations>` are parsed, see [`fill_decl_dict!`](@ref) .
-"""
-function parse_declarations!(net::APN, node::XMLNode)
-    decls = alldecendents(node, "declaration") # There may be none (empty vector).
-    D()&& println("## parse_declarations! $(length(decls)) <declaration> node(s)")
-    return parse_declaration!(net, decls)::Declaration
-end
-
-"""
     fill_decl_dict!(net::APN, node::XMLNode) -> Nothing
 
 Add a `<declaration><structure><declarations>` to DeclDict.
@@ -80,13 +68,13 @@ function fill_decl_dict!(net::APN, node::XMLNode)
         tag = EzXML.nodename(child)
         if tag == "namedsort"
             ns = parse_namedsort(child, net)
-            namedsorts(net)[pid(ns)] = ns # fill_decl_dict! namedsort
+            namedsorts(net)[pid(ns)] = ns
         elseif tag == "namedoperator"
             no = parse_namedoperator(child, net)
-            namedoperators(net)[pid(no)] = no # fill_decl_dict! namedoperator
+            namedoperators(net)[pid(no)] = no
         elseif tag == "variabledecl"
             vardecl = parse_variabledecl(child, net)
-            variabledecls(net)[pid(vardecl)] = vardecl # fill_decl_dict! variabledecl
+            variabledecls(net)[pid(vardecl)] = vardecl
         elseif tag == "partition"
             # NB: partiton is a declaration of a new sort refering to the partitioned sort.
             part = parse_partition(child, net)::SortRef
@@ -104,6 +92,18 @@ function fill_decl_dict!(net::APN, node::XMLNode)
         end
     end
     return nothing
+end
+
+"""
+    parse_declarations!(net::APN, node::XMLNode) -> Declaration
+
+Collect a vector of `<declaration>` `XMLNodes`. Serves as function barrier.
+NB: This is NOT where `<declarations>` are parsed, see [`fill_decl_dict!`](@ref) .
+"""
+function parse_declarations!(net::APN, node::XMLNode)
+    decls = alldecendents(node, "declaration") # There may be none (empty vector).
+    D()&& println("## parse_declarations! $(length(decls)) <declaration> node(s)")
+    return parse_declaration!(net, decls)::Declaration
 end
 
 """
