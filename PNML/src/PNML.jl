@@ -66,7 +66,7 @@ using TermInterface
 export @xml_str, APN, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
     MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place, PnmlModel, PnmlNet,
     ProductSortRef, REFID, RefPlace, RefTransition, SortRef, SortRefImpl,
-    Transition, UserSortRef, decldict, pnmlmodel, xmlnode
+    Transition, UserSortRef, pnmlmodel, xmlnode
 
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
 @public namedsort, Coordinate
