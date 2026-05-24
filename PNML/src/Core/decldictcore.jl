@@ -258,19 +258,6 @@ function show_sorts(dd::ADDicts)
     println()
 end
 
-"Look for matching value `x` in dictionary `d`, return key symbol or nothing."
-function find_valuekey(d::AbstractDict, x, func=identity)
-    id = nothing
-    for (k,v) in pairs(skipmissing(d))
-        if func(v) == x # Apply `func` to each value, looking for a match.
-            id = k
-            @warn("found existing $id for $x")
-            break
-        end
-    end
-    return id #  Key of matched value or nothing.
-end
-
 """
 If `a` is a `NamedSortRef` return its `sortdefinition`, otherwise return `a`.
 """
