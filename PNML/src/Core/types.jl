@@ -112,29 +112,12 @@ function text(x)
     end
 end
 
-labels(o) = hasproperty(o, :extralabels) ? o.extralabels : nothing
-
+has_extralabels(o) = hasproperty(o, :extralabels) && !isnothing(o.extralabels)
+extralabels(o) = hasproperty(o, :extralabels) ? o.extralabels : nothing
 has_tools(o::AbstractPnmlObject) = hasproperty(o, :toolspecinfos) && !isnothing(o.toolspecinfos)
 toolinfos(o::AbstractPnmlObject) = hasproperty(o, :toolspecinfos) ? o.toolspecinfos : nothing
-
 has_graphics(o::AbstractPnmlObject) = hasproperty(o, :graphics) && !isnothing(o.graphics)
-graphics(o::AbstractPnmlObject)     = o.graphics
-
-"""
-    get_label(x, tag) -> Maybe{AbstractLabel}
-
-`x` is anyting that supports 'labels'.
-`tag` is the tag of the xml label element.
-"""
-function get_label(x, tag::Union{Symbol, String, SubString{String}})
-    isnothing(x) && throw(ArgumentError("argument 'x' is nothing"))
-    l = labels(x)::AbstractDict
-    return if haskey(l, tag)
-        @inbounds(l[tag])
-    else
-        nothing
-    end
-end
+graphics(o::AbstractPnmlObject)     = hasproperty(o, :graphics) ? o.graphics : nothing
 
 #--------------------------------------------
 """
