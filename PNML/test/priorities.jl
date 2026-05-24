@@ -13,16 +13,15 @@ println("PRIORITY")
         xml"""<transition id ="birth">
                 <priority> <text>0.3</text> </priority>
             </transition>""", net)
-    #@show lab = PNML.labels(trans)
 
-    @test PNML.get_label(trans, :nosuchlabel) === nothing
-    lab = PNML.get_label(trans, :priority)
-    @test PNML.get_label(trans, :priority) === PNML.labels(trans)[:priority]
-    @test PNML.get_label(trans, :priority) == lab != nothing
+    @test get_label(trans, :nosuchlabel) === nothing
+    lab = get_label(trans, :priority)
+    @test get_label(trans, :priority) === PNML.extralabels(trans)[:priority]
+    @test get_label(trans, :priority) == lab != nothing
     @test PNML.priority_value(trans) ≈ 0.3
 
-    @test_call PNML.get_label(trans, :priority)
-    @test_call PNML.labels(trans)
+    @test_call get_label(trans, :priority)
+    @test_call PNML.extralabels(trans)
     @test_call PNML.priority_value(trans)
 
     tr = @inferred PNML.priority_value(trans)

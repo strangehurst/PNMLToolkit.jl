@@ -10,20 +10,20 @@ println("RATE")
     trans = PNML.Parser.parse_transition(xml"""<transition id ="birth">
                                                  <rate> <text>0.3</text> </rate>
                                                </transition>""", net)
-    #@show lab = PNML.labels(trans)
+    #@show lab = PNML.extralabels(trans)
 
-    @test get_label(trans, :rate) === labels(trans)[:rate]
+    @test get_label(trans, :rate) === extralabels(trans)[:rate]
     @test get_label(trans, :rate) !== nothing
     @test PNML.rate_value(trans) ≈ 0.3
-    r = PNML.get_label(trans, :rate)
+    r = get_label(trans, :rate)
     @test occursin(r"^Rate", sprint(show, r))
     @test eltype(r) == Float64
     @test sortref(r) isa SortRef
     @test refid(sortref(r)) === :real
     #!@test sortof(r) isa RealSort
 
-    @test_call PNML.get_label(trans, :rate)
-    @test_call PNML.labels(trans)
+    @test_call get_label(trans, :rate)
+    @test_call PNML.extralabels(trans)
     @test_call PNML.rate_value(trans)
 
     tr = @inferred PNML.rate_value(trans)

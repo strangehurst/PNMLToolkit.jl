@@ -189,7 +189,7 @@ end
 # First two run the parser and can have addded tool and label plugins as context.
 # toolinfos => (tool1, [tool2,]...), labels =< (label1, [label2,]...)
 SimpleNet(str::AbstractString)  = SimpleNet(PNML.xmlnode(str))
-SimpleNet(node::PNML.XMLNode) = SimpleNet(PNML.Parser.pnmlmodel(node))
+SimpleNet(node::PNML.XMLNode) = SimpleNet(PNML.Parser.pnmlmodel(node)) #TODO lp, tp, ef
 
 # These two use the flattened 1st net of the PnmlModel.
 SimpleNet(model::PnmlModel) = SimpleNet(PNML.firstnet(model))

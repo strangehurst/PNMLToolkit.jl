@@ -27,7 +27,7 @@ using XMLDict: XMLDict
     #@test_broken inscript() == 12
     #@test graphics(inscript) !== nothing
     #@test toolinfos(inscript) === nothing || !isempty(toolinfos(inscript))
-    #@test_throws MethodError labels(inscript)
+    #@test_throws MethodError PNML.extralabels(inscript)
 
     #@test occursin("Graphics", sprint(show, inscript))
 end

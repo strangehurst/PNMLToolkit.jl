@@ -28,9 +28,9 @@ println("DELAY")
     trans = @test_logs((:info, "add PnmlLabel :delay to :t6"),
         parse_transition(node, net)::Transition)
 
-    del = PNML.get_label(trans, :delay)
-    @test PNML.get_label(trans, :delay) == del
-    @test PNML.get_label(trans, :missinglabel) == nothing
+    del = get_label(trans, :delay)
+    @test get_label(trans, :delay) == del
+    @test get_label(trans, :missinglabel) == nothing
 
     #@show elements(del)["interval"]
     #! XXX where did xmlns dissappear
@@ -48,8 +48,8 @@ println("DELAY")
     </transition>"""
     trans = @test_logs((:info, "add PnmlLabel :delay to :t7"),
         parse_transition(node, net)::Transition)
-    del = PNML.get_label(trans, :delay)
-    @test PNML.get_label(trans, :delay) == del
+    del = get_label(trans, :delay)
+    @test get_label(trans, :delay) == del
     @test elements(del)["interval"][:closure] == "closed-open"
     @test elements(del)["interval"]["cn"] == "4"
     @test elements(del)["interval"]["ci"] == "infty"
@@ -64,8 +64,8 @@ println("DELAY")
     </transition>"""
     trans = @test_logs((:info, "add PnmlLabel :delay to :t8"),
         parse_transition(node, net)::Transition)
-    del = PNML.get_label(trans, :delay)
-    @test PNML.get_label(trans, :delay) == del
+    del = get_label(trans, :delay)
+    @test get_label(trans, :delay) == del
     @test elements(del)["interval"][:closure] == "open"
     @test elements(del)["interval"]["cn"] == ["3", "5"]
 end

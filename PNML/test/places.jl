@@ -32,7 +32,7 @@ using .TestUtils
     @test_call initial_marking(place)
     #@show pntd, initial_marking(place)
     @test initial_marking(place)::Number == 100
-    @test PNML.get_label(place, :nosuchlabel) === nothing
+    @test get_label(place, :nosuchlabel) === nothing
     @test PNML.has_tools(place) == false
 end
 
@@ -62,7 +62,7 @@ end
     @test_call target_modules=t_modules initial_marking(place)
     #@show pntd, initial_marking(place)
     @test PNML.cardinality(initial_marking(place)::PnmlMultiset) == 101
-    @test PNML.get_label(place, :nosuchlabel) === nothing
+    @test get_label(place, :nosuchlabel) === nothing
 end
 
 @testset "place unknown label $pntd" for pntd in PnmlTypes.all_nettypes(is_highlevel)
@@ -90,7 +90,7 @@ end
                        parse_place(node, net)::Place)
     @test pid(place) === :place1
     @test name(place) == ""
-    @test PNML.get_label(place, :nosuchlabel) === nothing
+    @test get_label(place, :nosuchlabel) === nothing
     @test elements(get_label(place, :somelabel1))[:a] == "text"
     @test elements(get_label(place, :somelabel1))["another"][:b] == "more"
     @test elements(get_label(place, :somelabel2))[:c] == "value"
@@ -114,7 +114,7 @@ end
     place = parse_refPlace(node, net)::RefPlace
     @test pid(place) === :rp1
     @test PNML.refid(place) === :p1
-    @test PNML.get_label(place, :nosuchlabel) === nothing
+    @test get_label(place, :nosuchlabel) === nothing
 end
 
 @testset "ref Place $pntd" for pntd in PnmlTypes.all_nettypes()
@@ -133,6 +133,6 @@ end
             parse_refPlace(node, net)::RefPlace)
     @test pid(place) === :rp1
     @test PNML.refid(place) === :p1
-    @test elements(labels(place)[:somelabel2])[:c] == "value"
-    @test PNML.get_label(place, :nosuchlabel) === nothing
+    @test elements(PNML.extralabels(place)[:somelabel2])[:c] == "value"
+    @test get_label(place, :nosuchlabel) === nothing
 end

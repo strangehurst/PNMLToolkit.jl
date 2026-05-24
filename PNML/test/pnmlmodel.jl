@@ -201,15 +201,15 @@ end
         @test isempty(collect(PNML.operators(net)))
         @test PNML.operator(net, :nosuch) === nothing
 
-        @test PNML.get_label(net, :nosuch) === nothing
+        @test get_label(net, :nosuch) === nothing
 
         for page in pages(net)
             @test page isa Page
             @test @inferred(pid(page)) isa Symbol
-            @test PNML.get_label(page, :XYZ) === nothing
+            @test get_label(page, :XYZ) === nothing
             for p in places(page)
                 @test p isa Place
-                @test PNML.get_label(p, :XYZ) === nothing
+                @test get_label(p, :XYZ) === nothing
                 placeid = pid(p)::Symbol
                 @test has_place(page, placeid)
                 @test pid(place(page, placeid)) === placeid
@@ -218,13 +218,13 @@ end
             for transition in transitions(page)
                 @test transition isa Transition
                 @test pid(transition) isa Symbol
-                @test PNML.get_label(transition, :XYZ) === nothing
+                @test get_label(transition, :XYZ) === nothing
                 @test condition(net, pid(transition)) == condition(transition)
             end
             for arc in arcs(page)
                 @test arc isa Arc
                 @test pid(arc) isa Symbol
-                @test PNML.get_label(arc, :XYZ) === nothing
+                @test get_label(arc, :XYZ) === nothing
                 @test inscription(net, pid(arc)) == inscription(arc)
             end
         end

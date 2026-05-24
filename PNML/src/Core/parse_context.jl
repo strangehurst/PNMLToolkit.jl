@@ -54,7 +54,7 @@ function fill_sort_tag!(dd::DeclDict, idreg, tag::Symbol, sort, dict)
         !isregistered(idreg, tag) && register_id!(idreg, tag)
         dict(dd)[tag] = sort
     end
-    return sortref(dict, tag) # used by make_sortref
+    return sortref(dict, tag)
 end
 
 
