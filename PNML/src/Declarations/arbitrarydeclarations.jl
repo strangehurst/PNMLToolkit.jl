@@ -17,7 +17,6 @@ struct ArbitrarySort{N <: APN} <: SortDeclaration
     net::N
 end
 
-pid(a::ArbitrarySort) = a.id
 name(a::ArbitrarySort) = a.name
 
 function Base.show(io::IO, s::ArbitrarySort)

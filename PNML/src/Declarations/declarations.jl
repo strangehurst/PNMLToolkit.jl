@@ -10,7 +10,6 @@ PNML nets and/or pages using a PNML Label defined in a <declarations> tag.
 """
 abstract type AbstractDeclaration end
 
-pid(decl::AbstractDeclaration) = decl.id
 name(decl::AbstractDeclaration) = decl.name
 
 function Base.show(io::IO, declare::AbstractDeclaration)
