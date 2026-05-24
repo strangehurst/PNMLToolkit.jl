@@ -85,8 +85,6 @@ end
 pntd(net::PnmlNet) = net.type
 nettype(net::PnmlNet) = typeof(net.type)
 
-pid(net::PnmlNet) = net.id
-
 "Return IDRegistry of a PnmlNet."
 registry_of(net::PnmlNet) = net.idregistry
 decldict(net::PnmlNet) = net.ddict[]
@@ -367,7 +365,7 @@ function Base.show(io::IO, net::PnmlNet)
     println(io)
     println(io, "Declarations = ", repr(decldict(net)))
     show(io, toolinfos(net)); println(io, ", ")
-    show(io, labels(net)); println(io, ", ")
+    show(io, extralabels(net)); println(io, ", ")
     show(io, nettype(net)); println(io, ")")
 
     println(io, "Arcs:")
