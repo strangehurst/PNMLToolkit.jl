@@ -40,27 +40,6 @@ $(METHODLIST)
 """
 function name end
 
-#-------------------------------------------------------
-# LABELS #TODO move to module
-#-------------------------------------------------------
-
-"""
-    labels(x) -> Iterateable
-
-Return iterator of labels attached to `x`.
-
-$(METHODLIST)
-"""
-function labels end
-
-"""
-    get_label(x, tag::Union{Symbol, String, SubString{String}}) -> PnmlLabel
-
-Return first label of `x` with a matching `tagvalue`.
-
-$(METHODLIST)
-"""
-function get_label end
 
 function toolinfos end
 
@@ -507,8 +486,6 @@ function decldict end
 $(METHODLIST)
 """
 function version end
-
-function fill_sort_tag! end
 
 # Create and return a ntransitions x nplaces matrix.
 # """
