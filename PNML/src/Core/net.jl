@@ -90,9 +90,9 @@ registry_of(net::PnmlNet) = net.idregistry
 decldict(net::PnmlNet) = net.ddict[]
 declarations(net::PnmlNet) =  declarations(decldict(net))
 
-is_discrete(net::APN) = is_discrete(pntd(net))
-is_continuous(net::APN) = is_continuous(pntd(net))
-is_highlevel(net::APN) = is_highlevel(pntd(net))
+#is_discrete(net::APN) = is_discrete(pntd(net))
+#is_continuous(net::APN) = is_continuous(pntd(net))
+#is_highlevel(net::APN) = is_highlevel(pntd(net))
 
 # `pagedict` is all pages in `net`, `page_idset` only for direct pages of net.
 pagedict(net::PnmlNet) = net.pagedict # Will be ordered.
