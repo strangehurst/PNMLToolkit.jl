@@ -86,11 +86,11 @@ import XMLDict
     @test name(tooli) == s.tool
     @test PNML.Labels.version(tooli) == s.version
 
-    @test get_toolinfo([tooli], s.tool, s.version) == tooli # Is identity on scalar
-    @test get_toolinfo([tooli], s.tool, r"^.*$") == tooli
-    @test get_toolinfo([tooli], Regex(s.tool), r"^.*$") == tooli
+    @test PNML.Labels.get_toolinfo([tooli], s.tool, s.version) == tooli # Is identity on scalar
+    @test PNML.Labels.get_toolinfo([tooli], s.tool, r"^.*$") == tooli
+    @test PNML.Labels.get_toolinfo([tooli], Regex(s.tool), r"^.*$") == tooli
 
-    @test_call broken=false get_toolinfo([tooli], s.tool, s.version)
+    @test_call broken=false PNML.Labels.get_toolinfo([tooli], s.tool, s.version)
 
     # @show tooli
 end
@@ -127,7 +127,7 @@ println()
     # Assumes ordered collection.
     for (i,s) in enumerate([str1, str2, str3, str4, str5, str6, str7])
         # @show s.tool, s.version
-        ti = get_toolinfo(placetools, s.tool, s.version)
+        ti = PNML.Labels.get_toolinfo(placetools, s.tool, s.version)
         @test ti isa ToolInfo
         @test PNML.name(placetools[i])    == PNML.name(ti) == s.tool
         @test PNML.Labels.version(placetools[i]) == PNML.Labels.version(ti) == s.version
