@@ -61,8 +61,6 @@ using NamedTupleTools
 using Preferences: load_preference, set_preferences!
 using TermInterface
 
-# EXPORTS
-
 export @xml_str, APN, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
     MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place, PnmlModel, PnmlNet,
     ProductSortRef, REFID, RefPlace, RefTransition, SortRef, SortRefImpl,
@@ -86,13 +84,8 @@ if !haskey(ENV, "COLUMNS")
     ENV["COLUMNS"] = 180
 end
 
-#include("logging.jl") # SciMLLogging based: `silent`, `verbose`, `logger_for_pnml`
-
 include("PnmlTypes.jl")
 using .PnmlTypes
-import .PnmlTypes: is_discrete, is_continuous, is_highlevel,
-                   is_collective_token, is_individual_token
-
 include("IDRegistrys.jl")
 using .IDRegistrys
 
@@ -105,53 +98,26 @@ include("Core/types.jl") # Abstract Types with docstrings.
 include("Core/sortref.jl")
 include("Core/toolparser.jl")
 include("Core/labelparser.jl")
-
-# Parts of Labels and Nodes.
-
 include("Core/decldictcore.jl") # define structure filled by Sorts, Declarations
 include("Core/constterm.jl")
 
 include("Sorts/Sorts.jl") # used in Variables, Operators, Places
 using .Sorts
-using .Sorts: MultisetSort
-using .Sorts: AbstractSort, MultisetSort, ProductSort
-using .Sorts: DotSort, BoolSort, NumberSort, IntegerSort, PositiveSort, NaturalSort, RealSort
-using .Sorts: EnumerationSort, CyclicEnumerationSort, FiniteEnumerationSort, FiniteIntRangeSort
-using .Sorts: ListSort, StringSort
-
-
 include("Declarations/Declarations.jl")
 using .Declarations
-using .Declarations: SortDeclaration, NamedSort, ArbitrarySort, PartitionSort
-using .Declarations: OperatorDeclaration, NamedOperator, ArbitraryOperator, PartitionElement
-using .Declarations: VariableDeclaration
-
-# include("Core/decldictcore.jl") # define structure filled by Sorts, Declarations
 include("Core/parse_context.jl") # parse context has id registry and DeclDict
-
 include("Core/multisets.jl")
 include("Core/variables.jl")
-
 include("Core/expressions.jl")
 using .Expressions
-#!using .Expressions: toexpr, PnmlExpr, AbstractBoolExpr, AbstractOpExpr
-
 include("Core/operators.jl")
-
 include("Core/rewrite.jl")
-
 include("Core/pnmlnetdata.jl") # Used by page, net; holds places, transitions, arcs.
 
 #^ Above here are things that appear in  DeclDict contents.
-#^ 2024-07-17 Changed DeclDict to be Any based,
-#^ with the hope that the accessor methods provide type inferrability.
 include("Core/decldict.jl") # Just contains show(). See decldictcore.jl.
-
-# Labels
 include("Labels/Labels.jl")
 using .Labels
-
-# Nodes
 include("Core/places.jl")
 include("Core/transitions.jl")
 include("Core/arcs.jl")
@@ -159,13 +125,9 @@ include("Core/page.jl")
 include("Core/net.jl") # PnmlNet holds pages
 include("Core/model.jl") # Holds multiple PnmlNets.
 include("Core/flatten.jl") # Flatten pages of PnmlNet
-
 include("NetAPI/NetAPI.jl") # API for Petri nets, graphs, et al.
 using .NetAPI
-
 include("Core/enable_filters.jl")
-
-# PARSE
 include("Parser/Parser.jl")
 using .Parser
 

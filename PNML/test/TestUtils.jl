@@ -3,62 +3,43 @@ module TestUtils
 using EzXML, Preferences, XMLDict, Reexport, Multisets
 Multisets.set_key_value_show()
 
-@reexport import Moshi
-@reexport import Moshi.Match: @match
-@reexport import Moshi.Data: @data, isa_variant, is_data_type, variant_type
-
 @reexport using PNML
+@reexport using PNML: AbstractDeclaration, AbstractOperator, AbstractTerm, AbstractVariable,
+    AnyElement, BooleanConstant, Coordinate, DeclDict, DotConstant, DotConstantEx,
+    DuplicateIDException, FEConstant, MalformedException, Maybe, MissingIDException,
+    NumberConstant, Page, PartitionElement, Place, PnmlException, PnmlExpr, PnmlModel,
+    PnmlMultiset, PnmlNet, PnmlNetData, PnmlNetKeys, RefPlace, RefTransition, SortType,
+    Transition, XmlDictType, allpages, arbitrarysort, arbitrarysorts, arc, arc_idset,
+    arcdict, arcs, arity, cardinality, condition, decldict, elements, extralabels,
+    fill_builtin_labelparsers!, fill_builtin_sorts!, fill_builtin_toolparsers!,
+    fill_sort_tag!, firstpage, flatten_pages!, graphics, has_arc, has_graphics, has_place,
+    has_tools, has_transition, initial_marking, inputs, inscription, ispid, length,
+    make_net, multiplicity, multiset, name, namedsort, namedsorts, narcs, netdata, nets,
+    netsets, nettype, npages, nplaces, nrefplaces, nreftransitions, ntransitions,
+    page_idset, pagedict, pages, partitionsort, partitionsorts, pid, place, place_idset,
+    placedict, places, pntd, refid, refplace, refplace_idset, refplacedict, refplaces,
+    reftransition, reftransition_idset, reftransitiondict, reftransitions, registry_of,
+    sortdefinition, sortelements, sortref, source, tag, target, term, toexpr, toolinfos,
+    transition, transition_idset, transitiondict, transitions, value, value_type, varsubs,
+    zero
 @reexport using PNML.Sorts
 @reexport using PNML.Labels
-@reexport using PNML.Labels:
-    Condition,  PnmlLabel, TokenGraphics, get_toolinfo, text, version, get_label
-@reexport using PNML.Parser:
-    allchildren, anyelement, default, firstchild, parse_arc,
+@reexport using PNML.Labels: get_label
+@reexport using PNML.Parser
+@reexport using PNML.Parser: allchildren, anyelement, default, firstchild, parse_arc,
     parse_declaration!, parse_declarations!, parse_fifoinitialMarking, parse_graphics,
     parse_hlinitialMarking, parse_hlinscription, parse_initialMarking, parse_inscription,
     parse_name, parse_net, parse_page!, parse_place, parse_refPlace, parse_refTransition,
     parse_sort, parse_text, parse_toolspecific, parse_transition, pnmlmodel, to_sort,
     xmldict
-@reexport using PNML.Parser
-@reexport using PNML.NetAPI
 @reexport using PNML.Declarations
 @reexport using PNML.IDRegistrys
 @reexport using PNML.PnmlTypes
 @reexport using PNML.PnmlGraphics
-
-@reexport using PNML: @xml_str, AbstractDeclaration, AbstractOperator, AbstractSort, AbstractTerm,
-    AbstractVariable, AnyElement, ArbitrarySort, Arc, BoolSort, BooleanConstant,
-    Coordinate, CyclicEnumerationSort, DeclDict, Declaration, DotConstant, DotConstantEx,
-    DotSort, DuplicateIDException, FEConstant, FiniteEnumerationSort, FiniteIntRangeSort,
-    IntegerSort, ListSort, MalformedException, Maybe, MissingIDException, MultisetSort,
-    NamedSort, NaturalSort, NumberConstant, Page, PartitionElement, PartitionSort, Place,
-    PnmlException, PnmlExpr, PnmlModel, PnmlMultiset, PnmlNet, PnmlNetData, PnmlNetKeys,
-    PositiveSort, ProductSort, RealSort, RefPlace, RefTransition, SortType, StringSort,
-    Transition, XMLNode, XmlDictType, allpages, arbitrarysort, arbitrarysorts, arc,
-    arc_idset, arcdict, arcs, arity, cardinality, condition, decldict, elements,
-    extralabels,
-    fill_builtin_labelparsers!, fill_builtin_sorts!, fill_builtin_toolparsers!,
-    fill_sort_tag!, firstpage, flatten_pages!, graphics, has_arc, has_graphics,
-    has_place, has_tools, has_transition, initial_marking, inputs, inscription, ispid,
-    length, make_net, multiplicity, multiset, name, namedsort, namedsort, namedsorts,
-    narcs, netdata, nets, netsets, nettype, npages, nplaces, nrefplaces, nreftransitions,
-    ntransitions, page_idset, pagedict, pagedict, pages, partitionsort, partitionsorts,
-    pid, place, place_idset, placedict, places, pntd, refid, refplace, refplace_idset,
-    refplacedict, refplaces, reftransition, reftransition_idset, reftransitiondict,
-    reftransitions, registry_of, sortdefinition, sortelements, sortref, source, tag,
-    target, term, toexpr, toolinfos, transition, transition_idset, transitiondict,
-    transitions, value, value_type, varsubs, xmlnode, zero
-
-@reexport using PNML.SortRefImpl: UserSortRef, NamedSortRef, PartitionSortRef,
-                    ProductSortRef, MultisetSortRef, ArbitrarySortRef
-
+@reexport using PNML.SortRefImpl
 @reexport using PNML.Expressions
+@reexport using PNML.NetAPI
 @reexport using PNML.NetAPI: metagraph, vertex_codes, vertex_labels
-
-
-
-
-#!@reexport using PNet: initial_markings
 
 "Run @test_opt, expect many dynamic dispatch reports."
 const runopt::Bool = false
