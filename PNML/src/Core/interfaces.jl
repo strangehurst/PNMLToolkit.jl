@@ -570,6 +570,6 @@ function has_feconstant end
 function has_useroperator end
 
 """
-    pntd(net) -> AbstractPnmlType
+    pntd_of(net) -> AbstractPnmlType
 """
-function pntd end
+function pntd_of end

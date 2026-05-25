@@ -42,7 +42,7 @@ using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict,
     is_namedsort, is_normal,
     is_partitionsort, is_productsort, is_read, is_reset, is_usersort, multisetsorts,
     namedoperators, namedsorts, netsets, number_value, operator, page_idset, pagedict,
-    partitionsorts, pid, place, place_idset, placedict, pntd, productsorts,
+    partitionsorts, pid, place, place_idset, placedict, pntd_of, productsorts,
     refplace_idset, refplace_idset, refplacedict, reftransition_idset, reftransitiondict,
     registry_of, to_sort, toolinfos, transition_idset, transitiondict, value_type,
     variabledecl, variabledecls, verify

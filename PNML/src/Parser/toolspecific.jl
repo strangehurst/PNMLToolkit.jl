@@ -44,7 +44,7 @@ end
 Parse `ToolInfo` content that is expected to be `<tokengraphics>`.
 """
 function tokengraphics_content(node::XMLNode, net::APN)
-    parse_tokengraphics(EzXML.firstelement(node), pntd(net))
+    parse_tokengraphics(EzXML.firstelement(node), pntd_of(net))
 end
 
 """
@@ -89,7 +89,7 @@ Parse `ToolInfo` content. Example:
 ```
 """
 function nupn_content end
-nupn_content(node::XMLNode, net::APN) = nupn_content(node, pntd(net))
+nupn_content(node::XMLNode, net::APN) = nupn_content(node, pntd_of(net))
 function nupn_content(node::XMLNode, pntd::APNTD)
     nupn = anyelement(Symbol(EzXML.nodename(node)), node)
     #@show nupn

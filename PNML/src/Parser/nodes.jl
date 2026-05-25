@@ -28,7 +28,7 @@ end
 function parse_arc!(netsets, netdata, node, net::APN)
     a = parse_arc(node, net)
     a isa valtype(arcdict(netdata)) ||
-        @error("$(typeof(a)) not a $(valtype(arcdict(netdata)))) $(pntd(net)) $(repr(a))")
+        @error("$(typeof(a)) not a $(valtype(arcdict(netdata)))) $(pntd_of(net)) $(repr(a))")
     push!(arc_idset(netsets)::OrderedSet{Symbol}, pid(a))
     arcdict(netdata)[pid(a)] = a
     return arc_idset(netsets)
@@ -58,7 +58,7 @@ For high-level nets, the marking is an empty multiset whose basis matches `place
 Others have a marking that is a `Number`.
 """
 function default(::Type{<:Marking}, net::APN, _placetype::SortType)
-    Marking(zero(value_type(Marking, pntd(net))), net) # not high-level!
+    Marking(zero(value_type(Marking, pntd_of(net))), net) # not high-level!
 end
 
 function default(::Type{<:Marking}, net::PnmlNet{T}, placetype::SortType) where {T <: AbstractHLCore}
@@ -92,10 +92,10 @@ function parse_place(node::XMLNode, net::APN)
     # Get sorttype to use in parsing marking.
     sorttype::Maybe{SortType} = let typenode = firstchild(node, "type")
         if isnothing(typenode) # Deduce sort type of place if possible.
-            if isa(pntd(net), AbstractHLCore) && !isa(pntd(net), PT_HLPNG)
+            if isa(pntd_of(net), AbstractHLCore) && !isa(pntd_of(net), PT_HLPNG)
                 nothing # Deduce from initial marking.
             else
-                SortType("default", Labels.default_typesort(pntd(net)), net)
+                SortType("default", Labels.default_typesort(pntd_of(net)), net)
             end
         else
             parse_sorttype(typenode, net; parentid=placeid)
@@ -110,14 +110,14 @@ function parse_place(node::XMLNode, net::APN)
     for place_child in EzXML.eachelement(node)
         tag = Symbol(EzXML.nodename(place_child))
         if tag == :initialMarking || tag == :hlinitialMarking tag == :fifoinitialMarking
-            isnothing(sorttype) && @warn "$pntd parse_place $placeid sorttype is nothing"
+            isnothing(sorttype) && @warn "$(pntd_of(net)) parse_place $placeid sorttype is nothing"
             mark = net.labelparser[tag](place_child, sorttype, net, parentid=placeid)
         elseif tag == :type
             # we already handled this
         elseif tag == :name
             namelabel = net.labelparser[tag](place_child, net, parentid=placeid)
         elseif tag == :graphics
-            graphics = parse_graphics(place_child, pntd(net))
+            graphics = parse_graphics(place_child, pntd_of(net))
         elseif tag == :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, place_child, net) # place
         else
@@ -126,9 +126,9 @@ function parse_place(node::XMLNode, net::APN)
     end
 
     if isnothing(mark) # Use additive identity of proper sort as default value.
-        effective_sorttype = if is_highlevel(pntd(net)) && isnothing(sorttype)
+        effective_sorttype = if is_highlevel(pntd_of(net)) && isnothing(sorttype)
             #D()&&
-            @error("$pntd parse_place $(repr(placeid)) has neither a mark nor sorttype, " *
+            @error("$(pntd_of(net)) parse_place $(repr(placeid)) has neither a mark nor sorttype, " *
                             "use :dot even if it is WRONG")
             SortType("dummy", NamedSortRef(:dot), net)
         else
@@ -171,7 +171,7 @@ function parse_transition(node::XMLNode, net::APN)
         elseif tag == :name
             namelabel = net.labelparser[tag](trans_child, net, parentid=transitionid)
         elseif tag == :graphics
-            graphics = parse_graphics(trans_child, pntd(net))
+            graphics = parse_graphics(trans_child, pntd_of(net))
         elseif tag == :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, trans_child, net)
         else
@@ -188,7 +188,7 @@ end #= function parse_transition =#
 function default(::Type{<:Inscription}, net::APN)
     #! Move this check to a verify! method! XXX
     # if refid(placetype) !== :positive
-    #     @error(string("$(pntd(net)) default Inscription $placetype mismatch ",
+    #     @error(string("$(pntd_of(net)) default Inscription $placetype mismatch ",
     #                   "$(repr(refid(placetype))) != :positive"))
     # end
     Inscription(nothing, NumberEx(NamedSortRef(:positive), one(Int)), nothing, nothing, REFID[], net)
@@ -247,7 +247,7 @@ function parse_arc(node::XMLNode, net::APN)
         elseif tag == :arctype
             arc_type_label = net.labelparser[tag](arc_child, net, parentid=arc_id)
         elseif tag == :graphics
-            graphics = parse_graphics(arc_child, pntd(net))
+            graphics = parse_graphics(arc_child, pntd_of(net))
         elseif tag == :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, arc_child, net)
         else
@@ -260,7 +260,7 @@ function parse_arc(node::XMLNode, net::APN)
     # It may have non-ground terms as parameters.
 
     if isnothing(inscription)
-    #     dummy_placetype = if is_highlevel(pntd(net))
+    #     dummy_placetype = if is_highlevel(pntd_of(net))
     #         if pntd isa PT_HLPNG
     #             SortType("dummy PT_HLPNG", NamedSortRef(:dot), net)
     #         else
@@ -278,14 +278,14 @@ function parse_arc(node::XMLNode, net::APN)
     #             end
     #             SortType("dummy HIGHLEVEL", sr,  net)
     #        end
-    #     elseif is_continuous(pntd(net))
+    #     elseif is_continuous(pntd_of(net))
     #         SortType("dummy CONTINUOUS", NamedSortRef(:real), net)
-    #     elseif is_discrete(pntd(net))
+    #     elseif is_discrete(pntd_of(net))
     #         SortType("dummy DISCRETE", NamedSortRef(:positive), net)
     #     end
-        if is_collective_token(pntd(net))
+        if is_collective_token(pntd_of(net))
             inscription = default(Inscription, net)
-        elseif is_individual_token(pntd(net))
+        elseif is_individual_token(pntd_of(net))
             # Try to deduce using the adjacent place.
             # NB: adjacent place may have not been parsed yet.
             sr = if has_place(net, source)
@@ -293,7 +293,7 @@ function parse_arc(node::XMLNode, net::APN)
             elseif has_place(net, target)
                 sortref(place(net, target))
             else
-                @error string("$pntd inscription not provided for ",
+                @error string("$(pntd_of(net)) inscription not provided for ",
                             "arc $arc_id ($source -> $target), ",
                             "and we failed to deduce a sorttype, will use :dot.")
                 NamedSortRef(:dot)
@@ -334,7 +334,7 @@ function parse_refPlace(node::XMLNode, net::APN)
         if tag == :name
             namelabel = net.labelparser[tag](refp_child, net, parentid=refp_id)
         elseif tag == :graphics
-            graphics =  parse_graphics(refp_child, pntd(net))
+            graphics =  parse_graphics(refp_child, pntd_of(net))
         elseif tag == :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, refp_child, net)
         else
@@ -365,7 +365,7 @@ function parse_refTransition(node::XMLNode, net::APN)
         if tag == :name
             namelabel = net.labelparser[tag](reft_child, net, parentid=reft_id)
         elseif tag == :graphics
-            graphics = parse_graphics(reft_child, pntd(net))
+            graphics = parse_graphics(reft_child, pntd_of(net))
         elseif tag == :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, reft_child, net)
         else

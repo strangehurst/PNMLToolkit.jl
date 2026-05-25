@@ -18,7 +18,7 @@ using LoggingExtras
 using NamedTupleTools
 using PNML
 using PNML: AbstractLabel, AbstractPnmlNode, Annotation, AnyElement, BooleanConstant, D,
-    HLAnnotation, Maybe, ToolParser, indent, namedsort, pntd
+    HLAnnotation, Maybe, ToolParser, indent, namedsort, pntd_of
 
 export ArcType, ArcTypeEnum, Condition, Declaration, Graphics, Inscription, Marking, Name,
     PnmlGraphics, PnmlLabel, Priority, Rate, SortType, Time, ToolInfo, ToolParser,

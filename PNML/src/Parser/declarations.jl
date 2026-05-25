@@ -37,7 +37,7 @@ function parse_declaration!(net::APN, nodes::Vector{XMLNode})
                 # Do not expect text here, so it must be important?
                 # @info "declaration text: $text"
             elseif tag == "graphics" && isnothing(graphics) # no overwrite if repeated
-                graphics = parse_graphics(child, pntd(net))
+                graphics = parse_graphics(child, pntd_of(net))
             elseif tag == "toolspecific"
                 toolspecinfos = add_toolinfo(toolspecinfos, child, net)
             else
@@ -498,7 +498,7 @@ end
 
 function parse_sort(::Val{:list}, node::XMLNode, net::APN, parentid, name)
     check_nodename(node, "list")
-    @error("IMPLEMENT ME: :list for pntd=$(pntd(net))")
+    @error("IMPLEMENT ME: :list for pntd=$(pntd_of(net))")
     ls = ListSort(NamedSortRef(:dot)) #! Made up, until we parse `node!
     ls_id = gensym("list")
     !isregistered(net.idregistry, ls_id) && register_id!(net.idregistry, ls_id)

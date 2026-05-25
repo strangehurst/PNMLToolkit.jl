@@ -105,7 +105,7 @@ function Base.show(io::IO, ptm::Marking)
 end
 
 #--------------------------------------------------------------------------------------
-value_type(::Type{Marking}, net::APN) = value_type(Marking, pntd(net))
+value_type(::Type{Marking}, net::APN) = value_type(Marking, pntd_of(net))
 
 # These are networks where the tokens have a collective identities.
 value_type(::Type{Marking}, ::APNTD) = eltype(NaturalSort) #::Int

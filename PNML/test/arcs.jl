@@ -27,7 +27,7 @@ end
 #! arc needs :place1 for adjacent place
 "Parse place with marking, add to dict & id set"
 function pl_node(net, netdata, netsets)
-    node = if is_highlevel(net)
+    node = if is_highlevel(pntd_of(net))
         xml"""
             <place id="place1">
             <name> <text>with text</text> </name>
@@ -76,7 +76,7 @@ println("\nARC\n")
      node = xmlnode("""
       <arc source="transition1" target="place1" id="arc1">
         <name> <text>Some arc</text> </name>
-        $(insc_xml(PNML.pntd(net)))
+        $(insc_xml(PNML.pntd_of(net)))
         <unknown id="unkn">
             <name> <text>unknown label</text> </name>
             <text>content text</text>
@@ -95,7 +95,7 @@ println("\nARC\n")
     @test has_graphics(a)
     @test_call inscription(a)
     #@show a inscription(a)(NamedTuple())
-    if is_highlevel(net) # assumes storttype of dot
+    if is_highlevel(pntd_of(net)) # assumes storttype of dot
         @test cardinality(inscription(a)(NamedTuple())) == 6
     else
         @test inscription(a)(NamedTuple()) == 6
@@ -111,7 +111,7 @@ end
     node = xmlnode("""
       <arc source="transition1" target="place1" id="arc1">
         <name> <text>Some arc</text> </name>
-        $insc_xml(pntd(net))
+        $insc_xml(pntd_of(net))
         <unknown id="unkn">
             <name> <text>unknown label</text> </name>
             <text>content text</text>

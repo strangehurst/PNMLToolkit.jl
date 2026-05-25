@@ -17,7 +17,7 @@ Multisets.set_key_value_show()
     make_net, multiplicity, multiset, name, namedsort, namedsorts, narcs, netdata, nets,
     netsets, nettype, npages, nplaces, nrefplaces, nreftransitions, ntransitions,
     page_idset, pagedict, pages, partitionsort, partitionsorts, pid, place, place_idset,
-    placedict, places, pntd, refid, refplace, refplace_idset, refplacedict, refplaces,
+    placedict, places, pntd_of, refid, refplace, refplace_idset, refplacedict, refplaces,
     reftransition, reftransition_idset, reftransitiondict, reftransitions, registry_of,
     sortdefinition, sortelements, sortref, source, tag, target, term, toexpr, toolinfos,
     transition, transition_idset, transitiondict, transitions, value, value_type, varsubs,

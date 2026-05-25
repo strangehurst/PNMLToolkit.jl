@@ -23,9 +23,9 @@ function parse_name(node::XMLNode, net::APN; parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            text = parse_text(child, pntd(net))
+            text = parse_text(child, pntd_of(net))
         elseif tag == "graphics"
-            graphics = parse_graphics(child, pntd(net))
+            graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
             toolspecinfos = add_toolinfo(toolspecinfos, child, net) # of name label
         else
@@ -70,9 +70,9 @@ function parse_arctype(node::XMLNode, net::APN; parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            text = parse_text(child, pntd(net))
+            text = parse_text(child, pntd_of(net))
         elseif tag == "graphics"
-            graphics = parse_graphics(child, pntd(net))
+            graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
             toolspecinfos = add_toolinfo(toolspecinfos, child, net) # name label
         else
@@ -128,19 +128,19 @@ function parse_label_content(node::XMLNode, termparser::F, net::APN) where {F}
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            text = parse_text(child, pntd(net))
+            text = parse_text(child, pntd_of(net))
         elseif tag == "structure"
             (; exp, ref, vars) = termparser(child, net) #collects variables
         elseif tag == "graphics"
-            graphics = parse_graphics(child, pntd(net))
+            graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
             toolspecinfos = add_toolinfo(toolspecinfos, child, net)
         else
-            @warn("ignoring unexpected child of <$(EzXML.nodename(node))>: '$tag'", termparser, pntd(net))
+            @warn("ignoring unexpected child of <$(EzXML.nodename(node))>: '$tag'", termparser, pntd_of(net))
         end
     end
     isnothing(exp) && isnothing(text) &&
-        error("$(pntd(net)) parse_label_content missing <structure> and <text> for $(EzXML.nodename(node)), one or both is expected")
+        error("$(pntd_of(net)) parse_label_content missing <structure> and <text> for $(EzXML.nodename(node)), one or both is expected")
     #D()&& @info "parse_label_content", text, exp, ref, graphics, toolspecinfos, vars
     return (; text, exp, sort=ref, graphics, toolspecinfos, vars)
 end
@@ -192,19 +192,19 @@ function parse_initialMarking(node::XMLNode, placetype::Maybe{SortType}, net::AP
     # to the label apply `parse_structure` as a `termparser`.
     l = parse_label_content(node, parse_structure, net)::NamedTuple
     if !isnothing(l.exp) # There was a <structure> tag. It is now an expression.
-        @warn "$nn place $parentid <structure> element in $(pntd(net)) net; parsed as $(l.exp)"
+        @warn "$nn place $parentid <structure> element in $(pntd_of(net)) net; parsed as $(l.exp)"
     end
     if isnothing(l.text) # Expected for non-HL values if there is an <initialMarking>.
-        @warn "$nn place $parentid <text> element expected for $(pntd(net)) net"
+        @warn "$nn place $parentid <text> element expected for $(pntd_of(net)) net"
     end
     @assert isempty(l.vars) # All markings are ground terms.
     # sr = @show sortref(placetype)
     # ts = @show to_sort(sr, net)
     # pt = @show eltype(ts)
     pt = eltype(to_sort(sortref(placetype), net))
-    mvt = eltype(value_type(Marking, pntd(net)))
+    mvt = eltype(value_type(Marking, pntd_of(net)))
     pt <: mvt ||
-        @error("initial marking value type of $(pntd(net)) must be $mvt, found: $pt")
+        @error("initial marking value type of $(pntd_of(net)) must be $mvt, found: $pt")
     value = isnothing(l.text) ? zero(pt) : number_value(pt, l.text)
     # We ate the text to make the expression.
     Marking(NumberEx(sortref(placetype), value), nothing, l.graphics, l.toolspecinfos, net)
@@ -215,7 +215,7 @@ $(TYPEDSIGNATURES)
 Ignore the source & target symbols.
 """
 function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net::APN; parentid::Symbol)
-    @assert !(pntd(net) isa AbstractHLCore) "inscription unexpected on pntd $(pntd(net)): $parentid"
+    @assert !(pntd_of(net) isa AbstractHLCore) "inscription unexpected on pntd $(pntd_of(net)): $parentid"
     check_nodename(node, "inscription")
     value = nothing
     graphics::Maybe{Graphics} = nothing
@@ -224,9 +224,9 @@ function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net:
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = number_value(value_type(Inscription, pntd(net)), parse_text(child, pntd(net)))
+            value = number_value(value_type(Inscription, pntd_of(net)), parse_text(child, pntd_of(net)))
         elseif tag == "graphics"
-            graphics = parse_graphics(child, pntd(net))
+            graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
             toolspecinfos = add_toolinfo(toolspecinfos, child, net) # inscription label
         else
@@ -236,7 +236,7 @@ function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net:
 
     # Treat missing value as if the <inscription> element was absent.
     if isnothing(value)
-        value = one(value_type(Inscription, pntd(net)))
+        value = one(value_type(Inscription, pntd_of(net)))
     end
     term = NumberEx(sortref(value), value)
     Inscription(nothing, term, graphics, toolspecinfos, REFID[], net)
@@ -262,24 +262,24 @@ function parse_hlinitialMarking(node::XMLNode, default_sorttype::Maybe{SortType}
     isnothing(l.sort) &&
         error("Missing parse_hlinitialMarking sort")
     isnothing(l.exp) &&
-        error("Missing expression for $(pntd(net)) net")
+        error("Missing expression for $(pntd_of(net)) net")
     placetype = l.sort
 
     if !(is_namedsort(placetype) ||
         (is_productsort(placetype) && all(is_namedsort, Sorts.sorts(placetype, net))))
-        @error("$(pntd(net)) placetype of $parentid expected to be NamedSortRef" *
+        @error("$(pntd_of(net)) placetype of $parentid expected to be NamedSortRef" *
                 " or product of named sorts, found $placetype")
     end
 
     #^ Do an equalSorts default_sorttype if !nothing.
     if !isnothing(default_sorttype)
         if !is_namedsort(sortref(default_sorttype))
-            error("$(pntd(net)) default_sorttype of $parentid " *
+            error("$(pntd_of(net)) default_sorttype of $parentid " *
                     "expected to be NamedSortRef, found $default_sorttype")
         end
         if !equalSorts(net, sortref(default_sorttype), placetype)
             println()
-            @error("$(pntd(net)) parse_hlinitialMarking of $parentid " *
+            @error("$(pntd_of(net)) parse_hlinitialMarking of $parentid " *
                     "sortref mismatch: $default_sorttype != $placetype",
                     default_sorttype, placetype, l)
             println()
@@ -315,14 +315,14 @@ function parse_fifoinitialMarking(node::XMLNode, default_sorttype::Maybe{SortTyp
 
     l = parse_label_content(node, ParseMarkingTerm(defsort), net)::NamedTuple
     isnothing(l.exp) &&
-        error("Missing expression for $(pntd(net)) net")
+        error("Missing expression for $(pntd_of(net)) net")
     isnothing(l.sort) &&
         error("Missing parse_fifoinitialMarking sort")
     placetype = l.sort
 
     if !(is_namedsort(placetype) ||
             (is_productsort(placetype) && all(is_namedsort, Sorts.sorts(placetype, net))))
-        @error(string("$(pntd(net)) placetype of $parentid expected to be NamedSortRef",
+        @error(string("$(pntd_of(net)) placetype of $parentid expected to be NamedSortRef",
                       " or product of named sorts, found $placetype"))
         is_productsort(placetype) && foreach(println, Sorts.sorts(placetype, net))
     end
@@ -330,12 +330,12 @@ function parse_fifoinitialMarking(node::XMLNode, default_sorttype::Maybe{SortTyp
     #^ Do an equalSorts default_sorttype if !nothing.
     if !isnothing(default_sorttype)
         if !is_namedsort(sortref(default_sorttype))
-            error("$(pntd(net)) default_sorttype of $parentid expected to be NamedSortRef" *
+            error("$(pntd_of(net)) default_sorttype of $parentid expected to be NamedSortRef" *
                     ", found $default_sorttype")
         end
         if !equalSorts(net, sortref(default_sorttype), placetype)
             println()
-            @error(string("$(pntd(net)) parse_fifoinitialMarking of $parentid",
+            @error(string("$(pntd_of(net)) parse_fifoinitialMarking of $parentid",
                           " sortref mismatch: $default_sorttype != $placetype"),
                     default_sorttype, placetype, l)
             println()
@@ -376,9 +376,9 @@ function (pmt::ParseMarkingTerm)(marknode::XMLNode, net::APN)
         mark_tj = parse_term(term, net; vars=()) # ParseMarkingTerm
         isempty(mark_tj.vars) || error("unexpected variables in $mark_tj")
         if isnothing(placetype(pmt))
-            @warn "$(pntd(net)) ParseMarkingTerm placetype(pmt) is nothing"
+            @warn "$(pntd_of(net)) ParseMarkingTerm placetype(pmt) is nothing"
         elseif !equalSorts(net, mark_tj.ref, placetype(pmt)::SortRef)
-            @warn "$(pntd(net)) ParseMarkingTerm sort mismatch" mark_tj.ref placetype(pmt) mark_tj
+            @warn "$(pntd_of(net)) ParseMarkingTerm sort mismatch" mark_tj.ref placetype(pmt) mark_tj
         end
         return mark_tj
 
@@ -588,8 +588,8 @@ For future support of structure elements in non-High-Level nets.
 """
 function parse_structure(node::XMLNode, net::APN)
     check_nodename(node, "structure")
-    @warn "parse_structure is not implemented for $(pntd(net)) " xmldict(node)
-    error("parse_structure is not implemented for $(pntd(net))")
+    @warn "parse_structure is not implemented for $(pntd_of(net)) " xmldict(node)
+    error("parse_structure is not implemented for $(pntd_of(net))")
 end
 
 function parse_rate(node::XMLNode, net::APN, parentid)
@@ -602,9 +602,9 @@ function parse_rate(node::XMLNode, net::APN, parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = number_value(value_type(Rate, pntd(net)), parse_text(child, pntd(net)))
+            value = number_value(value_type(Rate, pntd_of(net)), parse_text(child, pntd_of(net)))
         elseif tag == "graphics"
-            graphics = parse_graphics(child, pntd(net))
+            graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
             toolspecinfos = add_toolinfo(toolspecinfos, child, net) # inscription label
         else
@@ -614,7 +614,7 @@ function parse_rate(node::XMLNode, net::APN, parentid)
 
     # Treat missing value as if the <rate> element was absent.
     if isnothing(value)
-        value = one(value_type(Rate, pntd(net)))
+        value = one(value_type(Rate, pntd_of(net)))
     end
 
     term = NumberEx(sortref(value), value)
@@ -632,9 +632,9 @@ function parse_priority(node::XMLNode, net::APN, parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = number_value(value_type(Priority, pntd(net)), parse_text(child, pntd(net)))
+            value = number_value(value_type(Priority, pntd_of(net)), parse_text(child, pntd_of(net)))
         elseif tag == "graphics"
-            graphics = parse_graphics(child, pntd(net))
+            graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
             toolspecinfos = add_toolinfo(toolspecinfos, child, net) # inscription label
         else
@@ -644,7 +644,7 @@ function parse_priority(node::XMLNode, net::APN, parentid)
 
     # Treat missing value as if the element was absent.
     if isnothing(value)
-        value = one(value_type(Priority, pntd(net)))
+        value = one(value_type(Priority, pntd_of(net)))
     end
 
     term = NumberEx(sortref(value), value)

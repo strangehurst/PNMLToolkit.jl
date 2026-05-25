@@ -241,7 +241,7 @@ function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) wher
         elseif nname == :name
             page.namelabel = net.labelparser[nname](child, net; parentid=pageid)
         elseif nname == :graphics
-            page.graphics = parse_graphics(child, pntd(net))
+            page.graphics = parse_graphics(child, pntd_of(net))
         else
             unexpected_label!(page.extralabels, child, nname, net; parentid=pageid)
         end

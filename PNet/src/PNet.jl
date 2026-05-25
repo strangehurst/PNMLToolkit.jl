@@ -10,7 +10,7 @@ import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import PNML
 import PNML: PnmlMultiset,
     initial_marking, initial_markings, metagraph, nettype, pid,
-    pnmlmodel, pntd, rates
+    pnmlmodel, pntd_of, rates
 import XMLDict
 
 using DocStringExtensions

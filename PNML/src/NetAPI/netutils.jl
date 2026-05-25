@@ -128,7 +128,7 @@ Will not appear in input marking or output of fir!(incidence, enabled, marking).
 ########################################################################################
 function input_matrix(net::AbstractPnmlNet)
     # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-    ivt = pntd(net) isa PT_HLPNG ? Int : value_type(Inscription, pntd(net))
+    ivt = pntd_of(net) isa PT_HLPNG ? Int : value_type(Inscription, pntd_of(net))
     imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return input_matrix!(imatrix, net) # Dispatch on net type.
 end
@@ -140,7 +140,7 @@ function input_matrix!(imatrix, net::AbstractPnmlNet)
         for (t, transition_id) in enumerate(transition_idset(net))
             z = zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
             a = arc(net, place_id, transition_id)
-            imatrix[t, p] = _cvt_inscription_value(pntd(net), a, z, varsub)#::Number
+            imatrix[t, p] = _cvt_inscription_value(pntd_of(net), a, z, varsub)#::Number
         end
     end
 return imatrix
@@ -148,7 +148,7 @@ end
 
 function output_matrix(net::AbstractPnmlNet)
     # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-    ivt = pntd(net) isa PT_HLPNG ? Int : value_type(Inscription, pntd(net))
+    ivt = pntd_of(net) isa PT_HLPNG ? Int : value_type(Inscription, pntd_of(net))
     omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return output_matrix!(omatrix, net) # Dispatch on net type.
 end
@@ -159,7 +159,7 @@ function output_matrix!(omatrix, net::AbstractPnmlNet)
         for (t, transition_id) in enumerate(transition_idset(net))
             z = zero_marking(place(net, place_id))
             a = arc(net, transition_id, place_id)
-            omatrix[t, p] = _cvt_inscription_value(pntd(net), a, z, varsub)#::Number
+            omatrix[t, p] = _cvt_inscription_value(pntd_of(net), a, z, varsub)#::Number
         end
     end
 return omatrix

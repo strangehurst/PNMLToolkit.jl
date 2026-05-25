@@ -103,8 +103,8 @@ end
     @test all(registry_of(n) isa IDRegistry for n in modelnets)
 
     for net in modelnets
-        @test_opt pntd(net)
-        ntup = PNML.find_nets(model, pntd(net))
+        @test_opt pntd_of(net)
+        ntup = PNML.find_nets(model, pntd_of(net))
         t = PNML.nettype(net)
         @test name(net) == string(pid(net)) # true by special construction
         for n in ntup

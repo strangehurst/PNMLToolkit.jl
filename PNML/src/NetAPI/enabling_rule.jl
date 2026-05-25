@@ -157,7 +157,7 @@ function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
         if isempty(tr_vars) # 0-ary operators or constants
             # This includes the non-HL net types that do not have variables.
             eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-            inscription_val = _cvt_inscription_value(pntd(net), ar,
+            inscription_val = _cvt_inscription_value(pntd_of(net), ar,
                                         zero_marking(place(net, place_id)), NamedTuple())
             mark >= inscription_val || return false
         else
@@ -173,7 +173,7 @@ function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
                 tr_vsub = namedtuple(vids, candidate_params)
                 # condition expression may contain variables.
                 eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
-                inscription_val = _cvt_inscription_value(pntd(net), ar,
+                inscription_val = _cvt_inscription_value(pntd_of(net), ar,
                                     zero_marking(place(net, place_id)), tr_vsub)
                 mark = unwrap_pmset(mark)
                 issubset(inscription_val, mark) || continue # not a valid substitution

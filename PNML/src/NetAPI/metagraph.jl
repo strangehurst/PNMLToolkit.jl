@@ -7,10 +7,10 @@ Note that when `is_collective_token` is true the graph `weight_function` becomes
 function metagraph end
 metagraph(model::PnmlModel) = metagraph(first(nets(model)))
 function metagraph(net::PnmlNet{P})where {P <: AbstractPnmlType}
-    #! println("\nmetagraph $(pntd(net)) $(pid(net))")
+    #! println("\nmetagraph $(pntd_of(net)) $(pid(net))")
 
     if !(narcs(net) > 0 && nplaces(net) > 0 && ntransitions(net) > 0)
-        msg = string("Attempted to create a `MetaGraph` from an incomplete $(pntd(net)) graph: ",
+        msg = string("Attempted to create a `MetaGraph` from an incomplete $(pntd_of(net)) graph: ",
                   " net id = ", pid(net),
                   " narcs = ", narcs(net),
                   " nplaces = ", nplaces(net),
@@ -37,11 +37,11 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPnmlType}
     @assert length(edge_data) == Graphs.ne(graph)
 
     #todo weight function for MetaGraph
-    weight_function, default_weight = if is_collective_token(pntd(net))
+    weight_function, default_weight = if is_collective_token(pntd_of(net))
         tuple(a -> inscription(a)(NamedTuple()), # No variable substitutions here.
               PNML.Parser.default(Inscription, net))
     else
-        @error "graph edge weight function of multiset in $(pntd(net)) $(pid(net))"
+        @error "graph edge weight function of multiset in $(pntd_of(net)) $(pid(net))"
         tuple(a -> 1, 1)
     end
 
