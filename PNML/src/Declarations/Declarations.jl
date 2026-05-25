@@ -17,7 +17,6 @@ export AbstractDeclaration, ArbitraryOperator, ArbitrarySort, NamedOperator, Nam
     OperatorDeclaration, PartitionElement, PartitionSort, SortDeclaration,
     UnknownDeclaration, VariableDeclaration, element_ids, verify_partition
 
-
 include("declarations.jl")
 include("partitions.jl")
 include("arbitrarydeclarations.jl")
