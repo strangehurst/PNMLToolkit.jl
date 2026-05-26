@@ -113,9 +113,9 @@ end
     HLPetriNet(model::PnmlModel)
 
 Construct Petri net from the first network in model.
-Construct model from string of valid pnml XML and possible LabelParser & ToolParser vectors.
+Construct model from string of valid pnml XML and possible `LabelParser` & `ToolParser` vectors.
 
-HLPetriNet wraps a single PnmlNet. Presumes that the net does not need to be flattened
+`HLPetriNet` wraps a single `PnmlNet`. Presumes that the net does not need to be flattened
 as all content is in first page.
 
 $(TYPEDEF)
