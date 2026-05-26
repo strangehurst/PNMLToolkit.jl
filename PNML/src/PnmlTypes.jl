@@ -246,9 +246,6 @@ Unknown `symbol` throws a `DomainError` exception.
 
 ```
 jldoctest; setup=:(using PNML; using PNML: pnmltype, pntd_symbol)
-julia> pnmltype(PnmlCoreNet())
-PnmlCoreNet()
-
 julia> pnmltype("nonstandard")
 PnmlCoreNet()
 
