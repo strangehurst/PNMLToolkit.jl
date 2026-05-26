@@ -385,9 +385,9 @@ methods(PNML.value) # hide
 ```
 
 ### get_label - get a specific label
-[`get_label`](@ref)
+[`get_label`](@ref PNML.Labels.get_label)
 ```@example methods
-methods(PNML.get_label) # hide
+methods(PNML.Labels.get_label) # hide
 ```
 
 ## ToolInfo
