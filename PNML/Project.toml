@@ -1,6 +1,6 @@
 name = "PNML"
 uuid = "1f34f301-fe8c-4464-8328-ff2334f05424"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Jeff Hurst <strangehurst@users.noreply.github.com>"]
 
 [workspace]

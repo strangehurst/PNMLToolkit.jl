@@ -1,6 +1,6 @@
 name = "PNet"
 uuid = "b17e8b3e-4e57-4399-9a85-41e87fede9cd"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Jeff <strangehurst@gmail.com>"]
 
 [workspace]
@@ -36,7 +36,7 @@ MetaGraphsNext = "0.7, 0.8"
 Multisets = "0.4.5"
 NamedTupleTools = "0.14.3"
 OrderedCollections = "1.8.1"
-PNML = "0.1.0"
+PNML = "0.1.2"
 SciMLLogging = "1.9, 2.0.0"
 TermInterface = "2.0.0"
 XMLDict = "0.4.1"
