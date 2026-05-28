@@ -6,7 +6,7 @@ CurrentModule = PNML
 
 Documentation for the GitHub [PNML.jl](https://github.com/strangehurst/PNML.jl) repository.
 Which defines a Julia module named `PNML`.
-Which handles an XML markup language with the acronym 'PNML' -- [Petri Net](https://en.wikipedia.org/wiki/Petri_net) Markup Language.
+Which handles an XML markup language with the acronym [pnml](http://www.pnml.org) -- [Petri Net](https://en.wikipedia.org/wiki/Petri_net) Markup Language.
 
 ```@eval
 using Markdown, Pkg, Dates, InteractiveUtils
@@ -27,14 +27,6 @@ Markdown.parse("""
 using InteractiveUtils; # hide
 versioninfo()
 ```
-
-<http://www.pnml.org>
-  - has publications and tutorials covering PNML at various points in its evolution.
-  - has links to a series of ISO/IEC 15909 standards relating to PNML.
-  - is the cannonical site for the meta-models, RELAX-NG XML schemas that define the grammar of several Petri Net Type Defintions (pntd), including:
-	  - PT Net (Place/Transition Net)
-	  - Symmetric Net
-  - and more: examples, meta-models in EMF, java-based framework
 
 There are 2 flavors currently covered by PNML meta-models:
   - integer-valued, where tokens have collective identities.
@@ -95,17 +87,48 @@ Of some note it that PNML.jl extends PNML. These, non-standard pntd do not
 
 ## References
 
-[www.pnml.org](https://www.pnml.org/)
-
-L.M. Hillah and E. Kindler and F. Kordon and L. Petrucci and N. Trèves:
-[*A primer on the Petri Net Markup Language and ISO/IEC 15909-2*](https://www.pnml.org/papers/pnnl76.pdf)
-Petri Net Newsletter 76:9--28, October 2009 (originally presented at the 10th International workshop on Practical Use of Colored Petri Nets and the CPN Tools -- CPN'09).
-
 ISO *High-level Petri nets* Standard in multiple parts:
 - [*ISO/IEC 15909-1:2019 — Part 1: Concepts, definitions and graphical notation*](https://www.iso.org/en/contents/data/standard/06/72/67235.html)
 - [*ISO/IEC 15909-2:2011 — Part 2: Transfer format*](https://www.iso.org/en/contents/data/standard/04/35/43538.html)
 - [*ISO/IEC 15909-2:2011/Cor 1:2013 — Part 2: Transfer format — TECHNICAL CORRIGENDUM 1*](https://www.iso.org/en/contents/data/standard/06/28/62800.html)
 - [*ISO/IEC 15909-3:2021 — Part 3: Extensions and structuring mechanisms*](https://www.iso.org/en/contents/data/standard/08/15/81504.html)
+
+Website: <http://www.pnml.org>
+  - has publications and tutorials covering PNML at various points in its evolution.
+  - has links to a series of ISO/IEC 15909 standards relating to PNML.
+  - is the cannonical site for the meta-models, RELAX-NG XML schemas that define the grammar of several Petri Net Type Defintions (pntd), including:
+	  - PT Net (Place/Transition Net)
+	  - Symmetric Net
+  - and more: examples, meta-models in EMF, java-based framework
+
+
+Primer: L.M. Hillah and E. Kindler and F. Kordon and L. Petrucci and N. Trèves:
+[*A primer on the Petri Net Markup Language and ISO/IEC 15909-2*](https://www.pnml.org/papers/pnnl76.pdf)
+Petri Net Newsletter 76:9--28, October 2009 (originally presented at the 10th International workshop on Practical Use of Colored Petri Nets and the CPN Tools -- CPN'09).
+
+[PNML Framework](https://pnml.lip6.fr/)
+"... a free and open-source prototype implementation of ISO/IEC-15909, International Standard on Petri Nets".
+The framework is an Eclipse/Java construction using Eclipse Public License 1.0.
+Uses 'Eclipse` Model-Driven Engineering [EMF](http://www.eclipse.org/modeling/emf/) to provide generated APIs.
+
+[github.com/lip6/pnmlframework](https://github.com/lip6/pnmlframework) hosts the source code of PNML Framework.
+See [apidocs](https://pnml.lip6.fr/pnmlframework/apidocs/index.html) and
+[XMLTestFilesRepository](https://github.com/lip6/pnmlframework/tree/master/pnmlFw-Tests/XMLTestFilesRepository).
+
+[ePNK](http://www.imm.dtu.dk/~ekki/projects/ePNK/index.shtml) a platform for developing Petri net tools based on the PNML transfer format is another Eclipse/Java EMF thing. Implements more complicated PNML than used in MCC. By some of the creators of PNML.
+[github](https://github.com/ekkart/ePNK) has the source, documentation, examples.
+
+"The [Model Checking Contest (MCC)](https://mcc.lip6.fr/) has two different parts:
+the Call for Models, which gathers Petri net models proposed by the scientific community,
+and the Call for Tools, which benchmarks verification tools developed within the scientific community."
+Each year new models are added to the contest.
+
+[github.com/daemontus/pnml-parser](https://github.com/daemontus/pnml-parser)
+Rust language.
+
+[Browsable PNML Grammar from Grammar Zoo](https://slebok.github.io/zoo/automata/petri/pnml/standard/symmetric/extracted/index.html)
+ For Symmetric Nets.
+
 
 [Towards a Standard for Modular Petri Nets:A Formalisation](https://portail.lipn.univ-paris13.fr/portail/plugins/publications/fichiers/EK-LP-ATPN09.pdf)
 expounds on structuring mechanism (modules and sort generators) in 15909-3.
@@ -141,42 +164,10 @@ In M. Abadi & L. de Alfaro, editors:
 _Proceedings 16th International Conference on Concurrency Theory, CONCUR’05_,
 San Francisco, USA, LNCS 3653, Springer, pp. 323-337.
 
-[PNML Framework](https://pnml.lip6.fr/)
-"... a free and open-source prototype implementation of ISO/IEC-15909, International Standard on Petri Nets".
-The framework is an Eclipse/Java construction using Eclipse Public License 1.0.
-Uses 'Eclipse` Model-Driven Engineering [EMF](http://www.eclipse.org/modeling/emf/) to provide generated APIs.
-
-[github.com/lip6/pnmlframework](https://github.com/lip6/pnmlframework) hosts the source code of PNML Framework.
-See [apidocs](https://pnml.lip6.fr/pnmlframework/apidocs/index.html) and
-[XMLTestFilesRepository](https://github.com/lip6/pnmlframework/tree/master/pnmlFw-Tests/XMLTestFilesRepository).
-
-[github.com/loig/pinimili](https://github.com/loig/pinimili)
-Go language.
-
-[github.com/stackdump/gopetri](https://github.com/stackdump/gopetri)
-Go language.
-
-[Petri net visualisator written in Go.](https://github.com/drahoslove/penego)
-Go language. Non-standard pnml xml syntax.
-
 [LTSmin](https://github.com/utwente-fmt/ltsmin) "a full (LTL/CTL/μ-calculus) model checker".
 C/M4/C++ language.
 
-[github.com/daemontus/pnml-parser](https://github.com/daemontus/pnml-parser)
-Rust language.
-
- [Browsable PNML Grammar from Grammar Zoo](https://slebok.github.io/zoo/automata/petri/pnml/standard/symmetric/extracted/index.html)
- For Symmetric Nets.
-
 [Automated Code Optimization with E-Graphs](https://arxiv.org/abs/2112.14714): Alessandro Cheli's Thesis on Metatheory.jl.
-
-[ePNK](http://www.imm.dtu.dk/~ekki/projects/ePNK/index.shtml) a platform for developing Petri net tools based on the PNML transfer format is another Eclipse/Java EMF thing. Implements more complicated PNML than used in MCC. By some of the creators of PNML.
-[github](https://github.com/ekkart/ePNK) has the source, documentation, examples.
-
-"The [Model Checking Contest (MCC)](https://mcc.lip6.fr/) has two different parts:
-the Call for Models, which gathers Petri net models proposed by the scientific community,
-and the Call for Tools, which benchmarks verification tools developed within the scientific community."
-Each year new models are added to the contest.
 
 [Nested-Unit Petri Nets (NUPN)](https://mcc.lip6.fr/2025/nupn.php)
 an "extension of P/T nets" used by MCC:
