@@ -97,7 +97,7 @@ Return `SortRef` for default `SortType` of a `PNTD`.
 """
 function default_typesort end
 
-default_typesort(::APNTD) = NamedSortRef(:natural)
+default_typesort(::AbstractPNTD) = NamedSortRef(:natural)
 default_typesort(::AbstractContinuousNet) = NamedSortRef(:real)
 # High-level nets are expected to provide a useful value. PT_HLPNG uses the minimum: 'dot'.
 # We provide an implementation of 'dot', so this is a safe assumption.

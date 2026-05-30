@@ -39,7 +39,7 @@ end
 
 #-------------------------------------------------------------------
 """
-    tokengraphics_content(node::XMLNode, pntd::APNTD) -> TokenGraphics
+    tokengraphics_content(node::XMLNode, pntd::AbstractPNTD) -> TokenGraphics
 
 Parse `ToolInfo` content that is expected to be `<tokengraphics>`.
 """
@@ -53,7 +53,7 @@ $(TYPEDSIGNATURES)
 Parse place-transition net's (PTNet) toolspecific structure defined for token graphics.
 See [`Labels.TokenGraphics`](@ref) and [`parse_tokenposition`](@ref).
 """
-function parse_tokengraphics(node::XMLNode, pntd::APNTD)
+function parse_tokengraphics(node::XMLNode, pntd::AbstractPNTD)
     nn = check_nodename(node, "tokengraphics")
     tpos = coordinate_type(pntd)[]
     for child in EzXML.eachelement(node)
@@ -72,7 +72,7 @@ end
 
 #-------------------------------------------------------------------
 """
-    nupn_content(node::XMLNode, pntd::APNTD) -> NupnTool
+    nupn_content(node::XMLNode, pntd::AbstractPNTD) -> NupnTool
     nupn_content(node::XMLNode, net::AbstractPnmlNet) -> NupnTool
 
 Parse `ToolInfo` content. Example:
@@ -90,7 +90,7 @@ Parse `ToolInfo` content. Example:
 """
 function nupn_content end
 nupn_content(node::XMLNode, net::AbstractPnmlNet) = nupn_content(node, pntd_of(net))
-function nupn_content(node::XMLNode, pntd::APNTD)
+function nupn_content(node::XMLNode, pntd::AbstractPNTD)
     nupn = anyelement(Symbol(EzXML.nodename(node)), node)
     #@show nupn
     e = elements(nupn)

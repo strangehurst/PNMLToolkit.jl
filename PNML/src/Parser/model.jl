@@ -208,7 +208,7 @@ end
 
 Return `Page`. `pageid` already parsed from `page_node`.
 """
-function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) where {T<:APNTD}
+function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) where {T<:AbstractPNTD}
     D()&& println("## parse_page ", pageid)
     #---------------------------------------------------------
     # Create "empty" page. Will have `toolinfos` parsed.

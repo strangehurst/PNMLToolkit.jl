@@ -48,7 +48,7 @@ function toolinfos end
 """
 $(TYPEDSIGNATURES)
 
-Return the [`APNTD`](@ref) subtype representing the flavor (or pntd) of this kind of
+Return the [`AbstractPNTD`](@ref) subtype representing the flavor (or pntd) of this kind of
 Petri Net Graph.
 
 See also [`pnmltype`](@ref PnmlTypes.pnmltype)
@@ -400,7 +400,7 @@ $(METHODLIST)
 function coordinate_type end
 
 """
-    value_type(::Type{<AbstractLabel}, ::APNTD) -> Type
+    value_type(::Type{<AbstractLabel}, ::AbstractPNTD) -> Type
 
 Return the `Type` of a label's value.
 

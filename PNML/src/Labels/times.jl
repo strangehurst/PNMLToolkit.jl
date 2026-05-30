@@ -17,7 +17,7 @@ Dynamic time is a function with arguments of net marking and transition.
 end
 
 value_type(::Type{Time}) = Float64
-value_type(::Type{Time}, ::APNTD) = Float64
+value_type(::Type{Time}, ::AbstractPNTD) = Float64
 
 Base.eltype(::Time) = value_type(Time)
 Base.eltype(::Type{Time}) = value_type(Time)

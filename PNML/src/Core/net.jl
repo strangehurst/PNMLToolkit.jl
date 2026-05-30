@@ -6,7 +6,7 @@ One Petri Net of a PNML model.
 $(FIELDS)
 
 """
-@kwdef mutable struct PnmlNet{PNTD <: APNTD} <: AbstractPnmlNet
+@kwdef mutable struct PnmlNet{PNTD <: AbstractPNTD} <: AbstractPnmlNet
     #"The meta-model type this net implements."
     const type::PNTD
     # PNML ID needed here for multiple nets of same `type` in a `<pnml>` model.
@@ -67,7 +67,7 @@ function filters(net::AbstractPnmlNet)
 end
 
 "Create empty net with builtins installed for use in test scaffolding."
-function make_net(type::APNTD, id=:make_net,)
+function make_net(type::AbstractPNTD, id=:make_net,)
     net = PnmlNet(; type, id,
                     idregistry=IDRegistry(),
                     pagedict=OrderedDict{Symbol, Page{PnmlNet{typeof(type)}}}())
@@ -95,7 +95,7 @@ pagedict(net::PnmlNet) = net.pagedict # Will be ordered.
 page_idset(net::PnmlNet) = net.page_idset # Indices into `pagedict` directly owned by net.
 
 netdata(net::PnmlNet) = net.netdata
-netsets(net::PnmlNet) = throw(ArgumentError("PnmlNet $(pid(net)) does not have a PnmlKeySet, did you mean `netdata`?"))
+netsets(net::PnmlNet) = throw(DomainError("PnmlNet $(pid(net)) does not have a PnmlKeySet, did you mean `netdata`?"))
 
 placedict(net::PnmlNet)         = placedict(netdata(net))
 transitiondict(net::PnmlNet)    = transitiondict(netdata(net))
@@ -244,17 +244,17 @@ has_partitionop(net::AbstractPnmlNet, id::Symbol)    = has_key(net, partitionops
 has_feconstant(net::AbstractPnmlNet, id::Symbol)     = has_key(net, feconstants, id)
 has_useroperator(net::AbstractPnmlNet, id::Symbol)   = has_key(net, useroperators, id)
 
-has_variabledecl(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, variabledecls, refid(ref))
-has_namedsort(net::AbstractPnmlNet, ref::SortRef)      = has_key(net, namedsorts, refid(ref))
-has_arbitrarysort(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, arbitrarysorts, refid(ref))
-has_partitionsort(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, partitionsorts, refid(ref))
-has_multisetsort(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, multisetsorts, refid(ref))
-has_productsort(net::AbstractPnmlNet, ref::SortRef)    = has_key(net, productsorts,refid(ref) )
-has_namedop(net::AbstractPnmlNet, ref::SortRef)        = has_key(net, namedoperators, refid(ref))
-has_arbitraryop(net::AbstractPnmlNet, ref::SortRef)    = has_key(net, arbitraryops, refid(ref))
-has_partitionop(net::AbstractPnmlNet, ref::SortRef)    = has_key(net, partitionops, refid(ref))
-has_feconstant(net::AbstractPnmlNet, ref::SortRef)     = has_key(net, feconstants, refid(ref))
-has_useroperator(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, useroperators, refid(ref))
+has_variabledecl(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, variabledecls, refid(ref))
+has_namedsort(net::AbstractPnmlNet, ref::SortRef)     = has_key(net, namedsorts, refid(ref))
+has_arbitrarysort(net::AbstractPnmlNet, ref::SortRef) = has_key(net, arbitrarysorts, refid(ref))
+has_partitionsort(net::AbstractPnmlNet, ref::SortRef) = has_key(net, partitionsorts, refid(ref))
+has_multisetsort(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, multisetsorts, refid(ref))
+has_productsort(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, productsorts,refid(ref) )
+has_namedop(net::AbstractPnmlNet, ref::SortRef)       = has_key(net, namedoperators, refid(ref))
+has_arbitraryop(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, arbitraryops, refid(ref))
+has_partitionop(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, partitionops, refid(ref))
+has_feconstant(net::AbstractPnmlNet, ref::SortRef)    = has_key(net, feconstants, refid(ref))
+has_useroperator(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, useroperators, refid(ref))
 
 
 #------------------------------------------------------------------------------

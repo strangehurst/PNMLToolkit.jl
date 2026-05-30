@@ -108,7 +108,7 @@ end
 value_type(::Type{Marking}, net::AbstractPnmlNet) = value_type(Marking, pntd_of(net))
 
 # These are networks where the tokens have a collective identities.
-value_type(::Type{Marking}, ::APNTD) = eltype(NaturalSort) #::Int
+value_type(::Type{Marking}, ::AbstractPNTD) = eltype(NaturalSort) #::Int
 value_type(::Type{Marking}, ::AbstractContinuousNet) = eltype(RealSort) #::Float64
 
 # These are networks were the tokens have individual identities.
@@ -124,7 +124,7 @@ value_type(::Type{Marking}, ::PT_HLPNG) = eltype(NaturalSort) #::Int
 #~ Inscription values are non-zero while marking values may be zero.
 
 #--------------------------------------------------------------------------------------
-# Basis sort can be, and are, restricted by/on APNTD in the ISO 15909 standard.
+# Basis sort can be, and are, restricted by/on AbstractPNTD in the ISO 15909 standard.
 # That is a statement about the XML file content. Allows a partial implementation that
 # only supports the PTNet meta-model or SymmetricNet meta-model of Petri nets.
 # The PnmlCoreNet, upon which PTNet, SymmetricNet, HLPNG, etc. are defined can be used

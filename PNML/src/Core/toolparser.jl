@@ -5,7 +5,7 @@ $(TYPEDFIELDS)
 
 Holds a parser callable for a `<toolspecific>` tag's well-formed contents invoked as:
 
-    `(tp::ToolParser)(node::XMLNode, pntd::APNTD)`
+    `(tp::ToolParser)(node::XMLNode, pntd::AbstractPNTD)`
 
 Will be in an iteratable collection that maps tool name & version to a parser callable.
 See `toolspecific_content_fallback`.

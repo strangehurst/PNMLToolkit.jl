@@ -3,7 +3,7 @@ $(TYPEDSIGNATURES)
 
 Return the stripped string of `<text>` node's content.
 """
-function parse_text(node::XMLNode, _::APNTD)
+function parse_text(node::XMLNode, _::AbstractPNTD)
     check_nodename(node, "text")
     return string(strip(EzXML.nodecontent(node)))::String
 end
@@ -50,7 +50,7 @@ function parse_name(node::XMLNode, net::AbstractPnmlNet; parentid)
     return Name(text, graphics, toolspecinfos)
 end
 
-# function parse_name(node::XMLNode, _pntd::APNTD; net::AbstractPnmlNet, parentid)
+# function parse_name(node::XMLNode, _pntd::AbstractPNTD; net::AbstractPnmlNet, parentid)
 #     parse_name(node, net; parentid)
 # end
 
@@ -180,7 +180,7 @@ end
 """
 $(TYPEDSIGNATURES)
 
-Non-high-level `APNTD` initial marking parser. Most things are assumed to be Numbers.
+Non-high-level `AbstractPNTD` initial marking parser. Most things are assumed to be Numbers.
 See also [`parse_hlinitialMarking`](@ref), [`parse_fifoinitialMarking`](@ref).
 """
 function parse_initialMarking(node::XMLNode, placetype::Maybe{SortType}, net::AbstractPnmlNet;
@@ -355,7 +355,7 @@ end # parse_fifoinitialMarking
 """
     ParseMarkingTerm(defsort) -> Functor
 
-Holds parameters for parsing when called as (f::T)(::XMLNode, ::APNTD)
+Holds parameters for parsing when called as (f::T)(::XMLNode, ::AbstractPNTD)
 """
 struct ParseMarkingTerm{S}
     defplacetype::S
@@ -410,7 +410,7 @@ end
 Holds `source` & `target` parameters for parsing an inscription.
 The sort of the inscription must match the place sorttype.
 Input arcs (source is a transition) and output arcs (source is a place)
-called as (pit::ParseInscriptionTerm)(::XMLNode, ::APNTD)
+called as (pit::ParseInscriptionTerm)(::XMLNode, ::AbstractPNTD)
 """
 struct ParseInscriptionTerm
     source::Symbol
@@ -495,7 +495,7 @@ function def_insc(netdata, source,::REFID, target::REFID, net::AbstractPnmlNet)
 end
 
 """
-    parse_condition(::XMLNode, ::APNTD; net::AbstractPnmlNet) -> Condition
+    parse_condition(::XMLNode, ::AbstractPNTD; net::AbstractPnmlNet) -> Condition
 
 Label of transition node. Used in the enabling function.
 
@@ -558,7 +558,7 @@ function parse_sorttype(node::XMLNode, net::AbstractPnmlNet; parentid)
 end
 
 """
-    parse_sorttype_term(::XMLNode, ::APNTD; net::AbstractPnmlNet) -> PnmlExpr, SortRef, Tuple
+    parse_sorttype_term(::XMLNode, ::AbstractPNTD; net::AbstractPnmlNet) -> PnmlExpr, SortRef, Tuple
 
 The PNML `<type>` of a `<place>` is a "sort" of the high-level many-sorted algebra.
 Because we are using the HL implementation with the other meta-models,

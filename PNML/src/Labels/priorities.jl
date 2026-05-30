@@ -17,7 +17,7 @@ Dynamic priority is a function with arguments of net marking and transition.
 end
 
 value_type(::Type{Priority}) = Float64
-value_type(::Type{Priority}, ::APNTD) = Float64
+value_type(::Type{Priority}, ::AbstractPNTD) = Float64
 
 Base.eltype(::Priority) = value_type(Priority)
 Base.eltype(::Type{Priority}) = value_type(Priority)

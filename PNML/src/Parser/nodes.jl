@@ -53,7 +53,7 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Return default marking value based on `APNTD`. Has meaning of empty, as in `zero`.
+Return default marking value based on `AbstractPNTD`. Has meaning of empty, as in `zero`.
 For high-level nets, the marking is an empty multiset whose basis matches `placetype`.
 Others have a marking that is a `Number`.
 """
@@ -216,7 +216,7 @@ end
 """
     parse_arc(node::XMLNode, net::AbstractPnmlNet) -> Arc
 
-Construct an `Arc` with labels specialized for the APNTD.
+Construct an `Arc` with labels specialized for the AbstractPNTD.
 """
 function parse_arc(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "arc")

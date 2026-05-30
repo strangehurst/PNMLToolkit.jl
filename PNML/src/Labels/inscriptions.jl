@@ -62,7 +62,7 @@ end
 #! with inscription being PositiveSort and marking being NaturalSort.
 #!============================================================================
 
-value_type(::Type{Inscription}, ::APNTD) = eltype(PositiveSort) #::Int
+value_type(::Type{Inscription}, ::AbstractPNTD) = eltype(PositiveSort) #::Int
 value_type(::Type{Inscription}, ::AbstractContinuousNet) = eltype(RealSort) #::Float64
 value_type(::Type{Inscription}, ::PT_HLPNG) = eltype(DotSort)
 
