@@ -459,6 +459,12 @@ $(METHODLIST)
 """
 function sortelements end
 
+"""
+    elements(x) -> LittleDict
+
+Return the dictionary produced by `xmldict` in a `AnyElement`, `PnmlLabel` or `Toolinfo`.
+"""
+function elements end
 
 """
     adjacent_place(net::PnmlNet, arc::Arc) -> Place
@@ -472,7 +478,7 @@ function adjacent_place end
 #todo Remove limitation of requiring arcs to be between place and transition.
 
 """
-    decldict(net::APN) -> DeclDict
+    decldict(net::AbstractPnmlNet) -> DeclDict
 
 Access net-level `DeclDict`.
 
@@ -492,7 +498,7 @@ function version end
 function output_matrix end
 
 """
-    verify!(errors::Vector{String}, x, verbose::Bool, net::APN)
+    verify!(errors::Vector{String}, x, verbose::Bool, net::AbstractPnmlNet)
 
 $(METHODLIST)
 """
@@ -570,6 +576,6 @@ function has_feconstant end
 function has_useroperator end
 
 """
-    pntd_of(net) -> AbstractPnmlType
+    pntd_of(net) -> AbstractPNTD
 """
 function pntd_of end

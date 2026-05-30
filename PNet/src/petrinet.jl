@@ -35,7 +35,7 @@ Note that pnml can represent nets that are **not** Petri Nets.
 
 Here is where specialization and restriction are applied to achive Proper Petri Behavior.
 
-See [`PnmlModel`](@ref), [`AbstractPnmlType`](@ref).
+See [`PnmlModel`](@ref), [`AbstractPNTD`](@ref).
 
 # Extended
 
@@ -48,7 +48,7 @@ a higher-level will create multiple AbstractPetriNet instances, each a different
 Multiple [`Page`](@ref)s can (are permitted to) be merged into one page
 by [`PNML.flatten_pages!`](@ref) without losing any Petri Net semantics.
 """
-abstract type AbstractPetriNet{PNTD <: AbstractPnmlType} end
+abstract type AbstractPetriNet{PNTD <: AbstractPNTD} end
 
 # Interface is having id::Symbol, net::PnmlNet.
 # function Base.getproperty(pn::AbstractPetriNet, prop_name::Symbol)
@@ -124,7 +124,7 @@ $(TYPEDFIELDS)
 # Details
 
 """
-struct HLPetriNet{PNTD<:APNTD} <: AbstractPetriNet{PNTD}
+struct HLPetriNet{PNTD<:AbstractPNTD} <: AbstractPetriNet{PNTD}
     net::PnmlNet{PNTD}
 end
 

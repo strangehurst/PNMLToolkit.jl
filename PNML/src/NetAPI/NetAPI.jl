@@ -19,14 +19,17 @@ using Moshi.Match: @match
 using NamedTupleTools
 using OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 using PNML
-using PNML: APNTD, AbstractHLCore, AbstractPnmlNet, AbstractPnmlType, Arc, Inscription,
+using PNML: APNTD, AbstractHLCore, AbstractPnmlNet, AbstractPNTD, Arc, Inscription,
     Marking, Maybe, PT_HLPNG, Place, PnmlMultiset, arc, arcdict, arcs, cardinality,
-    condition, filters, initial_marking, inscription, is_collective_token,
-    is_productsort, multiset, narcs, nets, nplaces, ntransitions, pid, place,
-    place_idset, places, pntd_of, rate_value, sortref, source, src_arcs, target, term,
+    condition, filters, initial_marking, inscription,
+    is_collective_token, is_productsort, multiset, narcs, nets, nplaces, ntransitions,
+    pid, place, place_idset, places, pntd_of, rate_value, refid, sortref,
+    source, src_arcs, target, term,
     tgt_arcs, toexpr, transition, transition_idset, transitiondict, transitions,
-    value_type, zero_marking
+    value_type, variabledecl, zero_marking
+using PNML.Declarations
 using PNML.PnmlGraphics
+using PNML.Sorts
 
 export conditions, enabled, fire, fire2, incidence_matrix, initial_markings, input_matrix,
     inscription_value, inscriptions, metagraph, output_matrix, postset, preset, rates

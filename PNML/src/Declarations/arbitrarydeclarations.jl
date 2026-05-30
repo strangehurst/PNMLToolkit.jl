@@ -11,7 +11,7 @@ they just introduce a new symbol.
 
 Like `ArbitraryOperator`, does not have an associated algebra, not usable by `SymmetricNet.`
 """
-struct ArbitrarySort{N <: APN} <: SortDeclaration
+struct ArbitrarySort{N <: AbstractPnmlNet} <: SortDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     net::N
@@ -32,7 +32,7 @@ they just introduce a new symbol.
 
 Like `ArbitrarySort`, does not have an associated algebra, not usable by `SymmetricNet.`
 """
-struct ArbitraryOperator{N <: APN} <: OperatorDeclaration
+struct ArbitraryOperator{N <: AbstractPnmlNet} <: OperatorDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     declaration::Symbol #! Are id and declaration redundent?

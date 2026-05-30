@@ -7,7 +7,7 @@ Label of [`Place`](@ref).
 Is a functor that returns the `value`.
 ```
 """
-struct Marking{N <: APN, T <: PnmlExpr} <: Annotation
+struct Marking{N <: AbstractPnmlNet, T <: PnmlExpr} <: Annotation
     term::T #! expression
     text::Maybe{String} # Supposed to be for human consumption.
     graphics::Maybe{Graphics} # PTNet uses TokenGraphics in toolspecinfos rather than graphics.
@@ -16,11 +16,11 @@ struct Marking{N <: APN, T <: PnmlExpr} <: Annotation
 end
 
 # Allow any Number subtype, only a few concrete subtypes are expected.
-function Marking(m::Number, net::APN)
+function Marking(m::Number, net::AbstractPnmlNet)
     Marking(NumberEx(sortref(m)::SortRef, m), net)
 end
-Marking(nx::NumberEx, net::APN) = Marking(nx, nothing, nothing, nothing, net)
-Marking(t::PnmlExpr, s::Maybe{AbstractString}, net::APN) = Marking(t, s, nothing, nothing, net)
+Marking(nx::NumberEx, net::AbstractPnmlNet) = Marking(nx, nothing, nothing, nothing, net)
+Marking(t::PnmlExpr, s::Maybe{AbstractString}, net::AbstractPnmlNet) = Marking(t, s, nothing, nothing, net)
 
 term(marking::Marking) = marking.term
 
@@ -105,7 +105,7 @@ function Base.show(io::IO, ptm::Marking)
 end
 
 #--------------------------------------------------------------------------------------
-value_type(::Type{Marking}, net::APN) = value_type(Marking, pntd_of(net))
+value_type(::Type{Marking}, net::AbstractPnmlNet) = value_type(Marking, pntd_of(net))
 
 # These are networks where the tokens have a collective identities.
 value_type(::Type{Marking}, ::APNTD) = eltype(NaturalSort) #::Int

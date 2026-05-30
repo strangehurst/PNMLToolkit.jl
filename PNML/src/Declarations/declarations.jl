@@ -26,7 +26,7 @@ end
 $(TYPEDEF)
 $(TYPEDFIELDS)
 """
-struct UnknownDeclaration{N <: APN, T <: AnyElement}  <: AbstractDeclaration
+struct UnknownDeclaration{N <: AbstractPnmlNet, T <: AnyElement}  <: AbstractDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     nodename::Union{String,SubString{String}}
@@ -68,7 +68,7 @@ EXAMPLE
 
 variabledecls[id] = VariableDeclaration(id, "human name", sort)
 """
-struct VariableDeclaration{N <: APN} <: AbstractDeclaration
+struct VariableDeclaration{N <: AbstractPnmlNet} <: AbstractDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     sort::SortRef
@@ -142,14 +142,14 @@ These are all `Declaration` subtypes in the UML2/RelaxNG parts of ISO 15909-2:20
 a strong _Java_ bias. The text on the standard states they are also sort-like.
 We use a different type system.
 """
-@auto_hash_equals struct NamedSort{N <: APN, S <: AbstractSort} <: SortDeclaration
+@auto_hash_equals struct NamedSort{N <: AbstractPnmlNet, S <: AbstractSort} <: SortDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     def::S  #! This remains where the concrete sort lives.
     # An instance of: ArbitrarySort, MultisetSort, ProductSort, or BUILT-IN sort!
     net::N
 
-    function NamedSort(id_::Symbol, name_, def_::AbstractSort, net_::APN)
+    function NamedSort(id_::Symbol, name_, def_::AbstractSort, net_::AbstractPnmlNet)
         if isa(def_, NamedSort)
             throw(ArgumentError("NamedSort wraps NamedSort: $id_ $name_ $def_"))
             yield()
@@ -162,9 +162,9 @@ function sortdefinition(namedsort::NamedSort)
     namedsort.def # Instance of concrete sort.
 end
 
-sortelements(namedsort::NamedSort, net::APN) = sortelements(sortdefinition(namedsort), net)
+sortelements(namedsort::NamedSort, net::AbstractPnmlNet) = sortelements(sortdefinition(namedsort), net)
 
-Base.eltype(::Type{NamedSort{N, S}}) where {N <: APN, S <: AbstractSort} = eltype(S)
+Base.eltype(::Type{NamedSort{N, S}}) where {N <: AbstractPnmlNet, S <: AbstractSort} = eltype(S)
 
 function Base.show(io::IO, nsort::NamedSort)
     print(io, "NamedSort(")
@@ -184,7 +184,7 @@ See `UserOperator`.
 Vector of `VariableDeclaration` for parameters (ordered),
 and duck-typed `AbstractTerm` for its body.
 """
-struct NamedOperator{N <: APN, T} <: OperatorDeclaration
+struct NamedOperator{N <: AbstractPnmlNet, T} <: OperatorDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     parameter::Vector{VariableDeclaration{N}} # constants,variables with inferred sorts #TODO XXX
@@ -193,7 +193,7 @@ struct NamedOperator{N <: APN, T} <: OperatorDeclaration
 end
 
 # Empty parameter vector. Default to return sort of dots.
-NamedOperator(id::Symbol, str::AbstractString, net::APN) =
+NamedOperator(id::Symbol, str::AbstractString, net::AbstractPnmlNet) =
     NamedOperator(id, str, VariableDeclaration{typeof(net)}[], DotConstant(), net)
 
 #operator(no::NamedOperator) = operator(no.net, no.def) #! XXX def is an expression

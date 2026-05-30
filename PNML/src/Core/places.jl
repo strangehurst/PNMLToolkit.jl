@@ -9,7 +9,7 @@ M is a "multiset sort denoting a collection of tokens".
 A "multiset sort over a basis sort is interpreted as
 "the set of multisets over the type associated with the basis sort".
 """
-@kwdef mutable struct Place{N <: APN, T <: PnmlExpr}  <: AbstractPnmlNode
+@kwdef mutable struct Place{N <: AbstractPnmlNet, T <: PnmlExpr}  <: AbstractPnmlNode
     id::Symbol
     initialMarking::Marking{N, T} # Expression as value. Used to create marking vector.
 
@@ -44,7 +44,7 @@ function Base.show(io::IO, place::Place)
     print(io, ")")
 end
 
-function verify!(errors, p::Place, verbose::Bool , net::APN)
+function verify!(errors, p::Place, verbose::Bool , net::AbstractPnmlNet)
     verbose && println("## verify Place{$(sortref(p))} $(pid(p))")
     !isregistered(registry_of(net), pid(p)) &&
         push!(errors, string("place ", repr(pid(p)), " not registered")::String)
@@ -60,7 +60,7 @@ Reference Place node of a Petri Net Markup Language graph. For connections betwe
 $(TYPEDEF)r
 $(TYPEDFIELDS)
 """
-struct RefPlace{N <: APN} <: ReferenceNode
+struct RefPlace{N <: AbstractPnmlNet} <: ReferenceNode
     id::Symbol
     ref::Symbol # Place or RefPlace
     namelabel::Maybe{Name}

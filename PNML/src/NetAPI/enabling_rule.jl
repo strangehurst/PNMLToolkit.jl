@@ -145,20 +145,23 @@ function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{T}, transitio
 end
 
 """
-Evaluate preset inscription expressions, compare to mark value.
-Update varsubs
+Evaluate transition's preset inscription expressions, compare to mark value.
+Update varsubs with feasible variable substitution named tuples.
+
+The firing rule will select from one transition's feasible substutions in its varsubs.
 """
-function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
+function comp_mark_inscription(net::AbstractPnmlNet, mark_dict, transition_id, cond_term,
                                 tr_var_binding_set, tr_vars, tr_varsubs)
     for place_id in preset(net, transition_id)
-        ar = arc(net, place_id, transition_id)
+        #!ar = arc(net, place_id, transition_id)
         mark = mark_dict[place_id]
 
         if isempty(tr_vars) # 0-ary operators or constants
             # This includes the non-HL net types that do not have variables.
             eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-            inscription_val = _cvt_inscription_value(pntd_of(net), ar,
-                                        zero_marking(place(net, place_id)), NamedTuple())
+            inscription_val = inscription_value(arc(net, place_id, transition_id),
+                                                zero_marking(place(net, place_id)),
+                                                NamedTuple())
             mark >= inscription_val || return false
         else
             # Use the transition-level variable substitution binding map `tr_var_binding_set`.
@@ -167,14 +170,17 @@ function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
             vids = tuple(keys(tr_var_binding_set)...) # Tuple of variable ids
             vtup = tuple(values(tr_var_binding_set)...) # Tuple of Multisets{PnmlMultiset}
             sub1 = tuple((keys.(vtup))...) # Tuple of iterators
-            vsubiter = Iterators.product(sub1...)
-            for candidate_params in vsubiter
+            for candidate_params in Iterators.product(sub1...)
                 # Assume order of tr_var_binding_set and product are the same.
+                # Mke named tuple where names are variable ids.
                 tr_vsub = namedtuple(vids, candidate_params)
-                # condition expression may contain variables.
+                # Check guard condition expression that may contain variables.
+                # Must be evaluated for each candidate_parms.
                 eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
-                inscription_val = _cvt_inscription_value(pntd_of(net), ar,
-                                    zero_marking(place(net, place_id)), tr_vsub)
+                #!inscription_val = _cvt_inscription_value(pntd_of(net), arc(net, place_id, transition_id), tr_vsub)
+                inscription_val = inscription_value(arc(net, place_id, transition_id),
+                                                    zero_marking(place(net, place_id)),
+                                                    tr_vsub)
                 mark = unwrap_pmset(mark)
                 issubset(inscription_val, mark) || continue # not a valid substitution
                 push!(tr_varsubs, tr_vsub)
@@ -186,7 +192,7 @@ function comp_mark_inscription(net::APN, mark_dict, transition_id, cond_term,
 end
 
 """
-    get_variable_substitutions!(binding_sets, net::APN, transition_id, tr_vars, mark_dict)
+    get_variable_substitutions!(binding_sets, net::AbstractPnmlNet, transition_id, tr_vars, mark_dict)
 # Arguments
  - binding_sets map from variable id to set of substitution values
  - net contains
@@ -196,7 +202,7 @@ end
 
 Return enabled state, update `tr_vars`  and `binding_sets`.
 """
-function get_variable_substitutions!(binding_sets, net::APN, transition_id, tr_vars, mark_dict)
+function get_variable_substitutions!(binding_sets, net::AbstractPnmlNet, transition_id, tr_vars, mark_dict)
     for place_id in preset(net, transition_id)
         ar = arc(net, place_id, transition_id)
         isnothing(ar) && error("did not find arc: $place_id -> $transition_id")
@@ -221,7 +227,7 @@ Fill `arc_var_binding_set` with an entry for each key in `arc_vars`.
 Return `true` if no variables are present or all variables have at least 1 substition.
 Indicates that transition is able to fire (enabled fro selection to fire).
 """
-function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark, net::APN)
+function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark, net::AbstractPnmlNet)
     arc_binding_sets = OrderedDict{Symbol, Multiset{Symbol}}()
     for v in keys(arc_vars)
         # Each variable must have a non-empty substitution.
@@ -229,13 +235,13 @@ function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
         # Start with empty substution set for variable.
         # Use multiset as a counter.
         arc_binding_sets[v] = Multiset{Symbol}()
-        v_decl = variabledecl(net, v)
+        v_decl = PNML.variabledecl(net, v)
         v_sortref = sortref(v_decl)
-        v_refid = refid(v_sortref)
+        v_refid = PNML.refid(v_sortref)::Symbol
 
         # Verify variable sort matches placesort.
         if is_productsort(placesort)
-            any(==(v_refid), sorts(placesort, net)) ||
+            any(==(v_refid), PNML.Sorts.sorts(placesort, net)) ||
                     error("none of product sorts are '$v_refid': ", repr(placesort))
         else
             placesort !== v_sortref &&
@@ -254,7 +260,7 @@ function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
                 if element isa Tuple # mark is a ProductSort.
                     # Select the tuple member(s) matching variable sort.
                     for expr in element
-                        if refid(expr) === v_refid
+                        if PNML.refid(expr) === v_refid
                             push!(arc_binding_sets[v], expr())
                         else
                             @warn "refid(expr) !== v_refid"

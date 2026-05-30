@@ -7,7 +7,7 @@ Labels an Arc with a expression term .
 `Inscription(t::PnmlExpr)()` is a functor evaluating the expression and
 returns a value of the `eltype` of sort of inscription.
 """
-struct Inscription{N <: APN, T <: PnmlExpr} <: HLAnnotation
+struct Inscription{N <: AbstractPnmlNet, T <: PnmlExpr} <: HLAnnotation
     text::Maybe{String}
     term::T # expression whose output sort is the same as adjacent place's sorttype.
     graphics::Maybe{Graphics}

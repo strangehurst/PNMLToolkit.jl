@@ -1,11 +1,11 @@
 """
-    fill_builtin_enabled_filters!(net::APN) -> Nothing
+    fill_builtin_enabled_filters!(net::AbstractPnmlNet) -> Nothing
 
 Fill a dictionary with default enabled filters. Part of the enabling rule.
 Based on ISO 15909-1:2019, ISO 15909-3:2021.
 """
 function fill_builtin_enabled_filters! end
-fill_builtin_enabled_filters!(net::APN) = fill_builtin_enabled_filters!(net.enabled_filters)
+fill_builtin_enabled_filters!(net::AbstractPnmlNet) = fill_builtin_enabled_filters!(net.enabled_filters)
 function fill_builtin_enabled_filters!(dict::AbstractDict)
     dict[:inhibit] = enable_filter_inhibit
     dict[:reset] = enable_filter_reset
@@ -16,11 +16,11 @@ function fill_builtin_enabled_filters!(dict::AbstractDict)
 end
 
 """
-    fill_builtin_sorts!(net::APN) -> Nothing
+    fill_builtin_sorts!(net::AbstractPnmlNet) -> Nothing
 
 Fill a DeclDict with built-ins and defaults (that may be redefined).
 """
-function fill_builtin_sorts!(net::APN)
+function fill_builtin_sorts!(net::AbstractPnmlNet)
     __insert_sort!(net, :dot, "Dot", Sorts.DotSort()) # can be overridden
     __insert_sort!(net, :integer, "Integer", Sorts.IntegerSort())
     __insert_sort!(net, :natural, "Natural", Sorts.NaturalSort())
@@ -39,13 +39,13 @@ function __insert_sort!(net, tag, name, sort::AbstractSort)
 end
 
 """
-    fill_sort_tag!(net::APN, tag::Symbol, sort, dict) -> SortRef
+    fill_sort_tag!(net::AbstractPnmlNet, tag::Symbol, sort, dict) -> SortRef
 
 If not already in the declarations dictionary `dict`, add `sort` with key of `tag`.
 
 Register the tag and create and return an `SortRef` holding `tag`.
 """
-function fill_sort_tag!(net::APN, tag::Symbol, sort, dict)
+function fill_sort_tag!(net::AbstractPnmlNet, tag::Symbol, sort, dict)
     fill_sort_tag!(decldict(net), registry_of(net), tag, sort, dict)
 end
 function fill_sort_tag!(dd::DeclDict, idreg, tag::Symbol, sort, dict)
@@ -59,6 +59,8 @@ end
 
 
 function sortref(dict_callable, tag)
+    @assert !ismissing(dict_callable)
+    @assert !ismissing(tag)
     @match dict_callable begin
         PNML.multisetsorts  => MultisetSortRef(tag)  # sort, basis is a builtin,
         PNML.productsorts   => ProductSortRef(tag)   # sort, tuple of SortRefs

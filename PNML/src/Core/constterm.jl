@@ -45,7 +45,7 @@ Base.eltype(::FEConstant) = Symbol # Use id symbol as the value. Alternative is 
 (fec::FEConstant)(_args) = fec() # Constants are 0-ary operators. Ignore arguments.
 (fec::FEConstant)() = fec.id # A constant literal. We use symbol, could use name string.
 
-function x_sortof(fec::FEConstant, net::APN)
+function x_sortof(fec::FEConstant, net::AbstractPnmlNet)
     @match fec.ref begin
         NamedSortRef(refid) => sortdefinition(namedsort(net, refid))::EnumerationSort
         PartitionSortRef(refid) => sortdefinition(partitionsort(net, refid))::PartitionSort
@@ -75,7 +75,7 @@ tag(::FiniteIntRangeConstant) = :finiteintrangeconstant
 sortref(c::FiniteIntRangeConstant) = identity(c.sort)::SortRef
 
 #"Special case to ` IntegerSort()`, it is part of the name, innit."
-x_sortof(::FiniteIntRangeConstant, ::APN) = IntegerSort()
+x_sortof(::FiniteIntRangeConstant, ::AbstractPnmlNet) = IntegerSort()
 # or sortdefinition(namedsort(ddict, :integer))::IntegerSort
 
 value(c::FiniteIntRangeConstant) = c.value

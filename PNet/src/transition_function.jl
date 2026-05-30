@@ -17,15 +17,15 @@ transition_function(net::PnmlNet) =
     [tid => in_out(net, tid) for tid in PNML.transition_idset(net)]
 
 """
-    civ(net, arcid) -> _cvt_inscription_value(pntd_of(net), arcdict[arcid], z, NamedTuple())
+    civ(net, arcid) -> inscription_value(arcdict(net)[arcid], z, NamedTuple())
 
 Lookup the `Arc`, find its inscription's value and if PT_HLPNG convert to integer-valued.
 #TODO add variables for full HL support
 """
-function civ(net, arc_id)
-    arc = PNML.arcdict(net)[arc_id]
+function civ(net::AbstractPnmlNet, arc_id)
+    arc = PNML.arcdict(net)[arc_id]::Arc
     z = PNML.zero_marking(PNML.adjacent_place(net, arc)) # 0 or empty multiset similar to placetype
-    PNML._cvt_inscription_value(pntd_of(net), arc, z, NamedTuple())
+    inscription_value(arc, z, NamedTuple())
 end
 
 """
@@ -101,6 +101,8 @@ Iterate over preset of transition, returning source place id => inscription valu
 function in_inscriptions(net::PnmlNet, transitionid)
     Iterators.map(PNML.preset(net, transitionid)) do placeid
         a = PNML.arc(net, placeid, transitionid)
+        isnothing(a) &&
+            error("did not locate in arc $placeid -> $transitionid $placeid")
         PNML.source(a) => PNML.inscription(a)(NamedTuple())
     end
 end
@@ -114,6 +116,8 @@ Iterate over postset of transition, returning target place id => inscription val
 function out_inscriptions(net::PnmlNet, transitionid)
     Iterators.map(PNML.postset(net, transitionid)) do placeid
         a = PNML.arc(net, transitionid, placeid)
+        isnothing(a) &&
+            error("did not locate out arc $transitionid -> $placeid")
         PNML.target(a) => PNML.inscription(a)(NamedTuple())
     end
 end

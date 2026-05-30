@@ -56,7 +56,7 @@ this is a sort, not a term, so no variables or operators.
 
 Ground terms have no variables and can be evaluated outside of a transition firing rule.
 """
-@kwdef struct SortType{N <: APN} <: Annotation # Label not limited to high-level dialects.
+@kwdef struct SortType{N <: AbstractPnmlNet} <: Annotation # Label not limited to high-level dialects.
     text::Maybe{String} = nothing # Supposed to be for human consumption.
     sort::SortRef # NOT PartitionSort.  #! ePNK uses inline sorts.
     graphics::Maybe{Graphics} = nothing
@@ -73,7 +73,7 @@ SortType(s::AbstractString, sort::SortRef, net) = SortType(; text=s, sort, net)
 text(t::SortType)   = ifelse(isnothing(t.text), "", t.text) # See text(::AbstractLabel)
 sortref(t::SortType) = t.sort
 refid(t::SortType) = refid(sortref(t))::Symbol
-sortelements(t::SortType, net::APN) = sortelements(sortdefinition(namedsort(net, sortref(t))), net)
+sortelements(t::SortType, net::AbstractPnmlNet) = sortelements(sortdefinition(namedsort(net, sortref(t))), net)
 
 function Base.show(io::IO, st::SortType)
     print(io, indent(io), "SortType(")

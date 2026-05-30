@@ -6,7 +6,7 @@ Note that when `is_collective_token` is true the graph `weight_function` becomes
 """
 function metagraph end
 metagraph(model::PnmlModel) = metagraph(first(nets(model)))
-function metagraph(net::PnmlNet{P})where {P <: AbstractPnmlType}
+function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
     #! println("\nmetagraph $(pntd_of(net)) $(pid(net))")
 
     if !(narcs(net) > 0 && nplaces(net) > 0 && ntransitions(net) > 0)

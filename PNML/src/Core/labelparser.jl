@@ -15,5 +15,5 @@ end
 
 tag(lp::LabelParser) = lp.tag
 
-"LabelParser callable: func(lp)(::XMLNode, ::AbstractPnmlType)) -> PnmlLabel"
+"LabelParser callable: func(lp)(::XMLNode, ::AbstractPNTD)) -> PnmlLabel"
 func(lp::LabelParser) = lp.func

@@ -7,11 +7,11 @@ Example input: <variable refvariable="varx"/>.
 
 #TODO examples of use, modifying and accessing
 """
-struct Variable{N <: APN} <: AbstractVariable
+struct Variable{N <: AbstractPnmlNet} <: AbstractVariable
     refvariable::Symbol # of VariableDeclaration{N} that gives name and Type
     net::N
 
-    function Variable(v::Symbol, net::APN)
+    function Variable(v::Symbol, net::AbstractPnmlNet)
         # Check that REFID is valid in DeclDict.
         has_variabledecl(net, v) ||
             throw(ArgumentError("$(v) not a variable reference ID"))

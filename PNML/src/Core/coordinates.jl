@@ -17,11 +17,11 @@ function Coordinate(x::T1, y::T2) where {T1 <: Number, T2 <: Number}
                convert(value_type(Coordinate), y))
 end
 
-coordinate_type(::APNTD) = Coordinate
+coordinate_type(::AbstractPNTD) = Coordinate
 
 Base.eltype(::Coordinate) = Float32
 Base.eltype(::Type{Coordinate}) = Float32
-value_type(::Type{Coordinate}, ::APNTD) = eltype(Coordinate)
+value_type(::Type{Coordinate}, ::AbstractPNTD) = eltype(Coordinate)
 value_type(::Type{Coordinate}) = eltype(Coordinate)
 
 x(c::Coordinate) = c.x_

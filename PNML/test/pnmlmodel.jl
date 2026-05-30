@@ -3,6 +3,14 @@ using PNML, Test, JET
 include("TestUtils.jl")
 using .TestUtils
 
+function parse_test_label1(node::XMLNode,
+                           placetype::Maybe{SortType},
+                           net::AbstractPnmlNet;
+                           parentid::Symbol)
+    println("parse_test_label1")
+    PNML.Parser.parse_initialMarking(node, placetype, net; parentid)
+end
+
 @testset "Show" begin
     xnode = xml"""<?xml version="1.0"?>
         <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
@@ -29,18 +37,32 @@ using .TestUtils
           </net>(1)
         </pnml>
         """
+    @test_logs pnmlmodel(xnode; lp=())
+    @test_logs pnmlmodel(xnode; lp=[])
+    @test_logs pnmlmodel(xnode; lp=(), tp=(), ef=())
+    @test_logs (:info, "add 2 lp plugin(s)") pnmlmodel(xnode;
+                lp=((:initialMarking,  PNML.Parser.parse_initialMarking),
+                    (:hlinitialMarking, PNML.Parser.parse_hlinitialMarking)))
+
+    @test_logs (:info, "add 2 lp plugin(s)") pnmlmodel(xnode;
+                lp=((:initialMarking, parse_test_label1),
+                    (:hlinitialMarking, PNML.Parser.parse_hlinitialMarking)),
+                tp=(),
+                ef=())
+
     m = pnmlmodel(xnode;
                   tp=(("org.pnml.tool", "1.0", Parser.tokengraphics_content),
                       ("nupn", "1.2", Parser.nupn_content),
                       ("nupn", "1.1", Parser.nupn_content),), # toolinfo parser
                   lp=(tuple(:arctype, Parser.parse_arctype),), # label parser
                   ef=(tuple(:priority, PNML.enable_filter_priority),),
-                ) # enabled filter
+                  ) # enabled filter
+
     @test m isa PnmlModel
     net = PNML.firstnet(m)
-    foreach(println, pairs(net.toolparser)) # ::XMLNode, ::APN
-    foreach(println, pairs(net.labelparser)) # ::XMLNode, ::APN; Symbol
-    foreach(println, pairs(net.enabled_filters)) # ::Dict, ::Dict, ::APN, ::Symbol
+    foreach(println, pairs(net.toolparser)) # ::XMLNode, ::AbstractPnmlNet
+    foreach(println, pairs(net.labelparser)) # ::XMLNode, ::AbstractPnmlNet; Symbol
+    foreach(println, pairs(net.enabled_filters)) # ::Dict, ::Dict, ::AbstractPnmlNet, ::Symbol
 end
 
 @testset "pnmlmodel(empty_page)" begin
@@ -78,7 +100,7 @@ end
 # f(a; kwargs...) = isempty(kwargs) ? _f(a; c = c_specialized_for_default_b) : _f(a; kwargs...)
 
 @testset "multiple empty net types" begin
-    model = @test_logs(match_mode=:all, pnmlmodel(xml"""
+    model = pnmlmodel(xml"""
     <?xml version="1.0"?>
     <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
       <net id="net1" type="http://www.pnml.org/version-2009/grammar/ptnet">
@@ -90,8 +112,8 @@ end
       <net id="net4" type="hlcore"> <name><text>net4</text></name> <page id="page4"/> </net>
       <net id="net5" type="pt_hlpng"> <name><text>net5</text></name> <page id="page5"/> </net>
     </pnml>
-    """))
-
+    """)
+    @assert !isnothing(model)
     @test PNML.namespace(model) == "http://www.pnml.org/version-2009/grammar/pnml"
 
     Base.redirect_stdio(stdout=devnull, stderr=devnull) do

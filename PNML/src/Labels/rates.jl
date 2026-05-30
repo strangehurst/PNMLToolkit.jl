@@ -5,7 +5,7 @@ $(TYPEDFIELDS)
 Real valued label. An expected use is as a transition rate.
 Expected XML: `<rate> <text>0.3</text> </rate>`.
 """
-@kwdef struct Rate{N <: APN, T <: PnmlExpr} <: Annotation
+@kwdef struct Rate{N <: AbstractPnmlNet, T <: PnmlExpr} <: Annotation
     text::Maybe{String} = nothing
     term::T # Use the same mechanism as PTNet initialMarking and inscription.
     graphics::Maybe{Graphics} = nothing

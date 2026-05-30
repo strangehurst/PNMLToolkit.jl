@@ -6,10 +6,11 @@ $(TYPEDFIELDS)
 
 A <toolspecific> tag holds well formed XML that is parsed into an [`AnyElement`](@ref).
 """
-@auto_hash_equals struct ToolInfo{N <: APN, T}
+@auto_hash_equals struct ToolInfo{N <: AbstractPnmlNet,
+                                  T <: Any}
     toolname::String
     version::String
-    info::T # content of tool specific info
+    info::T #AnyElement{LittleDict{Union{Symbol,String}, Any}} # content of tool specific info
     net::N
 end
 
@@ -38,13 +39,13 @@ function Base.show(io::IO, ti::ToolInfo)
     print(io, ")")
 end
 
-function verify!(errors::Vector{String}, v::Vector{T}, verbose::Bool, net::APN) where {T <: ToolInfo}
+function verify!(errors::Vector{String}, v::Vector{T}, verbose::Bool, net::AbstractPnmlNet) where {T <: ToolInfo}
     verbose && println("## verify $(typeof(v))")
     foreach(t -> verify!(errors, t, verbose, net),  v)
     return errors
 end
 
-function verify!(errors::Vector{String}, t::ToolInfo, verbose::Bool, _net::APN)
+function verify!(errors::Vector{String}, t::ToolInfo, verbose::Bool, _net::AbstractPnmlNet)
     verbose && println("## verify $(typeof(t)) $(repr(name(t))) $(repr(version(t)))")
     isempty(name(t)) &&
         push!(errors, string("ToolInfo must have non-empty name")::String)

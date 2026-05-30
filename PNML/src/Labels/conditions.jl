@@ -8,7 +8,7 @@ There may be other things evaluating to boolean used to determine transition fir
 including: priority labels, inhibitor arc, place capacity labels, time/delay labels.
 ```
 """
-@auto_hash_equals struct Condition{N <: APN, T<:PnmlExpr} <: HLAnnotation
+@auto_hash_equals struct Condition{N <: AbstractPnmlNet, T<:PnmlExpr} <: HLAnnotation
     text::Maybe{String}
     term::T # duck-typed AbstractBoolExpr
     # color function: uses term and args, Built/JITed
@@ -18,11 +18,11 @@ including: priority labels, inhibitor arc, place capacity labels, time/delay lab
     net::N
 end
 
-Condition(b::Bool, net::APN) = Condition(BooleanConstant(b), net)
-Condition(c::BooleanConstant, net::APN) = Condition(BooleanEx(c), net)
-Condition(expr::BooleanEx, net::APN) =
+Condition(b::Bool, net::AbstractPnmlNet) = Condition(BooleanConstant(b), net)
+Condition(c::BooleanConstant, net::AbstractPnmlNet) = Condition(BooleanEx(c), net)
+Condition(expr::BooleanEx, net::AbstractPnmlNet) =
     Condition(nothing, expr, nothing, nothing, REFID[], net)
-Condition(text::AbstractString, expr::BooleanEx, net::APN) =
+Condition(text::AbstractString, expr::BooleanEx, net::AbstractPnmlNet) =
     Condition(text, expr, nothing, nothing, REFID[], net)
 
 Base.eltype(::Condition) = Bool

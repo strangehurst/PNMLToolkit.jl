@@ -26,7 +26,7 @@ function Base.show(io::IO, d::Declaration)
     return print(io, ")")
 end
 
-function verify!(errors::Vector{String}, decl::Declaration, verbose::Bool, ::APN)
+function verify!(errors::Vector{String}, decl::Declaration, verbose::Bool, ::AbstractPnmlNet)
     verbose && println("## verify $(typeof(decl))")
     #! TBD
     return errors

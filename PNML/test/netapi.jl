@@ -3,11 +3,10 @@ using PNML, JET, Test
 include("TestUtils.jl")
 using .TestUtils
 
-
 # String so that pntd can be embedded in the XML.
 const core_types = ("pnmlcore","ptnet",)
 const ex_types = ("continuous",)
-const hl_types = ("pt_hlpng",)#"hlcore","symmetric") #,"hlnet",)
+const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
 
 @warn "hl nets do not currently do linear algebra! 'fire' will error."
 
@@ -39,7 +38,7 @@ const hl_types = ("pt_hlpng",)#"hlcore","symmetric") #,"hlnet",)
         </initialMarking>
         """
         insctag = "inscription"
-    end
+    end #= if pntd in hl_types =#
     #println()
     #println(marking)
     str3 = """<?xml version="1.0"?>
@@ -79,6 +78,7 @@ const hl_types = ("pt_hlpng",)#"hlcore","symmetric") #,"hlnet",)
         </net>
     </pnml>
     """
+
     model = pnmlmodel(xmlnode(str3))
     anet = first(nets(model))
     mg = PNML.metagraph(anet)

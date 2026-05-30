@@ -7,7 +7,7 @@ Return [`ToolInfo`](@ref) with tool & version attributes and content.
 The content can be one or more well-formed xml elements.
 Parsed by `net.toolparser[tool][version]` or [`toolspecific_content_fallback`](@ref)
 """
-function parse_toolspecific(node, net::APN)
+function parse_toolspecific(node, net::AbstractPnmlNet)
     check_nodename(node, "toolspecific")
     tool    = attribute(node, "tool")
     version = attribute(node, "version")
@@ -22,18 +22,18 @@ function parse_toolspecific(node, net::APN)
     else
         toolspecific_content_fallback
     end
-    #@show tool, version, tool_parser
-    content = tool_parser(node, net) # Run ToolParser callable.
+    content = tool_parser(node, net) # Parse node.
+    #@show typeof(content) content typeof(content.elements)
     return Labels.ToolInfo(tool, version, content, net)
 end
 
 """
-    toolspecific_content_fallback(node::XMLNode, net::APN) -> AnyElement
+    toolspecific_content_fallback(node::XMLNode, net::AbstractPnmlNet) -> AnyElement
 Content of a `<toolspecific> `node` as parsed by `xmldict`.
 The `net` argument is present to conform to the _toolparser interface_.
 Some users may do net-specific parsing.
 """
-function toolspecific_content_fallback(node::XMLNode, net::APN)
+function toolspecific_content_fallback(node::XMLNode, net::AbstractPnmlNet)
     anyelement(Symbol(EzXML.nodename(node)), node)
 end
 
@@ -43,7 +43,7 @@ end
 
 Parse `ToolInfo` content that is expected to be `<tokengraphics>`.
 """
-function tokengraphics_content(node::XMLNode, net::APN)
+function tokengraphics_content(node::XMLNode, net::AbstractPnmlNet)
     parse_tokengraphics(EzXML.firstelement(node), pntd_of(net))
 end
 
@@ -73,7 +73,7 @@ end
 #-------------------------------------------------------------------
 """
     nupn_content(node::XMLNode, pntd::APNTD) -> NupnTool
-    nupn_content(node::XMLNode, net::APN) -> NupnTool
+    nupn_content(node::XMLNode, net::AbstractPnmlNet) -> NupnTool
 
 Parse `ToolInfo` content. Example:
 ```
@@ -89,7 +89,7 @@ Parse `ToolInfo` content. Example:
 ```
 """
 function nupn_content end
-nupn_content(node::XMLNode, net::APN) = nupn_content(node, pntd_of(net))
+nupn_content(node::XMLNode, net::AbstractPnmlNet) = nupn_content(node, pntd_of(net))
 function nupn_content(node::XMLNode, pntd::APNTD)
     nupn = anyelement(Symbol(EzXML.nodename(node)), node)
     #@show nupn

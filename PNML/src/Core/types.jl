@@ -85,7 +85,11 @@ function Base.getproperty(o::AbstractPnmlObject, prop_name::Symbol)
 end
 
 #! 2026-01-09 change pid, name from ::AbstractPnmlObject to ::Any
-pid(x) = x.id::Symbol
+pid(x) = if hasfield(typeof(x), :id)
+    x.id::Symbol
+else
+    error("type $(nameof(typeof(x))) has no field `id")
+end
 
 """
     name(x) -> String

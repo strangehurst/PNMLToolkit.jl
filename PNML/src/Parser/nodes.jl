@@ -1,6 +1,6 @@
 
 """
-    default(::Type{T<:AbstractLabel}, net::APN) -> T
+    default(::Type{T<:AbstractLabel}, net::AbstractPnmlNet) -> T
 
 Return a default instance of label `T` for `pntd`.
 """
@@ -8,7 +8,7 @@ function default end
 
 # parse nodes of graph
 "Fill place_set, place_dict."
-function parse_place!(netsets, netdata, node, net::APN)
+function parse_place!(netsets, netdata, node, net::AbstractPnmlNet)
     pl = parse_place(node, net)::valtype(placedict(netdata))
     #@show valtype(placedict(netdata)) typeof(placedict(netdata))
     push!(place_idset(netsets)::OrderedSet{Symbol}, pid(pl))
@@ -17,7 +17,7 @@ function parse_place!(netsets, netdata, node, net::APN)
 end
 
 "Fill transition_set, transition_dict."
-function parse_transition!(netsets, netdata, node, net::APN)
+function parse_transition!(netsets, netdata, node, net::AbstractPnmlNet)
     tr = parse_transition(node, net)::valtype(transitiondict(netdata))
     push!(transition_idset(netsets)::OrderedSet{Symbol}, pid(tr))
     transitiondict(netdata)[pid(tr)] = tr
@@ -25,7 +25,7 @@ function parse_transition!(netsets, netdata, node, net::APN)
 end
 
 "Fill arc_set, arc_dict."
-function parse_arc!(netsets, netdata, node, net::APN)
+function parse_arc!(netsets, netdata, node, net::AbstractPnmlNet)
     a = parse_arc(node, net)
     a isa valtype(arcdict(netdata)) ||
         @error("$(typeof(a)) not a $(valtype(arcdict(netdata)))) $(pntd_of(net)) $(repr(a))")
@@ -35,7 +35,7 @@ function parse_arc!(netsets, netdata, node, net::APN)
 end
 
 "Fill refplace_set, refplace_dict."
-function parse_refPlace!(netsets, netdata, node, net::APN)
+function parse_refPlace!(netsets, netdata, node, net::AbstractPnmlNet)
     rp = parse_refPlace(node, net)::valtype(refplacedict(netdata))
     push!(refplace_idset(netsets)::OrderedSet{Symbol}, pid(rp))
     refplacedict(netdata)[pid(rp)] = rp
@@ -43,7 +43,7 @@ function parse_refPlace!(netsets, netdata, node, net::APN)
 end
 
 "Fill reftransition_set, reftransition_dict."
-function parse_refTransition!(netsets, netdata, node, net::APN)
+function parse_refTransition!(netsets, netdata, node, net::AbstractPnmlNet)
     rt = parse_refTransition(node, net)::valtype(reftransitiondict(netdata))
     push!(reftransition_idset(netsets)::OrderedSet{Symbol}, pid(rt))
     reftransitiondict(netdata)[pid(rt)] = rt
@@ -57,7 +57,7 @@ Return default marking value based on `APNTD`. Has meaning of empty, as in `zero
 For high-level nets, the marking is an empty multiset whose basis matches `placetype`.
 Others have a marking that is a `Number`.
 """
-function default(::Type{<:Marking}, net::APN, _placetype::SortType)
+function default(::Type{<:Marking}, net::AbstractPnmlNet, _placetype::SortType)
     Marking(zero(value_type(Marking, pntd_of(net))), net) # not high-level!
 end
 
@@ -83,7 +83,7 @@ end
 """
 $(TYPEDSIGNATURES)
 """
-function parse_place(node::XMLNode, net::APN)
+function parse_place(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "place")
     placeid = register_idof!(net.idregistry, node)
     D()&& println("## parse_place ", repr(placeid))
@@ -144,7 +144,7 @@ function parse_place(node::XMLNode, net::APN)
     Place(placeid, mark, sorttype, namelabel, graphics, toolspecinfos, extralabels, net)
 end
 
-function default(::Type{<:Labels.Condition}, net::APN)
+function default(::Type{<:Labels.Condition}, net::AbstractPnmlNet)
     #@info "default Condition"
     Labels.Condition(BooleanEx(BooleanConstant(true)), net)
 end
@@ -152,7 +152,7 @@ end
 """
 $(TYPEDSIGNATURES)
 """
-function parse_transition(node::XMLNode, net::APN)
+function parse_transition(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "transition")
     transitionid = register_idof!(net.idregistry, node)
     D()&& println("## parse_transition ", repr(transitionid))
@@ -185,7 +185,7 @@ function parse_transition(node::XMLNode, net::APN)
             namelabel, graphics, toolspecinfos, extralabels, net)
 end #= function parse_transition =#
 
-function default(::Type{<:Inscription}, net::APN)
+function default(::Type{<:Inscription}, net::AbstractPnmlNet)
     #! Move this check to a verify! method! XXX
     # if refid(placetype) !== :positive
     #     @error(string("$(pntd_of(net)) default Inscription $placetype mismatch ",
@@ -214,11 +214,11 @@ function default(::Type{<:Inscription}, net::PnmlNet{T}, placetype::SortType) wh
 end
 
 """
-    parse_arc(node::XMLNode, net::APN) -> Arc
+    parse_arc(node::XMLNode, net::AbstractPnmlNet) -> Arc
 
 Construct an `Arc` with labels specialized for the APNTD.
 """
-function parse_arc(node::XMLNode, net::APN)
+function parse_arc(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "arc")
     arc_id = register_idof!(net.idregistry, node)
 
@@ -317,7 +317,7 @@ end
 """
 $(TYPEDSIGNATURES)
 """
-function parse_refPlace(node::XMLNode, net::APN)
+function parse_refPlace(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "referencePlace")
     refp_id = register_idof!(net.idregistry, node)
     D()&& println("## parse_refPlace ", repr(refp_id))
@@ -348,7 +348,7 @@ end
 """
 $(TYPEDSIGNATURES)
 """
-function parse_refTransition(node::XMLNode, net::APN)
+function parse_refTransition(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "referenceTransition")
     reft_id = register_idof!(net.idregistry, node)
     D()&& println("## parse_refTransition ", repr(reft_id))

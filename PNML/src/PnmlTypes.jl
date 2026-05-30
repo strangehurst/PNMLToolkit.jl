@@ -1,5 +1,5 @@
 """
-Petri Net Type Definition (pntd) URI mapped to AbstractPnmlType subtype singleton.
+Petri Net Type Definition (pntd) URI mapped to AbstractPNTD subtype singleton.
 """
 module PnmlTypes
 
@@ -7,7 +7,7 @@ using DocStringExtensions
 using SciMLLogging: @SciMLMessage
 
 # Abstract Types
-export APNTD, AbstractContinuousNet, AbstractHLCore, AbstractPnmlCore, AbstractPnmlType
+export APNTD, AbstractContinuousNet, AbstractHLCore, AbstractPnmlCore, AbstractPNTD
 # Concrete Types
 export ContinuousNet, HLCoreNet, HLPNG, PTNet, PT_HLPNG, PnmlCoreNet, SymmetricNet
 # Functions
@@ -29,9 +29,9 @@ are suported by this tool. See [`pntd_map`](@ref).
 Refer to [`pntd_symbol`](@ref) and [`pnmltype`](@ref) for
 how to get from the URI to a singleton.
 """
-abstract type AbstractPnmlType end
-"Abbreviation for AbstractPnmlType"
-const APNTD = AbstractPnmlType
+abstract type AbstractPNTD end
+"Abbreviation for AbstractPNTD"
+const APNTD = AbstractPNTD
 
 """
 $(TYPEDEF)
@@ -186,7 +186,7 @@ const pnmltype_map = IdDict{Symbol, APNTD}(:pnmlcore => PnmlCoreNet(),
 """
     all_nettypes([predicate])
 
-Return iterator over [`AbstractPnmlType`](@ref) singletons.
+Return iterator over [`AbstractPNTD`](@ref) singletons.
 Filtered by a predicate `p` if one is provided.
 """
 all_nettypes() = values(pnmltype_map)
@@ -196,7 +196,7 @@ all_nettypes(p) = Iterators.filter(p, values(pnmltype_map))
     core_nettypes() -> Tuple{APNTD}
 
 Useful for testing the 3 kinds of tokens corresponding to
-abstract subclasses of `APNTD` (or `AbstractPnmlType`) .
+abstract subclasses of `APNTD` (or `AbstractPNTD`) .
 """
 core_nettypes() = (PnmlCoreNet(), HLCoreNet(), ContinuousNet())
 

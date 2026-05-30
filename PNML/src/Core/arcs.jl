@@ -4,7 +4,7 @@ Edge of a Petri Net Markup Language graph that connects place and transition.
 $(TYPEDEF)
 $(TYPEDFIELDS)
 """
-@kwdef mutable struct Arc{N <: APN, T <: PnmlExpr} <: AbstractPnmlNode #Object
+@kwdef mutable struct Arc{N <: AbstractPnmlNet, T <: PnmlExpr} <: AbstractPnmlNode #Object
     id::Symbol
     source::RefValue{Symbol} # IDREF
     target::RefValue{Symbol} # IDREF
@@ -66,7 +66,7 @@ function Base.show(io::IO, arc::Arc)
     print(io, ")")
 end
 
-function verify!(errors, a::Arc, verbose::Bool , net::APN)
+function verify!(errors, a::Arc, verbose::Bool , net::AbstractPnmlNet)
     verbose && println("## verify Transition $(pid(a))")
     !isregistered(registry_of(net), pid(a)) &&
         push!(errors, string("arc ", repr(pid(a)), " not registered")::String)

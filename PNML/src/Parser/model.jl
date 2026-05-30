@@ -9,8 +9,11 @@ Build a [`PnmlModel`](@ref) holding one or more [`PnmlNet`](@ref) from either:
 
 XMLNode is an alias for EzXML.Node.
 
-# Arguments
-
+# Named Parameters
+  - pntd_override::Maybe{AbstractPNTD}
+  - lp: optional label parser plugins, a collection of (Symbol, callable) tuples
+  - tp: optional toolspecific parser plugins, a collection of(String, String, callable) tuples
+  - ef: optional enabled filter plugins, a collection of (Symbol, callable) tuples
 """
 function pnmlmodel end
 
@@ -52,7 +55,7 @@ end
 
 Fill `dict` if `kwargs[plugintag]` exists & has a collection of tuples.
 The first tuple element being a key of `dict` and the last entry the callable.
-Intermediate elements are dictionary keys for nested dictionaries.
+Intermediate tupel elements are keys for nested dictionaries.
 """
 function plugins!(dict::AbstractDict, kwargs, plugintag)
     if haskey(kwargs, plugintag) &&
@@ -60,7 +63,7 @@ function plugins!(dict::AbstractDict, kwargs, plugintag)
         @info "add $(length(kwargs[plugintag])) $plugintag plugin(s)" #kwargs[plugintag] dict
         for plugin in kwargs[plugintag]
             #! todo sanity check labelparser
-            @show plugin #! bring-up
+            #@show plugin #! bring-up
             if length(plugin) >= 2
                 push!(dict, recurse_plugin(plugin, 1, length(plugin)))
             else
@@ -84,7 +87,7 @@ end
 [`PnmlNet`](@ref) created from an `<net>` `XMLNode`.
 
 # Options
- - pntd_override::Maybe{AbstractPnmlType}
+ - pntd_override::Maybe{AbstractPNTD}
  - lp: optional label parser plugins, a collection of (Symbol, callable) tuples
  - tp: optional toolspecific parser plugins, a collection of(String, String, callable) tuples
  - ef: optional enabled filter plugins, a collection of (Symbol, callable) tuples

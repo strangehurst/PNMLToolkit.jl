@@ -53,29 +53,22 @@ function rates(net::AbstractPnmlNet)
 end
 
 """
-inscription_value(a::Maybe{Arc}, def, varsub) -> T
+inscription_value(a::Maybe{Arc}, default_value, varsub) -> T
 
-If `a` is nothing return `def` else evaluate inscription expression with varsub,
-where `def` is a default value of same sort as adjacent place.
+If `a` is nothing return `default_value` else evaluate inscription expression with varsub,
+where `default` is a same sort as adjacent place.
 and `varsub` is a possibly empty variable substitution.
 
 Used to create arrays where the default value is used when
 there is no arc between an place and transition of the net.
 """
-function inscription_value end
-
-function inscription_value(a::Maybe{Arc}, def, varsub)
+function inscription_value(a::Maybe{Arc}, default_value, varsub)
     if isnothing(a)
-        def
+        return default_value
     else
-        eval(toexpr(term(inscription(a)), varsub, a.net))
+        val = eval(toexpr(term(inscription(a)), varsub, a.net))
+        return pntd_of(a.net) isa PT_HLPNG ? cardinality(val) : val #! XXX not type stable
     end
-end
-
-"Convert inscription value of PT_HLPNG from multiset to cardinality of the multiset."
-function _cvt_inscription_value(pntd::APNTD, a::Maybe{Arc}, def, varsub)
-    val = inscription_value(a, def, varsub)
-    return pntd isa PT_HLPNG ? cardinality(val) : val
 end
 
 #==========================================================================
@@ -138,9 +131,9 @@ function input_matrix!(imatrix, net::AbstractPnmlNet)
     varsub = NamedTuple() # PT_HLPNG is only supported High-level net here
     for (p, place_id) in enumerate(place_idset(net))
         for (t, transition_id) in enumerate(transition_idset(net))
-            z = zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
             a = arc(net, place_id, transition_id)
-            imatrix[t, p] = _cvt_inscription_value(pntd_of(net), a, z, varsub)#::Number
+            z = zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
+            imatrix[t, p] = inscription_value(a, z, varsub)#::Number
         end
     end
 return imatrix
@@ -157,9 +150,9 @@ function output_matrix!(omatrix, net::AbstractPnmlNet)
     varsub = NamedTuple()
     for (p, place_id) in enumerate(place_idset(net))
         for (t, transition_id) in enumerate(transition_idset(net))
-            z = zero_marking(place(net, place_id))
             a = arc(net, transition_id, place_id)
-            omatrix[t, p] = _cvt_inscription_value(pntd_of(net), a, z, varsub)#::Number
+            z = zero_marking(place(net, place_id))
+            omatrix[t, p] = inscription_value(a, z, varsub)#::Number
         end
     end
 return omatrix
@@ -183,7 +176,7 @@ function incidence_matrix(net::AbstractPnmlNet)
 end
 
 # Vector{NamedTuple} cached in transition field.
-varsubs(net::APN, transition_id::Symbol) = varsubs(transition(net, transition_id))
+varsubs(net::AbstractPnmlNet, transition_id::Symbol) = varsubs(transition(net, transition_id))
 
 """
     initial_markings(petrinet) -> Tuple{Pair{id(place),value_type(marking(place))}

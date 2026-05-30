@@ -19,7 +19,7 @@ using LoggingExtras
 using NamedTupleTools
 using PNML
 using PNML.NetAPI
-using PNML.PnmlTypes: APNTD, AbstractPnmlType
+using PNML.PnmlTypes: APNTD, AbstractPNTD
 using TermInterface
 
 export AbstractPetriNet, SimpleNet, counted_transitions, input_matrix, labeled_transitions,

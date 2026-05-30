@@ -29,7 +29,7 @@ PNML Operator as Functor
 
 tag maps to func, a functor/function callable. Its arity is same as length of inexprs and insorts
 """
-struct Operator{N <: APN} <: AbstractOperator
+struct Operator{N <: AbstractPnmlNet} <: AbstractOperator
     tag::Symbol
     func::Union{Function, Type} # Apply `func` to `inexprs`:
     inexprs::Vector{AbstractTerm} #! TermInterface expressions some may be variables (not just ground terms).
@@ -285,7 +285,7 @@ $(TYPEDFIELDS)
 
 User operator wraps a [`REFID`](@ref) to a [`OperatorDeclaration`](@ref).
 """
-struct UserOperator{N <: APN} <: AbstractOperator
+struct UserOperator{N <: AbstractPnmlNet} <: AbstractOperator
     declaration::REFID # of a NamedOperator, AbstractOperator.
     net::N
 end

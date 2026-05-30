@@ -39,7 +39,7 @@ Each keyed by REFID symbols.
     useroperators::Dict{Symbol, UO}
 end  #= struct DeclDict =#
 
-function DeclDict(net::APN)
+function DeclDict(net::AbstractPnmlNet)
     N = typeof(net)
     DeclDict(;
                arbitraryoperators = Dict{Symbol, ArbitraryOperator{N}}(),
@@ -62,7 +62,6 @@ __dd_fields(dd) = Iterators.map(Fix1(getproperty, dd),
                                  :partitionops, :partitionsorts, :productsorts,
                                  :variabledecls, :useroperators,))
 
-#!Base.isempty(dd::DeclDict{N}) where {N <: APN} = all(isempty, __dd_fields(dd))
 Base.isempty(dd::ADDicts) = all(isempty, __dd_fields(dd))
 Base.length(dd::ADDicts)  = sum(length,  __dd_fields(dd))
 
@@ -212,9 +211,9 @@ function operator(dd::ADDicts, opid::Symbol)
 end
 
 """
-    verify(dd::ADDicts, verbose::Bool, net::APN) -> Bool
+    verify(dd::ADDicts, verbose::Bool, net::AbstractPnmlNet) -> Bool
 """
-function verify(dd::ADDicts, verbose::Bool, net::APN)
+function verify(dd::ADDicts, verbose::Bool, net::AbstractPnmlNet)
     errors = String[]
     verify!(errors, dd, verbose, net)
     isempty(errors) ||
@@ -222,7 +221,7 @@ function verify(dd::ADDicts, verbose::Bool, net::APN)
     return true
 end
 
-function verify!(errors::Vector{String}, dd::ADDicts, verbose::Bool, net::APN)
+function verify!(errors::Vector{String}, dd::ADDicts, verbose::Bool, net::AbstractPnmlNet)
     verbose && println("## verify $(typeof(dd))")
     for k in Iterators.flatten([keys(variabledecls(dd)),
                             keys(namedsorts(dd)),

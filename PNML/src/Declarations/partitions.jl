@@ -74,7 +74,7 @@ end
 
 # verify terms are in parent partitions's referenced sort elements.
 function verify!(errors::Vector{String}, pe::PartitionElement,
-                 verbose::Bool, net::APN)
+                 verbose::Bool, net::AbstractPnmlNet)
     sdiff = setdiff(pe.terms,
                     sortelements(sortdefinition(partitionsort(net, pe.partition)), net))
     verbose && println("## verify $(typeof(pe))")
@@ -105,7 +105,7 @@ Is the sort at the partition or the element level (1 sort or many sorts?)
 Like [`NamedSort`](@ref), will add an `id` and `name` to a sort,
 may be accessed by `UserSortRef` indirection.
 """
-struct PartitionSort{N <: APN} <: SortDeclaration
+struct PartitionSort{N <: AbstractPnmlNet} <: SortDeclaration
     id::Symbol
     name::Union{String, SubString{String}}
     def::SortRef # Like a NamedSort, refers to a sort (EnumerationSort)
@@ -122,7 +122,7 @@ end
 
 #TODO also do AbstractSort, another SortDeclaration
 sortdefinition(p::PartitionSort) = sortdefinition(namedsort(p.net, p.def))
-sortelements(p::PartitionSort, ::APN) = p.elements
+sortelements(p::PartitionSort, ::AbstractPnmlNet) = p.elements
 
 # TODO Add Partition/PartitionElement methods here
 # list PartitionElement ids & names
@@ -139,7 +139,7 @@ function element_names(ps::PartitionSort)
     Iterators.map(name, sortelements(ps, ps.net))
 end
 
-function verify!(errors::Vector{String}, psort::PartitionSort, verbose::Bool, net::APN)
+function verify!(errors::Vector{String}, psort::PartitionSort, verbose::Bool, net::AbstractPnmlNet)
     #psort = partitionsort(net, pe.partition)
     for pe in psort.elements
         verify!(errors, pe, verbose, net)

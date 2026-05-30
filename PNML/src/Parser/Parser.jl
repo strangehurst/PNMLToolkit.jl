@@ -11,8 +11,8 @@ import Base: eltype
 import EzXML
 import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
-import PNML:
-    adjacent_place, netdata, refid, sortdefinition, sortelements, sortref, tag, verify!
+import PNML: adjacent_place, elements, netdata, refid, source, target,
+    sortdefinition, sortelements, sortref, tag, verify!
 import XMLDict
 
 using ..Declarations
@@ -33,7 +33,7 @@ using Moshi.Match: @match
 using NamedTupleTools
 using PNML
 using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, FEConstant,
-    LabelParser, MalformedException, Maybe, MissingIDException, PnmlNetData, PnmlNetKeys,
+    LabelParser, MalformedException, Maybe, MissingIDException, PnmlMultiset, PnmlNetData, PnmlNetKeys,
     ToolParser, XmlDictType, arbitrarysorts, arc_idset, arcdict, basis, coordinate_type,
     decldict, feconstants, fill_builtin_enabled_filters!, fill_builtin_labelparsers!,
     fill_builtin_sorts!, fill_builtin_toolparsers!, fill_sort_tag!, has_arbitrarysort,
@@ -41,7 +41,8 @@ using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, FECons
     has_productsort, is_arbitrarysort, is_inhibitor, is_multisetsort, is_namedsort,
     is_normal, is_partitionsort, is_productsort, is_read, is_reset, is_usersort,
     multisetsorts, namedoperators, namedsorts, netsets, number_value, operator, page_idset,
-    pagedict, partitionsorts, pid, place, place_idset, placedict, pntd_of, productsorts,
+    pagedict, partitionsorts, pid, place, place_idset, placedict, pnmlmultiset, pntd_of,
+    productsort, productsorts,
     refplace_idset, refplacedict, reftransition_idset, reftransitiondict, registry_of,
     to_sort, toolinfos, transition_idset, transitiondict, value_type, variabledecl,
     variabledecls, verify

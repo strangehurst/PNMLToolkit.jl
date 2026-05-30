@@ -67,7 +67,7 @@ export @xml_str, APN, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
     Transition, UserSortRef, pnmlmodel, xmlnode
 
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
-@public namedsort, Coordinate
+@public namedsort, productsort, Coordinate
 @public basis, rates, mcontains, to_sort
 @public is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
 
@@ -92,8 +92,8 @@ using .IDRegistrys
 include("Core/exceptions.jl")
 include("Core/utils.jl")
 include("Core/coordinates.jl")
+include("Core/anyelement.jl") # AnyElement, XmlDictType,
 include("Core/interfaces.jl") # Function docstrings mostly.
-include("Core/anyelement.jl") # AnyElement, XmlDictType, XDVT
 include("Core/types.jl") # Abstract Types with docstrings.
 include("Core/sortref.jl")
 include("Core/toolparser.jl")

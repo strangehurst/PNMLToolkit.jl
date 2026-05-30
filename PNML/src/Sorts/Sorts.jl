@@ -50,7 +50,8 @@ using PNML: AbstractSort, DotConstant, inc_indent, indent, is_multisetsort,
 
 export AbstractSort, BoolSort, CyclicEnumerationSort, DotSort, EnumerationSort,
     FiniteEnumerationSort, FiniteIntRangeSort, IntegerSort, ListSort, MultisetSort,
-    NaturalSort, NumberSort, PositiveSort, ProductSort, RealSort, StringSort, equalSorts
+    NaturalSort, NumberSort, PositiveSort, ProductSort, RealSort, StringSort, equalSorts,
+    sorts
 
 include("sorts.jl")
 include("dots.jl")

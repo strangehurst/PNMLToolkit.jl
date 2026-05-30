@@ -15,16 +15,13 @@ using .TestUtils
 
 isempty(ARGS) && push!(ARGS, "ALL")
 "Return true if `ARGS` is empty or one of `y`  and none of `n` is found in `ARGS`."
-select(y::Tuple, n::Tuple=()) = any(∈(ARGS), y) && !any(∈(ARGS), n)
+select(y::Tuple, n::Tuple=()) = any(∈(ARGS), skipmissing(y)) && !any(∈(ARGS), skipmissing(n))
 select(y, n) = select(y, tuple(n))
 select(y::AbstractString) = select(tuple(y))
 
-const FAILFAST = parse(Bool, get(ENV, "JULIA_TEST_FAILFAST", "true"))
-@show FAILFAST
-
 #############################################################################
 @time "TESTS" begin
-@testset verbose=true failfast=FAILFAST showtiming=true "PNML.jl" begin
+@testset verbose=true showtiming=true "PNML.jl" begin
     if !isempty(ARGS) && select("NONE")
         return nothing # Have chosen to bail before any tests.
     end

@@ -41,7 +41,6 @@ $(TYPEDEF)
 $(TYPEDFIELDS)
 
 Hold AbstractDict holding zero or more well-formed XML elments.
-See also [`ToolInfo`](@ref) and [`PnmlLabel`](@ref).
 
 Creates a tree where the root is `tag`,
 leaf node values are `Union{String, SubString{String}}`, and
@@ -57,7 +56,7 @@ See [`XmlDictType`](@ref).
 end
 
 tag(a::AnyElement) = a.tag
-elements(a::AnyElement) = a.elements # label elements
+elements(a::AnyElement) = a.elements::LittleDict # label elements
 
 function Base.show(io::IO, ae::AnyElement)
     print(io, "AnyElement(", repr(tag(ae)), ", ")
