@@ -156,7 +156,7 @@ reftransition(net::PnmlNet, id::Symbol) = reftransitiondict(net)[id]
 Return `Arc` from 'src' to 'tgt' or `nothing`.
 Useful for graphs where arcs are represented by a tuple or pair (source,target).
 """
-arc(net, src::Symbol, tgt::Symbol) = begin
+function arc(net, src::Symbol, tgt::Symbol)
     x = Iterators.filter(a -> source(a) === src && target(a) === tgt, arcs(net))
     isempty(x) ? nothing : first(x)
 end
