@@ -9,13 +9,13 @@ using PNML, InteractiveUtils, Markdown, AbstractTrees
 AbstractTrees.children(x::Type) = subtypes(x)
 type_tree(t) = println(AbstractTrees.repr_tree(t))
 ```
-## AbstractPnmlType - Petri Net Type Definition (PNTD)
+## AbstractPNTD - Petri Net Type Definition (PNTD)
 
 See [`PnmlTypes`](@ref) module page.
 
 There are levels:  Core (Place-Transition), Continuous and High-Level PNG (HLPNG).
 
-[`PnmlCoreNet`](@ref) is a concrete subtype of [`AbstractPnmlType`](@ref).
+[`PnmlCoreNet`](@ref) is a concrete subtype of [`AbstractPNTD`](@ref).
 `PnmlCoreNet` is used by some `PNet.AbstractPetriNet` concrete types (`PNet.SimpleNet`).
 
 [`ContinuousNet`](@ref) is a concrete type of [`AbstractContinuousNet`](@ref).
@@ -29,10 +29,10 @@ Think of it as a testable implementation of `AbstractHLCore`.
 Tries to represent the model (all models) at a structural level.
 Tries to avoid imposing semantics. It is a toolkit with a wide range of behavior.
 Those semantics should be part of `PNet.AbstractPetriNet`.
-Yes, the [`AbstractPnmlType`](@ref) in use selects some semantics and affects the toolkit.
+Yes, the [`AbstractPNTD`](@ref) in use selects some semantics and affects the toolkit.
 
 ```@example type
-type_tree(PNML.PnmlTypes.AbstractPnmlType) # hide
+type_tree(PNML.PnmlTypes.AbstractPNTD) # hide
 ```
 
 | PnmlType     | Description                                               |
@@ -52,7 +52,7 @@ Todo: Continuous Petri Net
 ## PNet.AbstractPetriNet
 
 `PNet.AbstractPetriNet` uses the Intermediate Representation's
-[`PnmlNet`](@ref) and `AbstractPnmlType` to implement a Petri Net Graph (PNG).
+[`PnmlNet`](@ref) and `AbstractPNTD` to implement a Petri Net Graph (PNG).
 
 ## AbstractPnmlObject
 
@@ -69,7 +69,7 @@ Fields expected of every subtype of [`AbstractPnmlObject`](@ref):
 | Name      | Description |
 |:----------|:-----------------------------------|
 | id        | Symbol, see ['REFID](@ref PNML.REFID) |
-| pntd      | <: [`AbstractPnmlType`](@ref) identifies the meta-model of a net. |
+| pntd      | <: [`AbstractPNTD`](@ref) identifies the meta-model of a net. |
 | name      | Optional [`Name`](@ref) label. |
 | labels    | Optional [`PnmlLabel`](@ref) collection of unclaimed labels. |
 | toolspecinfos | Optional [`ToolInfo`](@ref) collection of tool specific content. |

@@ -29,7 +29,7 @@ the kind on number they use:
 See [PnmlType - Petri Net Type Definition](@ref) for the full hierarchy.
 
 This means there are at least 3 sets of default value types.
-We use the pntd [AbstractPnmlType](@ref PNML.PnmlTypes.AbstractPnmlType) as a trait to determine the default types/values.
+We use the pntd [AbstractPNTD](@ref PNML.PnmlTypes.AbstractPNTD) as a trait to determine the default types/values.
 
 A consequence is that the default value's type ripples through the type system.
 

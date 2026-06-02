@@ -12,7 +12,7 @@ end
 # Traits
 
 Some of the traits used are based on the pntd.
-Each supported pntd has a singleton subtype of AbstractPnmlType.
+Each supported pntd has a singleton subtype of AbstractPNTD.
 
 3 branches of pntd based on number system
   - _core_ uses integers
