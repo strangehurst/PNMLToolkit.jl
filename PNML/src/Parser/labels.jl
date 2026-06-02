@@ -458,6 +458,7 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
     return tj
 end
 
+adjacent_place(net::AbstractPnmlNet, arc_id::Symbol) = adjacent_place(netdata(net), arc(net, arc_id))
 adjacent_place(net::AbstractPnmlNet, a::Arc) = adjacent_place(netdata(net), a)
 adjacent_place(netdata::PnmlNetData, a::Arc) = adjacent_place(netdata, source(a), target(a))
 function adjacent_place(netdata::PnmlNetData, source::REFID, target::REFID, strict=true)
