@@ -6,8 +6,8 @@ $(TYPEDFIELDS)
 """
 @kwdef mutable struct Arc{N <: AbstractPnmlNet, T <: PnmlExpr} <: AbstractPnmlNode #Object
     id::Symbol
-    source::RefValue{Symbol} # IDREF
-    target::RefValue{Symbol} # IDREF
+    source::RefValue{Symbol} # ID of Place or Transition
+    target::RefValue{Symbol} # ID of Place or Transition
     inscription::Inscription{N,T} #! expression label
     type_label::ArcType
     namelabel::Maybe{Name}
