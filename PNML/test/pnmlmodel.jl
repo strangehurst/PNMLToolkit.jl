@@ -295,7 +295,7 @@ println("-----------------------------------------")
 
     @test !isempty(repr(PNML.netdata(net)))
     @test !isempty(repr(PNML.netsets(firstpage(net))))
-    @test_throws ArgumentError PNML.netsets(net)
+    @test_throws DomainError PNML.netsets(net)
 
     summary(stdout, PNML.netsets(firstpage(net)))
 

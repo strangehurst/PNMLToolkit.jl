@@ -1,4 +1,4 @@
-using PNML, JET
+using PNML, JET, Test
 
 include("TestUtils.jl")
 using .TestUtils
@@ -35,7 +35,7 @@ function verify_sets(net::PnmlNet)
     @test !isempty(setdiff(reftransition_idset(net), reftransition_idset(firstpage(net))))
 
     @test netdata(net) === netdata(firstpage(net))
-    @test_throws ArgumentError PNML.netsets(net)
+    @test_throws DomainError PNML.netsets(net)
     for page in pages(net)
         @test netdata(net) === netdata(page)   # There is only 1 netdata.
         @test pagedict(net) === pagedict(page) # There is only 1 pagedict.
