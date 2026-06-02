@@ -34,7 +34,7 @@ using NamedTupleTools
 using PNML
 using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, FEConstant,
     LabelParser, MalformedException, Maybe, MissingIDException, PnmlMultiset, PnmlNetData, PnmlNetKeys,
-    ToolParser, XmlDictType, arbitrarysorts, arc_idset, arcdict, basis, coordinate_type,
+    ToolParser, XmlDictType, arbitrarysorts, arc, arc_idset, arcdict, basis, coordinate_type,
     decldict, feconstants, fill_builtin_enabled_filters!, fill_builtin_labelparsers!,
     fill_builtin_sorts!, fill_builtin_toolparsers!, fill_sort_tag!, has_arbitrarysort,
     has_feconstant, has_multisetsort, has_namedsort, has_partitionsort, has_place,

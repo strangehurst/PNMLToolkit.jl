@@ -145,50 +145,82 @@ function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{T}, transitio
 end
 
 """
+    comp_mark_inscription(net, mark_dict, transition_id, cond_term,
+                          tr_var_binding_set, tr_vars, tr_varsubs)-> Bool
+
 Evaluate transition's preset inscription expressions, compare to mark value.
 Update varsubs with feasible variable substitution named tuples.
 
 The firing rule will select from one transition's feasible substutions in its varsubs.
 """
+function comp_mark_inscription end
+# function comp_mark_inscription(net::PnmlNet{T}, mark_dict, transition_id, cond_term,
+#                                 tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractHLCore}
+#     for place_id in preset(net, transition_id)
+#         mark = mark_dict[place_id]
+#         z = zero_marking(place(net, place_id))
+#         __compare_mi_impl(net, mark, cond_term, place_id, transition_id,
+#                                 tr_var_binding_set, tr_vars, tr_varsubs, z) || return false
+#     end
+#     return true # transition is enabled
+# end
+# function comp_mark_inscription(net::PnmlNet{PT_HLPNG}, mark_dict, transition_id, cond_term,
+#                                 tr_var_binding_set, tr_vars, tr_varsubs)
+#     for place_id in preset(net, transition_id)
+#         mark = mark_dict[place_id]
+#         z = zero_marking(place(net, place_id))
+#         __compare_mi_impl(net, mark, cond_term, place_id, transition_id,
+#                                 tr_var_binding_set, tr_vars, tr_varsubs, z) || return false
+#     end
+#     return true # transition is enabled
+# end
 function comp_mark_inscription(net::AbstractPnmlNet, mark_dict, transition_id, cond_term,
                                 tr_var_binding_set, tr_vars, tr_varsubs)
-    for place_id in preset(net, transition_id)
-        #!ar = arc(net, place_id, transition_id)
+   for place_id in preset(net, transition_id)
         mark = mark_dict[place_id]
-
-        if isempty(tr_vars) # 0-ary operators or constants
-            # This includes the non-HL net types that do not have variables.
-            eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-            inscription_val = inscription_value(arc(net, place_id, transition_id),
-                                                zero_marking(place(net, place_id)),
-                                                NamedTuple())
-            mark >= inscription_val || return false
-        else
-            # Use the transition-level variable substitution binding map `tr_var_binding_set`.
-            # Iterate over the cartesian product to produce a list of candidate firings.
-            # A candidate firing is a NamedTuple variable_id => marking_value of substitutions.
-            vids = tuple(keys(tr_var_binding_set)...) # Tuple of variable ids
-            vtup = tuple(values(tr_var_binding_set)...) # Tuple of Multisets{PnmlMultiset}
-            sub1 = tuple((keys.(vtup))...) # Tuple of iterators
-            for candidate_params in Iterators.product(sub1...)
-                # Assume order of tr_var_binding_set and product are the same.
-                # Mke named tuple where names are variable ids.
-                tr_vsub = namedtuple(vids, candidate_params)
-                # Check guard condition expression that may contain variables.
-                # Must be evaluated for each candidate_parms.
-                eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
-                #!inscription_val = _cvt_inscription_value(pntd_of(net), arc(net, place_id, transition_id), tr_vsub)
-                inscription_val = inscription_value(arc(net, place_id, transition_id),
-                                                    zero_marking(place(net, place_id)),
-                                                    tr_vsub)
-                mark = unwrap_pmset(mark)
-                issubset(inscription_val, mark) || continue # not a valid substitution
-                push!(tr_varsubs, tr_vsub)
-            end
-            isempty(tr_varsubs) && return false # no sunstitution found
-        end
-    end
+        z = zero_marking(place(net, place_id))
+        __compare_mi_impl(net, mark, cond_term, place_id, transition_id,
+                                tr_var_binding_set, tr_vars, tr_varsubs, z) || return false
+     end
     return true # transition is enabled
+end
+
+function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transition_id,
+                           _, _, _, z) where {T <: AbstractPNTD}
+    eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
+    inscription_val = inscription_value(net, place_id, transition_id,z, NamedTuple()) # Number
+    return mark >= inscription_val
+ end
+
+function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transition_id,
+                           tr_var_binding_set, tr_vars, tr_varsubs, z) where {T <: AbstractHLCore}
+    if isempty(tr_vars) # 0-ary operators or constants
+        # PT_HLPNG will have no vars
+        eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
+        inscription_val = inscription_value(net, place_id, transition_id, z, NamedTuple()) # convert bag{dot} to Int
+        mark = unwrap_pmset(mark)
+        return issubset(inscription_val, mark)
+   else
+        # Use the transition-level variable substitution binding map `tr_var_binding_set`.
+        # Iterate over the cartesian product to produce a list of candidate firings.
+        # A candidate firing is a NamedTuple variable_id => marking_value of substitutions.
+        vids = tuple(keys(tr_var_binding_set)...) # Tuple of variable ids
+        vtup = tuple(values(tr_var_binding_set)...) # Tuple of Multisets{PnmlMultiset}
+        sub1 = tuple((keys.(vtup))...) # Tuple of iteratorsero_marking(place(net, place_id))
+        for candidate_params in Iterators.product(sub1...)
+            # Assume order of tr_var_binding_set and product are the same.
+            # Mke named tuple where names are variable ids.
+            tr_vsub = namedtuple(vids, candidate_params)
+            # Check guard condition expression that may contain variables.
+            # Must be evaluated for each candidate_parms.
+            eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
+            inscription_val = inscription_value(net, place_id, transition_id, z, tr_vsub) # bag
+            mark = unwrap_pmset(mark)
+            issubset(inscription_val, mark) || continue # not a valid substitution
+            push!(tr_varsubs, tr_vsub)
+        end
+        return !isempty(tr_varsubs) # no sunstitution found if empty
+    end
 end
 
 """

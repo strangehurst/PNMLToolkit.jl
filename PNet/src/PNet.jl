@@ -9,7 +9,7 @@ import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import PNML
 import PNML: PnmlMultiset,
-    initial_marking, initial_markings, metagraph, nettype, pid,
+    initial_marking, initial_markings, inscription, metagraph, nettype, pid,
     pnmlmodel, pntd_of, rates
 import XMLDict
 

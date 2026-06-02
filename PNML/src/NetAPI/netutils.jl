@@ -62,15 +62,29 @@ and `varsub` is a possibly empty variable substitution.
 Used to create arrays where the default value is used when
 there is no arc between an place and transition of the net.
 """
-function inscription_value(a::Maybe{Arc}, default_value, varsub)
+function inscription_value end
+function inscription_value(net::PnmlNet{T}, a::Maybe{Arc}, default_value, varsub) where {T <: AbstractPNTD}
+    #!@warn typeof(net) a default_value
     if isnothing(a)
         return default_value
     else
-        val = eval(toexpr(term(inscription(a)), varsub, a.net))
-        return pntd_of(a.net) isa PT_HLPNG ? cardinality(val) : val #! XXX not type stable
+        return eval(toexpr(term(inscription(a)), varsub, net))
     end
 end
-
+function inscription_value(net::PnmlNet{PT_HLPNG}, a::Maybe{Arc}, default_value, varsub)
+    val = if isnothing(a)
+        default_value
+    else
+        eval(toexpr(term(inscription(a)), varsub, net))
+    end
+    return cardinality(val)
+end
+function inscription_value(net::APN, source_id::Symbol, target_id::Symbol, default_value, varsub)
+    inscription_value(net, arc(net, source_id, target_id)::Maybe{Arc}, default_value, varsub)
+end
+function inscription_value(net::APN, arc_id::Symbol, default_value, varsub)
+    inscription_value(net, arc(net, arc_id), default_value, varsub)
+end
 #==========================================================================
 Notes based on ISO/IEC 15909-1:2019 (Part 1, 2nd Edition).
 
@@ -130,13 +144,12 @@ end
 function input_matrix!(imatrix, net::AbstractPnmlNet)
     varsub = NamedTuple() # PT_HLPNG is only supported High-level net here
     for (p, place_id) in enumerate(place_idset(net))
+        z = zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
         for (t, transition_id) in enumerate(transition_idset(net))
-            a = arc(net, place_id, transition_id)
-            z = zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
-            imatrix[t, p] = inscription_value(a, z, varsub)#::Number
+            imatrix[t, p] = inscription_value(net, place_id, transition_id, z, varsub)
         end
     end
-return imatrix
+    return imatrix
 end
 
 function output_matrix(net::AbstractPnmlNet)
@@ -149,13 +162,13 @@ end
 function output_matrix!(omatrix, net::AbstractPnmlNet)
     varsub = NamedTuple()
     for (p, place_id) in enumerate(place_idset(net))
+        z = zero_marking(place(net, place_id))
         for (t, transition_id) in enumerate(transition_idset(net))
-            a = arc(net, transition_id, place_id)
-            z = zero_marking(place(net, place_id))
-            omatrix[t, p] = inscription_value(a, z, varsub)#::Number
+            iv = inscription_value(net, transition_id, place_id, z, varsub)
+            omatrix[t, p] = iv
         end
     end
-return omatrix
+    return omatrix
 end
 
 """
