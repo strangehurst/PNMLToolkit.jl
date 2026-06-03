@@ -100,7 +100,7 @@ Iterate over preset of transition, returning source place id => inscription valu
 """
 function in_inscriptions(net::PnmlNet, transitionid)
     Iterators.map(PNML.preset(net, transitionid)) do placeid
-        a = PNML.arc(net, placeid, transitionid)
+        a = PNML.arc(net, placeid, transitionid)::Union{Arc, Nothing}
         isnothing(a) &&
             error("did not locate in arc $placeid -> $transitionid $placeid")
         PNML.source(a) => PNML.inscription(a)(NamedTuple())
@@ -115,7 +115,7 @@ Iterate over postset of transition, returning target place id => inscription val
 """
 function out_inscriptions(net::PnmlNet, transitionid)
     Iterators.map(PNML.postset(net, transitionid)) do placeid
-        a = PNML.arc(net, transitionid, placeid)
+        a = PNML.arc(net, transitionid, placeid)::Union{Arc, Nothing}
         isnothing(a) &&
             error("did not locate out arc $transitionid -> $placeid")
         PNML.target(a) => PNML.inscription(a)(NamedTuple())
