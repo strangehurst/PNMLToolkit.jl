@@ -236,7 +236,7 @@ Return enabled state, update `tr_vars`  and `binding_sets`.
 """
 function get_variable_substitutions!(binding_sets, net::AbstractPnmlNet, transition_id, tr_vars, mark_dict)
     for place_id in preset(net, transition_id)
-        ar = arc(net, place_id, transition_id)
+        ar = arc(net, place_id, transition_id)::Maybe{Arc}
         isnothing(ar) && error("did not find arc: $place_id -> $transition_id")
         mark = unwrap_pmset(mark_dict[place_id])
         arc_vars = Multiset(PNML.Labels.variables(PNML.inscription(ar))...) # Count variables.
@@ -245,7 +245,7 @@ function get_variable_substitutions!(binding_sets, net::AbstractPnmlNet, transit
         place_sort = sortref(place(net, place_id))
         enabled, arc_binding_sets = get_arc_var_binding_sets!(arc_vars, place_sort, mark, net)
         enabled || return false # transition not enabled
-        accum_var_binding_sets!(binding_sets, arc_binding_sets) || return false
+        accum_var_binding_sets!(binding_sets, arc_binding_sets)::Bool || return false
     end # preset arcs
     #TODO sanity check substitutions.
     return true # enabled, binding_sets is valid
