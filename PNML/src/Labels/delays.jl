@@ -43,11 +43,12 @@ end
 See [`delay_value`](@ref)
 """
 function delay_content_parser(label, value_type)
-    @show (tag, interval) = first(elements(label))
+    tag, interval = first(elements(label))
     tag == "interval" || error("expected 'interval', found '$(repr(tag))'")
-    D()&& @show value_type
+    D()&& @show value_type, tag, interval
     closure = PNML._attribute(interval, :closure)
     D()&& @show closure
+
     # Expect at least one cn number.
     n = if haskey(interval, "cn")
         let cn = @inbounds interval["cn"]
@@ -62,7 +63,6 @@ function delay_content_parser(label, value_type)
     else
         throw(ArgumentError(string("<interval> missing any <cn> element")))
     end
-    #D()&& @show n
 
     i = if haskey(interval, "ci") # At most one ci named constant.
         let ci = @inbounds interval["ci"]
@@ -79,12 +79,12 @@ function delay_content_parser(label, value_type)
     else
         length(n) == 1 && throw(ArgumentError("<interval> <ci> element missing."))
     end
-    #D()&& @show i
 
     a = n[1]
     b = length(n) > 1 ? n[2] : i[1]
     tup = tuple(closure, a, b)
     a <= b || error("invalid interval $(repr(tup))")
+    D()&& @show tup
     return tup
 end
 

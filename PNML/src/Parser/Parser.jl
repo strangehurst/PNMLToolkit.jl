@@ -37,7 +37,7 @@ using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, FECons
     ToolParser, XmlDictType, arbitrarysorts, arc, arc_idset, arcdict, basis, coordinate_type,
     decldict, feconstants, fill_builtin_enabled_filters!, fill_builtin_labelparsers!,
     fill_builtin_sorts!, fill_builtin_toolparsers!, fill_sort_tag!, has_arbitrarysort,
-    has_feconstant, has_multisetsort, has_namedsort, has_partitionsort, has_place,
+    has_feconstant, has_multisetsort, has_namedop, has_namedsort, has_partitionsort, has_place,
     has_productsort, is_arbitrarysort, is_inhibitor, is_multisetsort, is_namedsort,
     is_normal, is_partitionsort, is_productsort, is_read, is_reset, is_usersort,
     multisetsorts, namedoperators, namedsorts, netsets, number_value, operator, page_idset,
@@ -77,7 +77,7 @@ Uses `fill_sort_tag!`.
 Return concrete SortRef matching `dict`, wrapping `id`.
 """
 function make_sortref(net, dict, sort, seed, sort_id, name=nothing)
-    #println("\n## make_sortref $(pid(net)) $dict $sort $(repr(sort_id)) '$name'")
+    D()&& println("\n## make_sortref dict=$dict sort=$(nameof(typeof(sort))) sort_id=$(repr(sort_id)) '$name'")
     # See if there is an existing `sort` in `dict`
     if isnothing(sort_id) # No provided id, if no existing sort found, invent an id.
         if isnothing(find_valuekey(dict(net), sort))
