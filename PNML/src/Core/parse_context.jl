@@ -48,26 +48,23 @@ Register the tag and create and return an `SortRef` holding `tag`.
 function fill_sort_tag!(net::AbstractPnmlNet, tag::Symbol, sort, dict)
     fill_sort_tag!(decldict(net), registry_of(net), tag, sort, dict)
 end
+
 function fill_sort_tag!(dd::DeclDict, idreg, tag::Symbol, sort, dict)
     # Do not overwrite existing content (except dot).
+    D()&& println("## fill_sort_tag! tag=$(repr(tag)) sort=$(nameof(typeof(sort))) dict=$dict")
     if tag === :dot || !haskey(dict(dd), tag)
         !isregistered(idreg, tag) && register_id!(idreg, tag)
         dict(dd)[tag] = sort
     end
-    return sortref(dict, tag)
-end
-
-
-function sortref(dict_callable, tag)
-    @assert !ismissing(dict_callable)
-    @assert !ismissing(tag)
-    @match dict_callable begin
+    sr = @match skipmissing(dict) begin
         PNML.multisetsorts  => MultisetSortRef(tag)  # sort, basis is a builtin,
         PNML.productsorts   => ProductSortRef(tag)   # sort, tuple of SortRefs
         PNML.partitionsorts => PartitionSortRef(tag) # declaration
         PNML.arbitrarysorts => ArbitrarySortRef(tag) # declaration
         _ => NamedSortRef(tag)
     end
+    #!@show sr dd
+    return sr
 end
 
 
