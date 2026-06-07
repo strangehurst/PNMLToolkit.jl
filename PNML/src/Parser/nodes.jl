@@ -127,7 +127,6 @@ function parse_place(node::XMLNode, net::AbstractPnmlNet)
 
     if isnothing(mark) # Use additive identity of proper sort as default value.
         effective_sorttype = if is_highlevel(pntd_of(net)) && isnothing(sorttype)
-            #D()&&
             @error("$(pntd_of(net)) parse_place $(repr(placeid)) has neither a mark nor sorttype, " *
                             "use :dot even if it is WRONG")
             SortType("dummy", NamedSortRef(:dot), net)

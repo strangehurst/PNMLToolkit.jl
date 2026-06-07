@@ -198,9 +198,6 @@ function parse_initialMarking(node::XMLNode, placetype::Maybe{SortType}, net::Ab
         @warn "$nn place $parentid <text> element expected for $(pntd_of(net)) net"
     end
     @assert isempty(l.vars) # All markings are ground terms.
-    # sr = @show sortref(placetype)
-    # ts = @show to_sort(sr, net)
-    # pt = @show eltype(ts)
     pt = eltype(to_sort(sortref(placetype), net))
     mvt = eltype(value_type(Marking, pntd_of(net)))
     pt <: mvt ||
