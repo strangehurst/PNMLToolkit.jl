@@ -282,7 +282,7 @@ function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
 
         # Examine mark
         for (element, multiplicity) in pairs(multiset(mark))
-            @show typeof(element)
+            #@show typeof(element)
             #! arc_binding_set counts possible substitutions in source place's marking.
             # Multiple of same variable in arc inscription expression
             # means arc_binding_set only includes values of mark elements with

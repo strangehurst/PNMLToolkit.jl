@@ -569,7 +569,7 @@ function parse_partition(node::XMLNode, net::AbstractPnmlNet) #! a sort declarat
         tag = EzXML.nodename(part_child)
         if tag == "usersort" # The sort that partitionelements reference into.
             # The only non-partitionelement child possible,
-            partitioned_sortref = @show parse_usersort(part_child, net)::SortRef
+            partitioned_sortref = parse_usersort(part_child, net)::SortRef
             @assert is_namedsort(partitioned_sortref) "RelaxNG Schema says: defined over a NamedSort which it refers to."
         elseif tag === "partitionelement"
             # Each partitionelement holds REFIDs to elements of an enumeration sort.

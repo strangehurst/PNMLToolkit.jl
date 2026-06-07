@@ -21,8 +21,8 @@ using XMLDict: XMLDict
     #println(str)
 
     net = make_net(pntd, :pt_initmark)
-    @show value_type(Marking, pntd)
-    @show sortref(value_type(Marking, pntd))
+    #@show value_type(Marking, pntd)
+    #@show sortref(value_type(Marking, pntd))
 
     placetype = SortType("$pntd initMarking",
         sortref(value_type(Marking, pntd))::SortRef,
