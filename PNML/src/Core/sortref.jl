@@ -40,14 +40,13 @@ end
 @derive SortRefImpl[Show,Hash,Eq]
 
 """
-Alias for `SortRefImpl.Type`.
+Alias for `SortRefImpl.Type`. A.K.A PNML.SortRefImpl.var"typeof(SortRefImpl)"
 """
 const SortRef = SortRefImpl.Type
 
 # For access to values that SortRefImpl.Type my have.
 using .SortRefImpl: UserSortRef, NamedSortRef, PartitionSortRef,
                     ProductSortRef, MultisetSortRef, ArbitrarySortRef
-
 
 """
     $TYPEDSIGNATURES
@@ -117,7 +116,7 @@ is_multisetsort(x::SortRef) = isa_variant(x, SortRefImpl.MultisetSortRef)
 """
     $TYPEDSIGNATURES
 
-Check if a value is an `SortRef` variant of `ArbitrarySortRef`.
+Check if a value is an `SortRef` vaTyperiant of `ArbitrarySortRef`.
 
 # Arguments
 - `x`: Value to check (for `SortRef` input returns true if `ArbitrarySortRef`, for others returns false).
@@ -134,8 +133,8 @@ function refid(s::SortRef)
         SortRefImpl.PartitionSortRef(; refid) => refid
         SortRefImpl.ProductSortRef(; refid) => refid
         SortRefImpl.MultisetSortRef(; refid) => refid
-        SortRefImpl.ArbitrarySortRef( ;refid) => refid
-        _ => error("no match for: $s")
+        SortRefImpl.ArbitrarySortRef(; refid) => refid
+        _ => error("no refid match for: $s")
     end
 end
 
@@ -146,13 +145,12 @@ Return concrete sort from `net` using the `REFID` in `sortref`,
 """
 function to_sort(sr::SortRef, net::AbstractPnmlNet)
     s = @match sr begin
-        SortRefImpl.NamedSortRef(refid)     => namedsort(net, refid) # todo unwrap namedsort
-        SortRefImpl.ProductSortRef(refid)   => productsort(net, refid) #! named sort
-        SortRefImpl.MultisetSortRef(refid)  => multisetsort(net, refid) #! named sort
-        SortRefImpl.PartitionSortRef(refid) => partitionsort(net, refid)
-        SortRefImpl.ArbitrarySortRef(refid) => arbitrarysort(net, refid)
+        SortRefImpl.NamedSortRef(; refid)     => namedsort(net, refid) # todo unwrap namedsort
+        SortRefImpl.ProductSortRef(; refid)   => productsort(net, refid) #! named sort
+        SortRefImpl.MultisetSortRef(; refid)  => multisetsort(net, refid) #! named sort
+        SortRefImpl.PartitionSortRef(; refid) => partitionsort(net, refid)
+        SortRefImpl.ArbitrarySortRef(; refid) => arbitrarysort(net, refid)
         _ => error("to_sort no match for: $sr")
     end
     return s
 end
-to_sort(s::AbstractSort, ::AbstractPnmlNet) = s

@@ -123,8 +123,16 @@ function equalSorts( net::AbstractPnmlNet, a::SortRef, b::SortRef)
         return true
     else
         # Compare sortdefinitions.
-        asort = to_sort(unwrap_namedsort(a, net), net)
-        bsort = to_sort(unwrap_namedsort(b, net), net)
+        asort = if is_namedsort(a)
+            sortdefinition(namedsort(net, a))
+        else
+            to_sort(a, net)
+        end
+        bsort = if is_namedsort(b)
+            sortdefinition(namedsort(net, b))
+        else
+            to_sort(b, net)
+        end
         return equalSorts(net, asort, bsort)
     end
 end

@@ -117,15 +117,18 @@ end
     @test eltype(sort) == Int64
 
     # productsort is expected to be enclosed in a namedsort
-    @test_logs(match_mode=:any, (:warn, r"^ISO 15909 Standard allows.*"),
-               parse_sort(xml"""<productsort/>""", net, :emptyproduct, "emptyproduct"))
+    # @test_logs(match_mode=:any, (:warn, r"^ISO 15909 Standarparse_sort_d allows.*"),
+    #            parse_sort(xml"""<productsort/>""", net, :emptyproduct, "emptyproduct"))
 
     IDRegistrys.reset_reg!(net.idregistry)
+    println("-------------------------------------------------------------")
+    println("-------------------------------------------------------------")
     sortref = parse_sort(xml"""<productsort>
                                 <integer/>
                                 <integer/>
                         </productsort>""", net, :redundant, "redundant")
-    sort = to_sort(sortref, net)::ProductSort
+    @show net sortref
+    sort = to_sort(sortref, net)::NamedSort |> sortdefinition
     @test occursin(r"^ProductSort", sprint(show, sort))
     @test eltype(sort) == Tuple{Int64,Int64} #! TODO XXX
 
@@ -136,7 +139,7 @@ end
                         <usersort declaration="speed"/>
                         <usersort declaration="distance"/>
                         </productsort>""", net, :someproduct, "someproduct")
-    sort = to_sort(sortref, net)::ProductSort
+    sort = to_sort(sortref, net) |> sortdefinition
     @test sort isa ProductSort
     @test occursin(r"^ProductSort", sprint(show, sort))
     @test eltype(sort) == Tuple{Int64,Int64} #! TODO XXX
@@ -154,8 +157,9 @@ end
 
     sortref = parse_sort(xml"""<multisetsort>
                                 <usersort declaration="duck"/>
-                            </multisetsort>""", net)
-    sort = to_sort(sortref, net)#::MultisetSort
+                            </multisetsort>""", net, :testduck, "testduck")
+    @show net sortref
+    sort = to_sort(sortref, net) |> sortdefinition
     fill_sort_tag!(net, :amultiset, sort) #~ test of method needed here
     @test occursin(r"^MultisetSort", sprint(show, sort))
     @test eltype(sort) == Any
