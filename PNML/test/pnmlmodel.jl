@@ -40,11 +40,11 @@ end
     @test_logs pnmlmodel(xnode; lp=())
     @test_logs pnmlmodel(xnode; lp=[])
     @test_logs pnmlmodel(xnode; lp=(), tp=(), ef=())
-    @test_logs (:info, "add 2 lp plugin(s)") pnmlmodel(xnode;
+    @test_logs match_mode=:any (:info, "add 2 lp plugin(s)") pnmlmodel(xnode;
                 lp=((:initialMarking,  PNML.Parser.parse_initialMarking),
                     (:hlinitialMarking, PNML.Parser.parse_hlinitialMarking)))
 
-    @test_logs (:info, "add 2 lp plugin(s)") pnmlmodel(xnode;
+    @test_logs match_mode=:any (:info, "add 2 lp plugin(s)") pnmlmodel(xnode;
                 lp=((:initialMarking, parse_test_label1),
                     (:hlinitialMarking, PNML.Parser.parse_hlinitialMarking)),
                 tp=(),

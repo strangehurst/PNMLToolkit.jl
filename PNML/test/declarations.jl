@@ -76,7 +76,7 @@ end
     #println()
     #foreach(println, pairs(namedsorts(net)))
     # declarations in namedsorts twice
-    @test length(namedsorts(net)) == base_decl_length + 6
+    @test length(namedsorts(net)) == base_decl_length + 3
 
     for nsort in values(namedsorts(net))
         #!@test typeof(nsort) <: NamedSort # is a declaration

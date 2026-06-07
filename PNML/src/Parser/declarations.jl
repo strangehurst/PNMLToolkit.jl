@@ -68,25 +68,29 @@ function fill_decl_dict!(net::AbstractPnmlNet, node::XMLNode)
         tag = EzXML.nodename(child)
         if tag == "namedsort"
             ns = parse_namedsort(child, net)
-            namedsorts(net)[pid(ns)] = ns
+            has_namedsort(net, pid(ns)) || @error "missing namedsort: $ns"
+            #namedsorts(net)[pid(ns)] = ns
         elseif tag == "namedoperator"
             no = parse_namedoperator(child, net)
+            has_namedop(net, pid(no)) && @warn "overwrite namedoperator $no"
             namedoperators(net)[pid(no)] = no
         elseif tag == "variabledecl"
             vardecl = parse_variabledecl(child, net)
             variabledecls(net)[pid(vardecl)] = vardecl
         elseif tag == "partition"
-            # NB: partiton is a declaration of a new sort refering to the partitioned sort.
+            # NB: partition is a declaration of a new sort refering to the partitioned sort.
             part = parse_partition(child, net)::SortRef
-            @assert is_partitionsort(part)
+            has_partitionsort(net, part) || error("no parition sort found: $part")
+            @assert is_namedsort(part) "expected partition sort found: $part"
         #! elseif tag === :partitionoperator
         #!      PartitionLessThan, PartitionGreaterThan, PartitionElementOf
         #!      partop = parse_partition_op(child, pntd)
         #!      partitionops(net)[pid(partop)] = partop
 
         elseif tag == "arbitrarysort"
-            arb = parse_arbitrarysort(child, net)
-            @assert is_arbitrarysort(arb)
+            arb = parse_arbitrarysort(child, net)::SortRef
+            has_arbitrarysort(net, arb) || error("no arbitrary sort found: $arb")
+            @assert is_namedsort(arb) "expected arbitrary sort found: $arb"
        else
             push!(unknown_decls, parse_unknowndecl(child, net))
         end
@@ -342,7 +346,7 @@ function parse_sort end
 function parse_sort(node::XMLNode, net::AbstractPnmlNet, sortid::Maybe{REFID}=nothing,  name::String="")
     # Note: Sorts are NOT PNML labels. Will NOT have <text>, <graphics>, <toolspecific>.
     sorttag = Symbol(EzXML.nodename(node))
-    D()&&  println("## parse_sort $sorttag id=$sortid name=$name tag=$sorttag") #! debug
+    D()&& println("## parse_sort $sorttag id=$sortid name=$name tag=$sorttag") #! debug
     return parse_sort(Val(sorttag), node, net, sortid, name)::SortRef
 end
 
@@ -404,32 +408,33 @@ end
 
 
 # is a finiteenumeration with additional operators: successor, predecessor
-function parse_sort(::Val{:cyclicenumeration}, node::XMLNode, net::AbstractPnmlNet, namedsort_id, name)
+function parse_sort(::Val{:cyclicenumeration}, node::XMLNode, net::AbstractPnmlNet, sort_id, name)
     check_nodename(node, "cyclicenumeration")
-    D()&& println("cyclicenumeration $(repr(namedsort_id)), $(repr(name))") #! debug
-    @assert !isnothing(namedsort_id) "missing enclosing namedsort id"
-    fec_ids = parse_feconstants(node, net, NamedSortRef(namedsort_id))
+    D()&& println("cyclicenumeration $(repr(sort_id)), $(repr(name))") #! debug
+    @assert !isnothing(sort_id) "missing enclosing sort id"
+    fec_ids = parse_feconstants(node, net, NamedSortRef(sort_id))
     cesort = CyclicEnumerationSort(fec_ids)
-    ce_id = gensym("cyclicenumeration")
-    !isregistered(net.idregistry, ce_id) && register_id!(net.idregistry, ce_id)
-    namedsorts(net)[ce_id] = NamedSort(ce_id, String(ce_id), cesort, net)
-    return make_sortref(net, namedsorts, cesort, "cyclicenumeration", ce_id, name)
+    #ce_id = gensym("cyclicenumeration")
+    !isregistered(net.idregistry, sort_id) && register_id!(net.idregistry, sort_id)
+    namedsorts(net)[sort_id] = NamedSort(sort_id, String(sort_id), cesort, net)
+    return make_sortref(net, namedsorts, cesort, "cyclicenumeration", sort_id, name)
 end
 
-function parse_sort(::Val{:finiteenumeration}, node::XMLNode, net::AbstractPnmlNet, namedsort_id, name)
+function parse_sort(::Val{:finiteenumeration}, node::XMLNode, net::AbstractPnmlNet, sort_id, name)
     check_nodename(node, "finiteenumeration")
-    D()&& println("finiteenumeration $(repr(namedsort_id)), $(repr(name))") #! debug
-    @assert !isnothing(namedsort_id) "missing enclosing namedsort id"
-    fec_ids = parse_feconstants(node, net, NamedSortRef(namedsort_id))
+    D()&& println("finiteenumeration $(repr(sort_id)), $(repr(name))") #! debug
+    @assert !isnothing(sort_id) "missing enclosing sort id"
+    fec_ids = parse_feconstants(node, net, NamedSortRef(sort_id))
     fesort = FiniteEnumerationSort(fec_ids)
-    fe_id = gensym("finiteenumeration")
-    !isregistered(net.idregistry, fe_id) && register_id!(net.idregistry, fe_id)
-    namedsorts(net)[fe_id] = NamedSort(fe_id, String(fe_id), fesort, net)
-    return make_sortref(net, namedsorts, fesort, "finiteenumeration", fe_id, name)
+    #@show fe_id = gensym("finiteenumeration")
+    !isregistered(net.idregistry, sort_id) && register_id!(net.idregistry, sort_id)
+    namedsorts(net)[sort_id] = NamedSort(sort_id, String(sort_id), fesort, net)
+    return make_sortref(net, namedsorts, fesort, "finiteenumeration", sort_id, name)
 end
 
 function parse_sort(::Val{:finiteintrange}, node::XMLNode, net::AbstractPnmlNet, _parentid, name)
     check_nodename(node, "finiteintrange")
+    D()&& println("finiteintrange $(repr(_parentid)), $(repr(name))") #! debug
 
     startstr = attribute(node, "start")
     startval = tryparse(Int, startstr)
@@ -443,7 +448,7 @@ function parse_sort(::Val{:finiteintrange}, node::XMLNode, net::AbstractPnmlNet,
 
     # See function parse_term(::Val{:finiteintrangeconstant} for inline sort use.
     # Look for `sort` in `namedsorts(net)`, else create named/user duo.
-    sorttag = Symbol("FiniteIntRange_",startstr,"_",stopstr)
+    sorttag = isnothing(_parentid) ? Symbol("FiniteIntRange_",startstr,"_",stopstr) : _parentid
     if haskey(namedsorts(net), sorttag)
         return NamedSortRef(sorttag)
     else
@@ -452,7 +457,7 @@ function parse_sort(::Val{:finiteintrange}, node::XMLNode, net::AbstractPnmlNet,
         !isregistered(net.idregistry, sorttag) && register_id!(net.idregistry, sorttag)
         namedsorts(net)[sorttag] = NamedSort(sorttag, String(sorttag), sort, net)
         sref = make_sortref(net, namedsorts, sort, "finiteintrange", sorttag, name)
-        #D()&& @show sref
+        D()&& @show sref net
         @assert is_namedsort(sref)
         return sref
     end
@@ -468,32 +473,6 @@ end
 #TODO inline sort like FiniteIntRangeSort, but <tuple> may use non-ground terms to deduce.
 #TODO tuples may be nested.
 #TODO <tuple> is operator, subterms are expressions (terms) that have sortrefs.
-function parse_sort(::Val{:productsort}, node::XMLNode, net::AbstractPnmlNet, sortid, name)
-    check_nodename(node, "productsort")
-    isnothing(sortid) && error("parse_sort(::Val{:productsort} sortid is nothing") #! debug
-
-    sorts = [] # Orderded collection of zero or more Sorts in ISO 15909 Standard.
-    for child in EzXML.eachelement(node)
-        tag = Symbol(EzXML.nodename(child))
-        push!(sorts, parse_sort(Val(tag), child, net, nothing, "")::SortRef)
-    end
-    isempty(sorts) &&
-        @warn "ISO 15909 Standard allows a <productsort> to be empty. And somebody did!"
-    # What is the use of an empty productsort? bottom?
-
-    prod_sort = ProductSort(tuple(sorts...), net)
-
-    # See if there exists a matching sort. #! debug?
-    for (id,ps) in pairs(productsorts(net))
-        if equalSorts(net, ps, prod_sort)
-            @info "Found product sort $id while looking for $prod_sort " *
-                    "for sortid=$sortid name=$name" productsorts(net)
-         end
-    end
-
-    fill_sort_tag!(net, sortid, prod_sort) # add to productsorts without a sortref
-    return make_sortref(net, productsorts, prod_sort, "product", sortid, name)
-end
 
 
 function parse_sort(::Val{:list}, node::XMLNode, net::AbstractPnmlNet, parentid, name)
@@ -517,7 +496,7 @@ function parse_sort(::Val{:string}, node::XMLNode, net::AbstractPnmlNet, parenti
     return sref
 end
 
-function parse_sort(::Val{:multisetsort}, node::XMLNode, net::AbstractPnmlNet, sortid, name)
+function parse_sort(::Val{:multisetsort}, node::XMLNode, net::AbstractPnmlNet, sort_id, name)
     check_nodename(node, "multisetsort")
     EzXML.haselement(node) || throw(ArgumentError("multisetsort missing basis sort"))
 
@@ -537,8 +516,45 @@ function parse_sort(::Val{:multisetsort}, node::XMLNode, net::AbstractPnmlNet, s
     #D()&& @warn "parse_sort(::Val{:multisetsort}" basis_sort sortdefinition(to_sort(basis_sort, net))
     #!isnothing(sortid) && @error "inlined multiset" net
     ms = MultisetSort(basis_sort, net)
-    return make_sortref(net, multisetsorts, ms, "multiset", sortid, name)
+    # make a named sort duo
+    namedsorts(net)[sort_id] = NamedSort(sort_id, string(sort_id),
+                                         ms, net)
+   return make_sortref(net, multisetsorts, ms, "multiset", sort_id, name)
 end
+
+function parse_sort(::Val{:productsort}, node::XMLNode, net::AbstractPnmlNet, sort_id, name)
+    check_nodename(node, "productsort")
+    isnothing(sort_id) && error("parse_sort(::Val{:productsort} sort id is nothing") #! debug
+
+    sorts = [] # Orderded collection of zero or more Sorts in ISO 15909 Standard.
+    for child in EzXML.eachelement(node)
+        tag = Symbol(EzXML.nodename(child))
+        push!(sorts, parse_sort(Val(tag), child, net, nothing, "")::SortRef)
+    end
+    isempty(sorts) &&
+        @warn "ISO 15909 Standard allows a <productsort> to be empty. And somebody did!"
+    # What is the use of an empty productsort? bottom?
+
+    prod_sort = ProductSort(tuple(sorts...), net)
+
+    # See if there exists a matching sort. #! debug?
+    for (id,ps) in pairs(productsorts(net))
+        if equalSorts(net, ps, prod_sort)
+            @info "Found product sort $id while looking for $prod_sort " *
+                    "for sortid=$sor_tid name=$name" productsorts(net)
+         end
+    end
+    #@warn sort_id prod_sort
+    fill_sort_tag!(net, sort_id, prod_sort) # add to productsorts without a sortref
+    @assert productsorts(net)[sort_id] == prod_sort
+    # make a named sort duo
+    namedsorts(net)[sort_id] = NamedSort(sort_id, string(sort_id),
+                                         prod_sort, net)
+    sr = make_sortref(net, productsorts, prod_sort, "product", sort_id, name)
+    #!@show sr net
+    #!println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    return sr
+end #= function parse_sort :productsort =#
 
 #=
 Partition # id, name, usersort, partitionelement[]
@@ -553,9 +569,8 @@ function parse_partition(node::XMLNode, net::AbstractPnmlNet) #! a sort declarat
         tag = EzXML.nodename(part_child)
         if tag == "usersort" # The sort that partitionelements reference into.
             # The only non-partitionelement child possible,
-            partitioned_sortref = parse_usersort(part_child, net)::SortRef
-            #! RelaxNG Schema says: "defined over a NamedSort which it refers to."
-            @assert is_namedsort(partitioned_sortref)
+            partitioned_sortref = @show parse_usersort(part_child, net)::SortRef
+            @assert is_namedsort(partitioned_sortref) "RelaxNG Schema says: defined over a NamedSort which it refers to."
         elseif tag === "partitionelement"
             # Each partitionelement holds REFIDs to elements of an enumeration sort.
             parse_partitionelement!(elements, part_child, partition_id; net)
@@ -579,13 +594,16 @@ function parse_partition(node::XMLNode, net::AbstractPnmlNet) #! a sort declarat
     verify_partition(part_sort) || error("verify_partition failed: $part_sort")
 
     # add to productsorts
-    fill_sort_tag!(net, partition_id, part_sort)
+    fill_sort_tag!(net, partition_id, part_sort) # add to partitionsorts without a sortref
     @assert partitionsorts(net)[partition_id] == part_sort
-    # make a user/named sort duo
-    namedsorts(net)[partition_id] = NamedSort(partition_id,
-                                              string(partition_id), part_sort, net)
-    return make_sortref(net, partitionsorts, part_sort, "partition", partition_id, "")
-end
+    # make a named sort duo
+    namedsorts(net)[partition_id] = NamedSort(partition_id, string(partition_id),
+                                              part_sort, net)
+    sr = make_sortref(net, partitionsorts, part_sort, "partition", partition_id, "")
+    #!@show sr net
+    #!println("******************************")
+    return sr #!PartitionSortRef(partition_id)
+end #= function parse_partition =#
 
 """
     parse_partitionelement!(elements::Vector{PartitionElement}, node::XMLNode rid::REFID; net::AbstractPnmlNet)
