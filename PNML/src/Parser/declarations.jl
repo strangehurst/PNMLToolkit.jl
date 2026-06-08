@@ -318,7 +318,7 @@ function parse_arbitrarysort(node::XMLNode, net::AbstractPnmlNet)
     @warn("parse arbitrarysort: id = $arb_id, name = $name")
     arb = ArbitrarySort(arb_id, name, net)
     fill_sort_tag!(net, arb_id, arb)
-    @assert arbitrarysorts(net)[arb_id] == arb
+    @assert has_arbitrarysort(net, arb_id) "did not find arbitrary sort $arb_id"
     namedsorts(net)[arb_id] = NamedSort(arb_id, string(arb_id), arb, net)
     return make_sortref(net, arbitrarysorts, arb, "arbitrarysort", arb_id, "")
 end
@@ -541,7 +541,7 @@ function parse_sort(::Val{:productsort}, node::XMLNode, net::AbstractPnmlNet, so
     for (id,ps) in pairs(productsorts(net))
         if equalSorts(net, ps, prod_sort)
             @info "Found product sort $id while looking for $prod_sort " *
-                    "for sortid=$sor_tid name=$name" productsorts(net)
+                    "for sortid=$sort_id name=$name" productsorts(net)
          end
     end
     #@warn sort_id prod_sort
@@ -570,7 +570,8 @@ function parse_partition(node::XMLNode, net::AbstractPnmlNet) #! a sort declarat
         if tag == "usersort" # The sort that partitionelements reference into.
             # The only non-partitionelement child possible,
             partitioned_sortref = parse_usersort(part_child, net)::SortRef
-            @assert is_namedsort(partitioned_sortref) "RelaxNG Schema says: defined over a NamedSort which it refers to."
+            @assert is_namedsort(partitioned_sortref) string("RelaxNG Schema says: ",
+                "defined over a NamedSort which it refers to. Found: ", partitioned_sortref)
         elseif tag === "partitionelement"
             # Each partitionelement holds REFIDs to elements of an enumeration sort.
             parse_partitionelement!(elements, part_child, partition_id; net)
@@ -595,14 +596,11 @@ function parse_partition(node::XMLNode, net::AbstractPnmlNet) #! a sort declarat
 
     # add to productsorts
     fill_sort_tag!(net, partition_id, part_sort) # add to partitionsorts without a sortref
-    @assert partitionsorts(net)[partition_id] == part_sort
+    @assert has_partitionsort(net, partition_id) "did not find partition sort $partition_id"
     # make a named sort duo
     namedsorts(net)[partition_id] = NamedSort(partition_id, string(partition_id),
                                               part_sort, net)
-    sr = make_sortref(net, partitionsorts, part_sort, "partition", partition_id, "")
-    #!@show sr net
-    #!println("******************************")
-    return sr #!PartitionSortRef(partition_id)
+    return make_sortref(net, partitionsorts, part_sort, "partition", partition_id, "")
 end #= function parse_partition =#
 
 """
