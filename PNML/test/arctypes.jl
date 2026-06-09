@@ -1,4 +1,4 @@
-using PNML, JET, NamedTupleTools
+using PNML, JET, Test, NamedTupleTools
 using EzXML: EzXML
 using XMLDict: XMLDict
 # todo parse_arctype
@@ -20,7 +20,7 @@ using PNML: is_normal, is_inhibitor, is_read, is_reset
       </arc>"""
     node = xmlnode(str)
 
-    a = parse_arc(node, net)::Arc
+    a = @show parse_arc(node, net)::Arc
     atl = PNML.type_label(a)
     arct = PNML.Labels.arctype(atl)
 
@@ -37,7 +37,7 @@ using PNML: is_normal, is_inhibitor, is_read, is_reset
     @test inscription(a)(NamedTuple()) == 1
 end
 
-@testset "arctypes $arct" for arct in ["normal", "inhibitor", "read", "reset"]
+@testset "arctype is empty" begin
     net = make_net(PnmlCoreNet(), :empty_arctype)
     str = """<arc source="t1" target="p1" id="a1">
         <arctype>
