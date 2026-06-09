@@ -23,7 +23,7 @@ Return nets matching pntd `type` given as string, symbol or pnmltype instance.
 """
 function find_nets end
 find_nets(model, str::AbstractString) = find_nets(model, PnmlTypes.pntd_symbol(str))
-find_nets(model, sym::Symbol)    = find_nets(model, pnmltype(sym))
+find_nets(model, sym::Symbol) = find_nets(model, pnmltype(sym))
 find_nets(model, pntd::AbstractPNTD) = Iterators.filter(n -> Fix1(isa, pntd)(nettype(n)), nets(model))
 
 firstnet(model::PnmlModel) = first(nets(model))::PnmlNet
