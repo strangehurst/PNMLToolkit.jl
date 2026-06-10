@@ -41,6 +41,12 @@ end
 """
     tokengraphics_content(node::XMLNode, pntd::AbstractPNTD) -> TokenGraphics
 
+Example: ```<toolspecific tool="org.pnml.tool" version="1.0">
+    <tokengraphics>
+        <tokenposition x="6" y="9"/>
+    </tokengraphics>
+</toolspecific>````
+
 Parse `ToolInfo` content that is expected to be `<tokengraphics>`.
 """
 function tokengraphics_content(node::XMLNode, net::AbstractPnmlNet)
@@ -51,6 +57,7 @@ end
 $(TYPEDSIGNATURES)
 
 Parse place-transition net's (PTNet) toolspecific structure defined for token graphics.
+
 See [`Labels.TokenGraphics`](@ref) and [`parse_tokenposition`](@ref).
 """
 function parse_tokengraphics(node::XMLNode, pntd::AbstractPNTD)
@@ -85,7 +92,7 @@ Parse `ToolInfo` content. Example:
             <subunits>UL</subunits>
         </unit>
     </structure>
-    </toolspecific>
+</toolspecific>
 ```
 """
 function nupn_content end
@@ -112,4 +119,33 @@ function nupn_content(node::XMLNode, pntd::AbstractPNTD)
                       safe = parse(Bool, e["structure"][:safe]),
                       units
                     )
+end
+
+"""
+    toolkit_options(node, net|pntd) -> Labels.ToolkitOptions
+
+Parse `ToolInfo` content. Example:
+```
+<toolspecific tool="PNMLToolkit.jl" version="1.1">
+    <filters>
+        <filter>inhibit</filter>
+        <filter>reset</filter>
+        <filter>read</filter>
+        <filter>capacity</filter>
+        <filter>priority</filter>
+        <filter>tpn</filter>
+    </filters>
+</toolspecific>
+```
+"""
+function toolkit_options end
+toolkit_options(node::XMLNode, net::AbstractPnmlNet) = toolkit_options(node, pntd_of(net))
+function toolkit_options(node::XMLNode, pntd::AbstractPNTD)
+    tk_options = anyelement(Symbol(EzXML.nodename(node)), node)
+    @show tk_options
+    e = elements(tk_options)
+    @assert e[:tool] == "PNMLToolkit.jl"
+    version = VersionNumber(e[:version])
+    @assert version >= v"1.0"
+    Labels.ToolkitOptions(map(Symbol, e["filters"]["filter"]))
 end

@@ -61,3 +61,9 @@ end
 # function Base.show(io::IO, u::NupnTool)
 #     print(io, "NupnTool(", u.info, ")")
 # end
+
+"""
+"""
+@kwdef struct ToolkitOptions
+    filters::Vector{Symbol} = Symbol[]
+end

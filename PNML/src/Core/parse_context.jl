@@ -123,6 +123,7 @@ fill_builtin_toolparsers!(net::APN) = fill_builtin_toolparsers!(net.toolparser)
 function fill_builtin_toolparsers!(toolparsers::AbstractDict)
     for plugin in (
             ("org.pnml.tool", "1.0", Parser.tokengraphics_content),
+            ("PNMLToolkit.jl", "1.1", Parser.toolkit_options),
         )
         toolparsers[plugin[1]] = LittleDict(plugin[2] => last(plugin))
     end

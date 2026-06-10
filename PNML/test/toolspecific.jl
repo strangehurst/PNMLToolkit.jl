@@ -74,9 +74,22 @@ str7 = (tool="WoPeD", version="1.0", str = """
 </toolspecific>
 """)
 
+str8 = (tool="PNMLToolkit.jl", version="1.1", str = """
+<toolspecific tool="PNMLToolkit.jl" version="1.1">
+    <filters>
+        <filter>inhibit</filter>
+        <filter>reset</filter>
+        <filter>read</filter>
+        <filter>capacity</filter>
+        <filter>priority</filter>
+        <filter>tpn</filter>
+    </filters>
+</toolspecific>""")
+
 import XMLDict
 #-----------------------------------------------------------------------------------
-@testset "parse tool specific info $(s.tool) $(s.version)" for s in [str1, str2, str3, str4, str5, str6, str7]
+@testset "parse tool specific info $(s.tool) $(s.version)" for s in [str1, str2, str3,
+                                        str4, str5, str6, str7, str8]
     println("\n###### parse tool $(s.tool) $(s.version)")
     net = make_net(PnmlCoreNet(), :specific_net)
     # println(s.str)
@@ -105,6 +118,7 @@ println()
         $(str5.str)
         $(str6.str)
         $(str7.str)
+        $(str8.str)
         <initialMarking> <text>5</text> </initialMarking>
     </place>
     """
@@ -116,7 +130,7 @@ println()
     @test_call toolinfos(combinedplace)
     placetools = toolinfos(combinedplace)
     # @show placetools
-    @test length(placetools) == 7
+    @test length(placetools) == 8
     @test all(t -> isa(t, ToolInfo), placetools)
 
     #@test (placetools, r"petrinet3", r"1\.*")
@@ -125,7 +139,7 @@ println()
     # @test !has_toohas_toolinfolinfo(placetools, "XXX")
     # @test !has_toolinfo(placetools, "petrinet3", "2.0")
     # Assumes ordered collection.
-    for (i,s) in enumerate([str1, str2, str3, str4, str5, str6, str7])
+    for (i,s) in enumerate([str1, str2, str3, str4, str5, str6, str7, str8])
         # @show s.tool, s.version
         ti = PNML.Labels.get_toolinfo(placetools, s.tool, s.version)
         @test ti isa ToolInfo
