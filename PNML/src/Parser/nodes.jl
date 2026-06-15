@@ -8,45 +8,45 @@ function default end
 
 # parse nodes of graph
 "Fill place_set, place_dict."
-function parse_place!(netsets, netdata, node, net::AbstractPnmlNet)
-    pl = parse_place(node, net)::valtype(placedict(netdata))
-    #@show valtype(placedict(netdata)) typeof(placedict(netdata))
+function parse_place!(netsets, node, net::AbstractPnmlNet)
+    pl = parse_place(node, net)::valtype(placedict(net))
+    #@show valtype(placedict(net)) typeof(placedict(net))
     push!(place_idset(netsets)::OrderedSet{Symbol}, pid(pl))
-    placedict(netdata)[pid(pl)] = pl
+    placedict(net)[pid(pl)] = pl
     return place_idset(netsets) #place_set
 end
 
 "Fill transition_set, transition_dict."
-function parse_transition!(netsets, netdata, node, net::AbstractPnmlNet)
-    tr = parse_transition(node, net)::valtype(transitiondict(netdata))
+function parse_transition!(netsets, node, net::AbstractPnmlNet)
+    tr = parse_transition(node, net)::valtype(transitiondict(net))
     push!(transition_idset(netsets)::OrderedSet{Symbol}, pid(tr))
-    transitiondict(netdata)[pid(tr)] = tr
+    transitiondict(net)[pid(tr)] = tr
     return transition_idset(netsets)
 end
 
 "Fill arc_set, arc_dict."
-function parse_arc!(netsets, netdata, node, net::AbstractPnmlNet)
+function parse_arc!(netsets, node, net::AbstractPnmlNet)
     a = parse_arc(node, net)
-    a isa valtype(arcdict(netdata)) ||
-        @error("$(typeof(a)) not a $(valtype(arcdict(netdata)))) $(pntd_of(net)) $(repr(a))")
+    a isa valtype(arcdict(net)) ||
+        @error("$(typeof(a)) not a $(valtype(arcdict(net)))) $(pntd_of(net)) $(repr(a))")
     push!(arc_idset(netsets)::OrderedSet{Symbol}, pid(a))
-    arcdict(netdata)[pid(a)] = a
+    arcdict(net)[pid(a)] = a
     return arc_idset(netsets)
 end
 
 "Fill refplace_set, refplace_dict."
-function parse_refPlace!(netsets, netdata, node, net::AbstractPnmlNet)
-    rp = parse_refPlace(node, net)::valtype(refplacedict(netdata))
+function parse_refPlace!(netsets, node, net::AbstractPnmlNet)
+    rp = parse_refPlace(node, net)::valtype(refplacedict(net))
     push!(refplace_idset(netsets)::OrderedSet{Symbol}, pid(rp))
-    refplacedict(netdata)[pid(rp)] = rp
+    refplacedict(net)[pid(rp)] = rp
     return refplace_idset(netsets)
 end
 
 "Fill reftransition_set, reftransition_dict."
-function parse_refTransition!(netsets, netdata, node, net::AbstractPnmlNet)
-    rt = parse_refTransition(node, net)::valtype(reftransitiondict(netdata))
+function parse_refTransition!(netsets, node, net::AbstractPnmlNet)
+    rt = parse_refTransition(node, net)::valtype(reftransitiondict(net))
     push!(reftransition_idset(netsets)::OrderedSet{Symbol}, pid(rt))
-    reftransitiondict(netdata)[pid(rt)] = rt
+    reftransitiondict(net)[pid(rt)] = rt
     return reftransition_idset(netsets)
 end
 
@@ -137,14 +137,12 @@ function parse_place(node::XMLNode, net::AbstractPnmlNet)
     end
 
     if isnothing(sorttype) # Infer sortype of place from mark.
-        #D()&& @warn("$pntd parse_place $(repr(placeid)) infer sorttype ", mark)
         sorttype = SortType("default", basis(mark)::SortRef, net)
     end
     Place(placeid, mark, sorttype, namelabel, graphics, toolspecinfos, extralabels, net)
 end
 
 function default(::Type{<:Labels.Condition}, net::AbstractPnmlNet)
-    #@info "default Condition"
     Labels.Condition(BooleanEx(BooleanConstant(true)), net)
 end
 
@@ -239,7 +237,7 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
             # Input arc inscription and source's marking/placesort must have equal Sorts.
             # Output arc inscription and target's marking/placesort must have equal Sorts.
             # Have IDREF to source & target place & transition.
-            # They which must have been parsed and can be found in netdata.
+            # Which must have been parsed and can be found in net data.
             inscription = net.labelparser[tag](arc_child, source, target, net, parentid=arc_id)
         elseif tag == :name
             namelabel = net.labelparser[tag](arc_child, net, parentid=arc_id)

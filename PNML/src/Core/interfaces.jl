@@ -468,7 +468,7 @@ function elements end
 
 """
     adjacent_place(net::PnmlNet, arc::Arc) -> Place
-    adjacent_place(netdata::PnmlNetData, source,::Symbol target::Symbol) -> Place
+    adjacent_place(net::PnmlNet, source,::Symbol target::Symbol) -> Place
 
 Adjacent place of an arc is either the `source` or `target`.
 """

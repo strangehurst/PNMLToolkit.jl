@@ -26,7 +26,7 @@ function insc_xml(pntd)
 end
 #! arc needs :place1 for adjacent place
 "Parse place with marking, add to dict & id set"
-function pl_node(net, netdata, netsets)
+function pl_node(net, netsets)
     node = if is_highlevel(pntd_of(net))
         xml"""
             <place id="place1">
@@ -54,24 +54,24 @@ function pl_node(net, netdata, netsets)
     end
     pl = parse_place(node, net)
     push!(place_idset(netsets), pid(pl))
-    placedict(netdata)[pid(pl)] = pl
+    placedict(net)[pid(pl)] = pl
 end
 
 #! arc needs :transition1 for adjacent transition
 "Parse empty transition, add to dict & id set"
-function tr_node(net, netdata, netsets)
+function tr_node(net, netsets)
     node = xml"""<transition id="transition1" />"""
     tr = parse_transition(node, net)
     push!(transition_idset(netsets), pid(tr))
-    transitiondict(netdata)[pid(tr)] = tr
+    transitiondict(net)[pid(tr)] = tr
 end
 
 println("\nARC\n")
-@testset "arc $pntd" for pntd in PnmlTypes.all_nettypes()
+@testset "arc $pntd" for pntd in skipmissing(PnmlTypes.all_nettypes())
     net = make_net(pntd, :arc_net)
     netsets = PnmlNetKeys()
-    pl_node(net, netdata(net), netsets)
-    tr_node(net, netdata(net), netsets)
+    pl_node(net, netsets)
+    tr_node(net, netsets)
 
      node = xmlnode("""
       <arc source="transition1" target="place1" id="arc1">
@@ -106,8 +106,8 @@ end
 @testset "arc unknown label for $pntd" for pntd in PnmlTypes.all_nettypes()
     net = make_net(pntd, :arc_unknown)
     netsets = PnmlNetKeys()
-    pl_node(net, netdata(net), netsets)
-    tr_node(net, netdata(net), netsets)
+    pl_node(net, netsets)
+    tr_node(net, netsets)
     node = xmlnode("""
       <arc source="transition1" target="place1" id="arc1">
         <name> <text>Some arc</text> </name>

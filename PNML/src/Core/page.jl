@@ -25,14 +25,14 @@ nettype(pg::Page) = nettype(net(pg))
 
 net(page::Page) = page.net
 pagedict(page::Page) = pagedict(net(page))
-netdata(page::Page)  = netdata(net(page))
+#netdata(page::Page)  = netdata(net(page))
 netsets(page::Page)  = page.netsets
 
-placedict(page::Page)         = placedict(netdata(page))
-transitiondict(page::Page)    = transitiondict(netdata(page))
-arcdict(page::Page)           = arcdict(netdata(page))
-refplacedict(page::Page)      = refplacedict(netdata(page))
-reftransitiondict(page::Page) = reftransitiondict(netdata(page))
+placedict(page::Page)         = placedict(net(page))
+transitiondict(page::Page)    = transitiondict(net(page))
+arcdict(page::Page)           = arcdict(net(page))
+refplacedict(page::Page)      = refplacedict(net(page))
+reftransitiondict(page::Page) = reftransitiondict(net(page))
 
 #! Do not expect the page api to see much use, so it is likely not very efficient.
 pages(page::Page)       = Iterators.filter(v -> in(pid(v), page_idset(page)), values(pagedict(page)))

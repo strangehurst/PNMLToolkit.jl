@@ -412,12 +412,10 @@ called as (pit::ParseInscriptionTerm)(::XMLNode, ::AbstractPNTD)
 struct ParseInscriptionTerm
     source::Symbol
     target::Symbol
-    #!netdata::PnmlNetData
 end
 
 source(pit::ParseInscriptionTerm) = pit.source
 target(pit::ParseInscriptionTerm) = pit.target
-#netdata(pit::ParseInscriptionTerm) = pit.netdata
 
 function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "structure")
@@ -432,7 +430,7 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
     # assume exactly one is a place (and the other a transition).
 
     # Find adjacent place's sorttype using `netdata`.
-    adjacentplace = adjacent_place(netdata(net), source(pit), target(pit))
+    adjacentplace = adjacent_place(net, source(pit), target(pit))
     placesort = sortref(adjacentplace)::SortRef
     # D()&& @show adjacentplace placesort
 
@@ -455,23 +453,22 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
     return tj
 end
 
-adjacent_place(net::AbstractPnmlNet, arc_id::Symbol) = adjacent_place(netdata(net), arc(net, arc_id))
-adjacent_place(net::AbstractPnmlNet, a::Arc) = adjacent_place(netdata(net), a)
-adjacent_place(netdata::PnmlNetData, a::Arc) = adjacent_place(netdata, source(a), target(a))
-function adjacent_place(netdata::PnmlNetData, source::REFID, target::REFID, strict=true)
+adjacent_place(net::AbstractPnmlNet, arc_id::Symbol) = adjacent_place(net, arc(net, arc_id))
+adjacent_place(net::AbstractPnmlNet, a::Arc) = adjacent_place(net, source(a), target(a))
+function adjacent_place(net::AbstractPnmlNet, source::REFID, target::REFID, strict=true)
     # `strict` means enforce Meta-model constraint for Petri nets
     # that arcs must be between place and transition.
 
-    if haskey(placedict(netdata), source)
-        if strict && !haskey(transitiondict(netdata), target)
+    if haskey(placedict(net), source)
+        if strict && !haskey(transitiondict(net), target)
             error("adjacent source place $source does not have transition target $target")
         end
-        return @inline placedict(netdata)[source]
-    elseif haskey(placedict(netdata), target)
-        if strict && !haskey(transitiondict(netdata), source)
+        return @inline placedict(net)[source]
+    elseif haskey(placedict(net), target)
+        if strict && !haskey(transitiondict(net), source)
              error("adjacent target place $target does not have transition source $source")
         end
-        return @inline placedict(netdata)[target]
+        return @inline placedict(net)[target]
     elseif strict
         # Forbid speculative lookup attempt.
         error("adjacent place not found for source = $source, target = $target")
@@ -481,11 +478,11 @@ end
 
 
 # default inscription with sort of adjacent place
-function def_insc(netdata, source,::REFID, target::REFID, net::AbstractPnmlNet)
+function def_insc(source,::REFID, target::REFID, net::AbstractPnmlNet)
     # Core PNML standard allows arcs from place to place & transition to transition.
     # Here we support symmetric nets that restrict arcs and
     # assume exactly one is a place (and the other a transition).
-    place = adjacent_place(netdata, source, target)
+    place = adjacent_place(net, source, target)
     place_type = place.sorttype
     sort_element = def_sort_element(place_type)
     @info "def_insc $source -> $target singleton pnmlmultiset: $place_type $sort_element"

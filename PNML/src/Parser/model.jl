@@ -63,7 +63,6 @@ function plugins!(dict::AbstractDict, kwargs, plugintag)
         @info "add $(length(kwargs[plugintag])) $plugintag plugin(s)" #kwargs[plugintag] dict
         for plugin in kwargs[plugintag]
             #! todo sanity check labelparser
-            #@show plugin #! bring-up
             if length(plugin) >= 2
                 push!(dict, recurse_plugin(plugin, 1, length(plugin)))
             else
@@ -225,15 +224,15 @@ function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) wher
     for child in EzXML.eachelement(page_node)
         nname = Symbol(EzXML.nodename(child))
         if nname == :place
-            parse_place!(netsets(page), netdata(net), child, net)
+            parse_place!(netsets(page), child, net)
         elseif nname == :referencePlace
-            parse_refPlace!(netsets(page), netdata(net), child, net)
+            parse_refPlace!(netsets(page), child, net)
         elseif nname == :transition
-            parse_transition!(netsets(page), netdata(net), child,  net)
+            parse_transition!(netsets(page), child,  net)
         elseif nname == :referenceTransition
-            parse_refTransition!(netsets(page), netdata(net), child,  net)
+            parse_refTransition!(netsets(page), child,  net)
         elseif nname == :arc
-            parse_arc!(netsets(page), netdata(net), child, net)
+            parse_arc!(netsets(page), child, net)
         elseif nname in [:declaration, :toolspecific]
              # NOOP already parsed
         elseif nname == :page
