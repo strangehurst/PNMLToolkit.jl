@@ -154,7 +154,7 @@ end
 @testset "parse tool specific errors" begin
     println("\n\nparse tool specific errors")
     pntd = PnmlCoreNet()
-    net = make_net(PnmlCoreNet(), :ftool_specific_errors)
+    net = make_net(PnmlCoreNet(), :tool_specific_errors)
 
     t1 = """<toolspecific version="" tool="toolname" />"""
     @test_throws ErrorException parse_toolspecific(xmlnode(t1), net)
