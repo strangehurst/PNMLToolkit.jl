@@ -10,7 +10,7 @@ A <toolspecific> tag holds well formed XML that is parsed into an [`AnyElement`]
                                   T <: Any}
     toolname::String
     version::String
-    info::T #AnyElement{LittleDict{Union{Symbol,String}, Any}} # content of tool specific info
+    info::T # content of tool specific info
     net::N
 end
 
@@ -52,9 +52,9 @@ function verify!(errors::Vector{String}, t::ToolInfo, verbose::Bool, _net::Abstr
     isempty(version(t)) &&
         push!(errors, string("ToolInfo must have non-empty version")::String)
 
-    info(t) isa AnyElement ||
+    isnothing(info(t)) &&
         push!(errors, string("ToolInfo $(repr(name(t))) $(repr(version(t))) ",
-                    "$(info(t)) is not a AnyElement")::String)
+                    "$(info(t)) is nothing")::String)
     return errors
 end
 
