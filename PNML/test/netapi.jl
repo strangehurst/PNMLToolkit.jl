@@ -12,6 +12,7 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
 
 @testset "firing rule: $pntd" for pntd in tuple(core_types..., ex_types..., hl_types...)
     if pntd in hl_types
+        #^ Only PT_HLPNG supported here
         marking = """
         <hlinitialMarking>
             <text>1</text>
@@ -23,21 +24,18 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
             </structure>
         </hlinitialMarking>
         """
-        insctag = "hlinscription"
     elseif pntd == "continuous"
         marking = """
         <initialMarking>
             <text>1.0</text>
         </initialMarking>
         """
-        insctag = "inscription"
     else
         marking = """
         <initialMarking>
             <text>1</text>
         </initialMarking>
         """
-        insctag = "inscription"
     end #= if pntd in hl_types =#
     #println()
     #println(marking)
@@ -82,33 +80,34 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
     model = pnmlmodel(xmlnode(str3))
     anet = first(nets(model))
     mg = PNML.metagraph(anet)
-    #! mg2 = PNML.metagraph(anet)
+    @show mg
 
     m₀ = PNML.initial_markings(anet)
-    C  = PNML.incidence_matrix(anet) # Matrix of PnmlMultiset
-    e  = PNML.enabled(anet, m₀)
-    @show pntd m₀ C e #typeof(e)
+    imatrix  = PNML.incidence_matrix(anet) # Matrix of PnmlMultiset
+    enabled_vec  = PNML.enabled(anet, m₀)
+    @show pntd m₀ imatrix enabled_vec #typeof(e)
+    # 3 representations of the enabled vector.
+    @test enabled_vec == Bool[1,0,0,0]
+    @test enabled_vec == [true,false,false,false]
+    @test enabled_vec == [1,0,0,0]
 
-    @test e == Bool[1,0,0,0]
-    @test e == [true,false,false,false] # 3 representations of the enabled vector.
-    @test e == [1,0,0,0]
-
-    m₁ = PNML.fire2(C, anet, m₀)
+    m₁ = PNML.fire2(imatrix, anet, m₀)
     @test PNML.enabled(anet, m₁) == [false,true,false,false]
 
-    m₂ = PNML.fire2(C, anet, m₁)
+    m₂ = PNML.fire2(imatrix, anet, m₁)
     @test PNML.enabled(anet, m₂) == [false,false,true,false]
 
-    m₃ = PNML.fire2(C, anet, m₂)
+    m₃ = PNML.fire2(imatrix, anet, m₂)
     @test PNML.enabled(anet, m₃) == [false,false,false,true]
 
-    m₄ = PNML.fire2(C, anet, m₃)
+    m₄ = PNML.fire2(imatrix, anet, m₃)
     @test PNML.enabled(anet, m₄) == [true,false,false,false]
 
     let mx = m₀
         for n in 1:10
-            mx = PNML.fire2(C, anet, mx)
+            mx = PNML.fire2(imatrix, anet, mx)
         end
         @test PNML.enabled(anet, mx) == [false,false,true,false]
+        @show mx
     end
 end

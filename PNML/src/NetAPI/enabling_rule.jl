@@ -74,22 +74,21 @@ function enabled(net::AbstractPnmlNet, marking)
 
    for tr in transitions(net)
         transition_id = pid(tr)
-        haskey(net.varsubs, transition_id) &&
-            empty!(net.varsubs[transition_id]) #~ clear cached NamedTuple[]
-        enabled_dict[transition_id] || continue
+        #~ clear any cached NamedTuple[]
+        haskey(net.varsubs, transition_id) && empty!(net.varsubs[transition_id])
+
         #TODO other filters reducing work done by token_load! Cannot use variables.
 
         # Build varsubs while accessing token sufficency part of enabling rule.
-        enabled = sufficient_tokens!(mark_dict, net, transition_id) #!, tr.vars, tr.varsubs)
-        enabled_dict[transition_id] &= enabled
+        enabled_dict[transition_id] &= sufficient_tokens!(mark_dict, net, transition_id)
         enabled_dict[transition_id] || continue
 
         # transition_guard evaluated as part of sufficient_tokens!
 
-        foreach(filters(net)) do f
-            # @show typeof(f) f
-            # filters modifying e_dict, may use variables
-            f(enabled_dict, mark_dict, net, transition_id)
+        for f in filters(net)
+            # filters may use variables (aka mark_dict values)
+            enabled_dict[transition_id] &= f(net, transition_id, mark_dict)
+            enabled_dict[transition_id] || break # next tr
         end
     end
     return collect(values(enabled_dict))
@@ -259,7 +258,19 @@ Fill `arc_var_binding_set` with an entry for each key in `arc_vars`.
 Return `true` if no variables are present or all variables have at least 1 substition.
 Indicates that transition is able to fire (enabled fro selection to fire).
 """
-function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark, net::AbstractPnmlNet)
+function get_arc_var_binding_sets! end
+
+# function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
+#                                     net::PnmlNet{T}) where {T <: AbstractPNTD}
+#     # mark is a Number
+# end
+# function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
+#                                     net::PnmlNet{T}) where {T <: PT_HLPNG}
+#     # mark is a
+# end
+function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
+                                    net::PnmlNet{T}) where {T <: AbstractHLCore}
+    # mark is a
     arc_binding_sets = OrderedDict{Symbol, Multiset{Symbol}}()
     for v in keys(arc_vars)
         # Each variable must have a non-empty substitution.
