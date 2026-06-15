@@ -56,9 +56,9 @@ this is a sort, not a term, so no variables or operators.
 
 Ground terms have no variables and can be evaluated outside of a transition firing rule.
 """
-@kwdef struct SortType{N <: AbstractPnmlNet} <: Annotation # Label not limited to high-level dialects.
+@kwdef struct SortType{N <: AbstractPnmlNet, S <: SortRef} <: Annotation
     text::Maybe{String} = nothing # Supposed to be for human consumption.
-    sort::SortRef # NOT PartitionSort.  #! ePNK uses inline sorts.
+    sort::S # NOT PartitionSort.  #! ePNK uses inline sorts.
     graphics::Maybe{Graphics} = nothing
     toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
     net::N
