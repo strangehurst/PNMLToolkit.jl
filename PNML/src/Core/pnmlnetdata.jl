@@ -16,6 +16,8 @@ See [`PnmlNetKeys`](@ref) for page-level pnml ID of "owners" net data.
     place_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     transition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    inhibit_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    read_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     refplace_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     reftransition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
 end
@@ -23,12 +25,16 @@ end
 placedict(d::PnmlNetData)         = d.place_dict
 transitiondict(d::PnmlNetData)    = d.transition_dict
 arcdict(d::PnmlNetData)           = d.arc_dict
+inhibit_arcdict(d::PnmlNetData)   = d.inhibit_arc_dict
+read_arcdict(d::PnmlNetData)      = d.read_arc_dict
 refplacedict(d::PnmlNetData)      = d.refplace_dict
 reftransitiondict(d::PnmlNetData) = d.reftransition_dict
 
 nplaces(d::PnmlNetData)         = length(placedict(d))
 ntransitions(d::PnmlNetData)    = length(transitiondict(d))
 narcs(d::PnmlNetData)           = length(arcdict(d))
+ninhibit(d::PnmlNetData)        = length(inhibit_arcdict(d))
+nread(d::PnmlNetData)           = length(read_arcdict(d))
 nrefplaces(d::PnmlNetData)      = length(refplacedict(d))
 nreftransitions(d::PnmlNetData) = length(reftransitiondict(d))
 
@@ -87,6 +93,8 @@ Per-page structure of `OrderedSet`s of pnml IDs for each "owned" `Page` and othe
     place_set::OrderedSet{Symbol} = OrderedSet{Symbol}()
     transition_set::OrderedSet{Symbol} = OrderedSet{Symbol}()
     arc_set::OrderedSet{Symbol} = OrderedSet{Symbol}()
+    inhibit_arc_set::OrderedSet{Symbol} = OrderedSet{Symbol}()
+    read_arc_set::OrderedSet{Symbol} = OrderedSet{Symbol}()
     reftransition_set::OrderedSet{Symbol} = OrderedSet{Symbol}()
     refplace_set::OrderedSet{Symbol} = OrderedSet{Symbol}()
 end
@@ -95,6 +103,8 @@ page_idset(s::PnmlNetKeys) = s.page_set
 place_idset(s::PnmlNetKeys) = s.place_set
 transition_idset(s::PnmlNetKeys) = s.transition_set
 arc_idset(s::PnmlNetKeys) = s.arc_set
+inhibit_arc_idset(s::PnmlNetKeys) = s.inhibit_arc_set
+read_arc_idset(s::PnmlNetKeys) = s.read_arc_set
 reftransition_idset(s::PnmlNetKeys) = s.reftransition_set
 refplace_idset(s::PnmlNetKeys) = s.refplace_set
 

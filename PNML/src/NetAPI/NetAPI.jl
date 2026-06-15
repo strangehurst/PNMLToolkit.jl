@@ -32,7 +32,8 @@ using PNML.PnmlGraphics
 using PNML.Sorts
 
 export conditions, enabled, fire, fire2, incidence_matrix, initial_markings, input_matrix,
-    inscription_value, inscriptions, metagraph, output_matrix, postset, preset, rates
+    inscription_value, inscriptions, metagraph, output_matrix, post, postset, pre, preset,
+    rates
 
 include("netutils.jl")
 include("enabling_rule.jl")

@@ -100,6 +100,8 @@ netsets(net::PnmlNet) = throw(DomainError("PnmlNet $(pid(net)) does not have a P
 placedict(net::PnmlNet)         = placedict(netdata(net))
 transitiondict(net::PnmlNet)    = transitiondict(netdata(net))
 arcdict(net::PnmlNet)           = arcdict(netdata(net))
+inhibit_arcdict(net::PnmlNet)   = inhibit_arcdict(netdata(net))
+read_arcdict(net::PnmlNet)      = read_arcdict(netdata(net))
 refplacedict(net::PnmlNet)      = refplacedict(netdata(net))
 reftransitiondict(net::PnmlNet) = reftransitiondict(netdata(net))
 
@@ -156,8 +158,8 @@ reftransition(net::PnmlNet, id::Symbol) = reftransitiondict(net)[id]
 Return `Arc` from 'src' to 'tgt' or `nothing`.
 Useful for graphs where arcs are represented by a tuple or pair (source,target).
 """
-function arc(net, src::Symbol, tgt::Symbol)
-    x = Iterators.filter(a -> source(a) === src && target(a) === tgt, arcs(net))
+function arc(net, src::Symbol, tgt::Symbol, dict=arcs)
+    x = Iterators.filter(a -> source(a) === src && target(a) === tgt, dict(net))
     isempty(x) ? nothing : first(x)
 end
 
@@ -175,6 +177,8 @@ end
 
 initial_marking(net::PnmlNet, placeid::Symbol) = initial_marking(place(net, placeid))
 inscription(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
+inhibitor(net::PnmlNet, arc_id::Symbol) = inscription(inhibit_arcdict(net)[arc_id])
+reader(net::PnmlNet, arc_id::Symbol) = inscription(read_arcdict(net)[arc_id])
 condition(net::PnmlNet, trans_id::Symbol) = condition(transition(net, trans_id))
 
 #------------------------------------------------------------------------------
