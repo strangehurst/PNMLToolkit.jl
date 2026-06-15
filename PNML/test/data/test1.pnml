@@ -3,6 +3,17 @@
 <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
 
     <net id="net1" type="pnmlcore">
+        <toolspecific tool="PNMLToolkit.jl" version="1.1">
+            <filters>
+                <filter>inhibit</filter>
+                <filter>reset</filter>
+                <filter>read</filter>
+                <filter>capacity</filter>
+                <filter>priority</filter>
+                <filter>tpn</filter>
+            </filters>
+            <other/>
+        </toolspecific>
         <name><text>pnmlcore with nested pages</text></name>
         <page id="net1page1">
             <place id="p1"><initialMarking><text> 1 </text></initialMarking></place>
@@ -238,7 +249,7 @@
                     <namedsort id="pro" name="Pro">
                         <finiteintrange start="-1" end="10"/>
                     </namedsort>
-                    <!-- Variables declaration -->		    
+                    <!-- Variables declaration -->
                     <variabledecl id="varA" name="A"><usersort declaration="pro"/></variabledecl>
 		            <namedsort id="Altitude" name="Altitude">
 				<cyclicenumeration>
