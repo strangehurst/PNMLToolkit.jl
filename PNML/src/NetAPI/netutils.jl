@@ -133,16 +133,36 @@ Will not appear in input marking or output of fir!(incidence, enabled, marking).
 ########################################################################################
 # firing rule
 ########################################################################################
-function input_matrix(net::AbstractPnmlNet)
-    # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-    ivt = pntd_of(net) isa PT_HLPNG ? Int : value_type(Inscription, pntd_of(net))
+
+"""
+    input_matrix(net::AbstractPnmlNet) -> Matrix{ivt}
+
+Return matrix of proper type and shape, fill using `input_matrix!`
+"""
+function input_matrix end
+
+function input_matrix(net::PnmlNet{T}) where {T <: AbstractPNTD}
+    ivt = value_type(Inscription, pntd_of(net))
     imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-    return input_matrix!(imatrix, net) # Dispatch on net type.
+    return input_matrix!(imatrix, net)
+end
+function input_matrix(net::PnmlNet{PT_HLPNG})
+    # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
+    ivt = Int
+    imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+    return input_matrix!(imatrix, net)
+end
+function input_matrix(net::PnmlNet{T}) where {T <: AbstractHLCore}
+    ivt = value_type(Inscription, pntd_of(net))
+    imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+    return input_matrix!(imatrix, net)
 end
 
-#! Default `<:Number`
+"""
+    input_matrix!(imatrix, net::AbstractPnmlNet)
+"""
 function input_matrix!(imatrix, net::AbstractPnmlNet)
-    varsub = NamedTuple() # PT_HLPNG is only supported High-level net here
+    varsub = NamedTuple()  #todo! add Symmetric and HL support
     for (p, place_id) in enumerate(place_idset(net))
         z = zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
         for (t, transition_id) in enumerate(transition_idset(net))
@@ -152,15 +172,31 @@ function input_matrix!(imatrix, net::AbstractPnmlNet)
     return imatrix
 end
 
-function output_matrix(net::AbstractPnmlNet)
-    # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-    ivt = pntd_of(net) isa PT_HLPNG ? Int : value_type(Inscription, pntd_of(net))
+"""
+    output_matrix(net::AbstractPnmlNet) -> Matrix{ivt}
+
+Return matrix of proper type and shape, fill using `output_matrix!`
+"""
+function output_matrix end
+function output_matrix(net::PnmlNet{T}) where {T <: AbstractPNTD}
+    ivt = value_type(Inscription, pntd_of(net))
     omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-    return output_matrix!(omatrix, net) # Dispatch on net type.
+    return output_matrix!(omatrix, net)
+end
+function output_matrix(net::PnmlNet{PT_HLPNG})
+    # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
+    ivt = Int
+    omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+    return output_matrix!(omatrix, net)
+end
+function output_matrix(net::PnmlNet{T}) where {T <: AbstractHLCore}
+    ivt = value_type(Inscription, pntd_of(net))
+    omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+    return output_matrix!(omatrix, net)
 end
 
 function output_matrix!(omatrix, net::AbstractPnmlNet)
-    varsub = NamedTuple()
+    varsub = NamedTuple() #todo! add Symmetric and HL support
     for (p, place_id) in enumerate(place_idset(net))
         z = zero_marking(place(net, place_id))
         for (t, transition_id) in enumerate(transition_idset(net))
@@ -171,6 +207,26 @@ function output_matrix!(omatrix, net::AbstractPnmlNet)
     return omatrix
 end
 
+"backward (input) incidence matrix element"
+function pre(net::AbstractPnmlNet, p::Symbol, t::Symbol, varsubs=NamedTuple())
+    @assert PNML.has_transition(net, t)
+    @assert PNML.has_place(net, p)
+    z = zero_marking(place(net, p))
+    iv = inscription_value(net, arc(net, p, t)::Maybe{Arc}, z, varsubs)
+    println("pre(net, $p, $t) = ", iv)
+    return iv
+end
+
+"forward (output) incidence matrix element"
+function post(net::AbstractPnmlNet, t::Symbol, p::Symbol, varsubs=NamedTuple())
+    @assert PNML.has_transition(net, t)
+    @assert PNML.has_place(net, p)
+    z = zero_marking(place(net, p))
+    iv = inscription_value(net, arc(net, t, p)::Maybe{Arc}, z, varsubs)
+    println("post(net, $t, $p) = ", iv)
+    return iv
+end
+
 """
     incidence_matrix(petrinet) -> Matrix
 
@@ -178,9 +234,9 @@ When token identity is collective, marking and inscription values are Numbers an
 `C[arc(transition,place)] = inscription(arc(transition,place)) - inscription(arc(place,transition))`
 is called the incidence_matrix.
 
-High-level nets have tokens with individual identity, perhaps tuples of them,
-usually multisets of finite enumerations, can be other sorts including numbers, strings, lists.
-Symmetric nets are restricted, and thus easier to deal with and reason about.
+High-level nets have tokens with individual identity, perhaps tuples of them.
+Usually multisets of finite enumerations, can be other sorts including numbers, strings, lists.
+Symmetric nets restricts multisets of finite enumerations, and thus easier to deal with and reason about.
 """
 function incidence_matrix end
 
