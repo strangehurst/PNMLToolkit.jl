@@ -17,7 +17,7 @@ using Logging
 using LoggingExtras
 using NamedTupleTools
 using PNML
-using PNML: AbstractLabel, AbstractPnmlNode, Annotation, AnyElement, BooleanConstant, D,
+using PNML: AbstractLabel, AbstractPnmlObject, Annotation, AnyElement, BooleanConstant, D,
     HLAnnotation, Maybe, ToolParser, XmlDictType, indent, namedsort, pntd_of
 using OrderedCollections: LittleDict
 
@@ -41,6 +41,7 @@ include("arctypes.jl")
 include("rates.jl")
 include("delays.jl")
 include("priorities.jl")
+include("capacity.jl")
 include("structure.jl")
 include("times.jl")
 
@@ -50,19 +51,21 @@ include("times.jl")
 If there is a label `tag` in `node.extralabels`, return its value,
 else return a default value.
 """
-function label_value(node::AbstractPnmlNode, tag::Symbol, default_value)
-    label = get_label(node, tag)
+function label_value(x::Union{AbstractPnmlNet, AbstractPnmlObject},
+                     tag::Symbol, default_value)
+    label = get_label(x, tag)
     isnothing(label) ? default_value : value(label)
 end
 
 """
     get_label(x, tag::Union{Symbol, String, SubString{String}}) -> Maybe{PnmlLabel}
 
-Return first label of `x` with a matching `tag` valu`.
+Return first label of `x` with a matching `tag` value.
 - `x` is anyting that supports 'labels'.
 - `tag` is the tag of the xml label element.
 """
-function get_label(x, tag::Union{Symbol, String, SubString{String}})
+function get_label(x::Union{AbstractPnmlNet, AbstractPnmlObject},
+                   tag::Union{Symbol, String, SubString{String}})
     isnothing(x) && throw(ArgumentError("argument 'x' is nothing"))
     if hasproperty(x, :extralabels) && haskey(x.extralabels, tag)
         return @inbounds(x.extralabels[tag])
