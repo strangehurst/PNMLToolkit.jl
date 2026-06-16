@@ -124,7 +124,7 @@ end
     @test_throws("MissingIDException: net",
             parse_net(xml"<net type='test'></net>"; net))
     @test_throws(r"^MissingIDException: page",
-        PNML.Parser.parse_page!(net, page_idset(netsets), xml"<page></page>"))
+        PNML.Parser.parse_page!(net, page_idset(net), xml"<page></page>"))
     @test_throws(r"^MissingIDException: place",
         PNML.Parser.parse_place(xml"<place></place>", net))
     @test_throws(r"^MissingIDException: transition",
