@@ -269,14 +269,13 @@ Better to iterate than allocate. Using a set abstraction that iterates consisten
 ### place\_idset
 | Object       | Synopsis                     | Comment                              |
 |:-------------|:-----------------------------|:-------------------------------------|
-| PnmlNet      | `keys(placedict(net))`       | Iterates [`PnmlNetData`](@ref) OrderedDict keys |
-| Page         | `place_idset(netsets(page))` | Iterates [`PnmlNetKeys`](@ref) OrderedSet |
-| PnmlNetKeys  | `OrderedSet` | Iterates [`PnmlNetKeys`](@ref) OrderedSet |
+| PnmlNet      | `keys(placedict(net))`       | Iterates OrderedDict keys |
+| Page         | `place_idset(netsets(page))` | Iterates OrderedSet |
+| PnmlNetKeys  | `OrderedSet` | Iterates OrderedSet |
 
-Both iterate over REFIDs that are indices into PnmlNetData.,
-To access a `Place` in the `PnmlNetData` use `place(refid)`.
+Both iterate over REFIDs that are indices into dictionaries.,
 
-The contents of PnmlKeySet are indices into PnmlNetData.
+The contents of PnmlKeySet are indices into PnmlNet dictionaries.
 When there is only one page, the keys of the `placedict` and `place_set` will be (must be) the same.
 
 For the foreseeable future, there will be little use of multi-page APIs.

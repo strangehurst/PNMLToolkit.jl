@@ -12,7 +12,7 @@ Options
 """
 function flatten_pages! end
 
-# Most content is already in the PnmlNetData database so mostly involves shuffling keys
+# Most content is already in the PnmlNet database so mostly involves shuffling keys
 function flatten_pages!(net::PnmlNet; trim::Bool = true, verbose::Bool = CONFIG.verbose)
     if length(pagedict(net)) > 1 # Place content of other pages into 1st page.
         pageids = keys(pagedict(net))
@@ -67,8 +67,8 @@ end
 Append selected fields of `r` to fields of `l`.
 Some, like Names and xml, are omitted because they are scalar values, not collections.
 
-pagedict & netdata (holding the arc and pnml nodes) are per-net data that is not modified here.
-netsets hold pnml IDs "owned"
+Per-net data is not modified here.
+The idsets hold pnml IDs of per-net data "owned" by some page.
 """
 function append_page!(lpage::Page, rpage::Page;
             keys = (:toolspecinfos,), # non-idset and non-dict fields of page to merge
@@ -121,7 +121,6 @@ $(TYPEDSIGNATURES)
 
 Remove reference nodes from arcs.
 
-Operates on the [`PnmlNetData`](@ref) at the net level.
 Expects that the [`PnmlNetKeys`](@ref) of the firstpage will have to be cleaned
 as part of [`flatten_pages!`](@ref),
 

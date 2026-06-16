@@ -10,7 +10,6 @@ end
 Return `true` iff ∀p ∈ preset(t): inscription!=0 && marks[p] < inscription.``
 """
 function enable_filter_inhibit(net::AbstractPnmlNet, t::Symbol, marks)
-    println("enable_filter_inhibit $t")
     for p in preset(net, t)
         iarc = arc(net, p, t, inhibit_arcdict)
         isnothing(iarc) && continue
@@ -36,7 +35,6 @@ end
 #  Pre, Post are the backward and forward incidence matrices,
 # """
 function enable_filter_capacity(net::AbstractPnmlNet, t::Symbol, marks)
-    println("enable_filter_capacity $t")
     @assert has_transition(net, t)
     for p in preset(net, t)
         @assert has_place(net, p)

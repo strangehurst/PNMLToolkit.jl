@@ -112,7 +112,7 @@ include("Core/expressions.jl")
 using .Expressions
 include("Core/operators.jl")
 include("Core/rewrite.jl")
-include("Core/pnmlnetdata.jl") # Used by page, net; holds places, transitions, arcs.
+include("Core/pnmlnetkeys.jl") # Used by page, net; who owns what.
 
 #^ Above here are things that appear in  DeclDict contents.
 include("Core/decldict.jl") # Just contains show(). See decldictcore.jl.

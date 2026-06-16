@@ -290,13 +290,8 @@ println("-----------------------------------------")
     @test PNML.nrefplaces(net) == 0
     @test isempty(PNML.refplaces(net))
 
-    #!@test_call broken=false target_modules=t_modules pnmlmodel(testfile)
     @test_call nets(model)
-
-    @test !isempty(repr(PNML.netdata(net)))
     @test !isempty(repr(PNML.netsets(firstpage(net))))
-    @test_throws DomainError PNML.netsets(net)
-
     summary(stdout, PNML.netsets(firstpage(net)))
 
     #TODO apply metagraph toolinfos

@@ -79,16 +79,12 @@ DeclDict
 
 This is where the graph node storage resides.
 
- [`PnmlNetData`](@ref) contains ordered collections of the graph node objects, indexed by REFID symbols.
-
-```@docs; canonical=false
-PnmlNetData
-```
+PnmlNet dictionaries contain ordered collections of the graph node objects, indexed by REFID symbols.
 
 The XML file format distributes a <net> over one or more <page>s. As the pages are parsed,
-the nodes are appended to a `PnmlNetData` dictionary and a `PnmlNetKeys` set.
+the nodes are appended to a dictionary and a `PnmlNetKeys` set.
 
-The `PnmlNetData` dictionaries maintain insertion order.
+The `PnmlNet` data dictionaries maintain insertion order.
 
 Each graph node may have labels attached.
 What labels depends on the [`PnmlTypes`](@ref)
@@ -108,7 +104,7 @@ We always use the [`flatten_pages!`](@ref) version.
 Testing of non-flattened nets is very minimal.
 
 !!! warning
-    After `flatten_pages!` the `PnmlNetKeys` of the only remaining page are assumed to be the same as the `keys` of corresponding `PnmlNetData` dictionary.
+    After `flatten_pages!` the `PnmlNetKeys` of the only remaining page are assumed to be the same as the `keys` of corresponding `PnmlNet` dictionary.
 
 ## Diagram of memory footprint
 

@@ -71,31 +71,6 @@ end
     @test r == eltype(RealSort) == Float64
 end
 
-#println()
-@testset "PnmlNetData()" for pntd in PnmlTypes.core_nettypes() # to limit number of tests
-    pnd = PnmlNetData()
-    @test isempty(PNML.placedict(pnd))
-    @test isempty(PNML.transitiondict(pnd))
-    @test isempty(PNML.arcdict(pnd))
-    @test isempty(PNML.refplacedict(pnd))
-    @test isempty(PNML.reftransitiondict(pnd))
-
-    @test nplaces(pnd) == 0
-    @test ntransitions(pnd) == 0
-    @test narcs(pnd) == 0
-    @test nreftransitions(pnd) == 0
-    @test nrefplaces(pnd) == 0
-
-    @test valtype(PNML.placedict(pnd)) isa DataType
-    @test valtype(PNML.transitiondict(pnd)) isa DataType
-    @test valtype(PNML.arcdict(pnd)) isa DataType
-    @test valtype(PNML.refplacedict(pnd)) isa DataType
-    @test valtype(PNML.reftransitiondict(pnd)) isa DataType
-
-    od = OrderedDict{Symbol,Symbol}()
-    @test valtype(od) isa DataType
-end
-#println()
 @testset "predicates for $pntd" for pntd in PnmlTypes.all_nettypes()
     @test Iterators.only(Iterators.filter(==(true), (PnmlTypes.is_discrete(pntd), is_highlevel(pntd), is_continuous(pntd))))
     tp = typeof(pntd) # translate from singleton to type

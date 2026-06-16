@@ -34,7 +34,6 @@ function verify_sets(net::PnmlNet)
     @test reftransition_idset(firstpage(net)) isa AbstractSet
     @test !isempty(setdiff(reftransition_idset(net), reftransition_idset(firstpage(net))))
 
-    @test_throws DomainError PNML.netsets(net)
     for page in pages(net)
         @test pagedict(net) === pagedict(page) # There is only 1 pagedict.
     end

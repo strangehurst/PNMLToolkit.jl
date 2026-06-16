@@ -123,11 +123,6 @@ end
     net = make_net(pntd, :missing_id_net)
     @test_throws("MissingIDException: net",
             parse_net(xml"<net type='test'></net>"; net))
-
-    pagedict = OrderedDict{Symbol, PNML.Page{typeof(net)}}()
-    netdata = PNML.PnmlNetData()
-    netsets = PNML.PnmlNetKeys()
-    #todo add net to parse_page!
     @test_throws(r"^MissingIDException: page",
         PNML.Parser.parse_page!(net, page_idset(netsets), xml"<page></page>"))
     @test_throws(r"^MissingIDException: place",

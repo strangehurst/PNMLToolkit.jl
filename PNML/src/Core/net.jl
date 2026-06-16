@@ -14,10 +14,16 @@ $(FIELDS)
     # Ensure that each PNML ID in a net is unique using a registry.
     const idregistry::IDRegistry
     # Holds all pages. Shared by pages that may have sub-pages.
-    # All PNML net objects are attached to a `Page`. And there must be at least one `Page`.
-    pagedict::OrderedDict{Symbol, Page{PnmlNet{PNTD}}} # abstract Page
-    # Shared by pages, holds all places, transitions, arcs, refs
-    netdata::PnmlNetData = PnmlNetData()
+    # All PNML net objects are attached to a `Page` by ID. There must be at least one `Page`.
+    pagedict::OrderedDict{Symbol, Page{PnmlNet{PNTD}}}
+    # These dictionaries hold all places, transitions, arcs, refs. Was in PnmlNetData
+    place_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    transition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    inhibit_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    read_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    refplace_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    reftransition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     # Keys of pages in `pagedict` owned by this net.
     # Use only `page_idset` not full `netsets` collection as net only contains pages.
     page_idset::OrderedSet{Symbol} = OrderedSet{Symbol}()
@@ -94,16 +100,13 @@ declarations(net::PnmlNet) =  declarations(decldict(net))
 pagedict(net::PnmlNet) = net.pagedict # Will be ordered.
 page_idset(net::PnmlNet) = net.page_idset # Indices into `pagedict` directly owned by net.
 
-netdata(net::PnmlNet) = net.netdata
-netsets(net::PnmlNet) = throw(DomainError("PnmlNet $(pid(net)) does not have a PnmlKeySet, did you mean `netdata`?"))
-
-placedict(net::PnmlNet)         = placedict(netdata(net))
-transitiondict(net::PnmlNet)    = transitiondict(netdata(net))
-arcdict(net::PnmlNet)           = arcdict(netdata(net))
-inhibit_arcdict(net::PnmlNet)   = inhibit_arcdict(netdata(net))
-read_arcdict(net::PnmlNet)      = read_arcdict(netdata(net))
-refplacedict(net::PnmlNet)      = refplacedict(netdata(net))
-reftransitiondict(net::PnmlNet) = reftransitiondict(netdata(net))
+placedict(net::PnmlNet)         = net.place_dict
+transitiondict(net::PnmlNet)    = net.transition_dict
+arcdict(net::PnmlNet)           = net.arc_dict
+inhibit_arcdict(net::PnmlNet)   = net.inhibit_arc_dict
+read_arcdict(net::PnmlNet)      = net.read_arc_dict
+refplacedict(net::PnmlNet)      = net.refplace_dict
+reftransitiondict(net::PnmlNet) = net.reftransition_dict
 
 #"Return iterator over keys of a dictionary" #! verify same as PnmlKeySet for flattened page
 place_idset(net::PnmlNet)         = keys(placedict(net))

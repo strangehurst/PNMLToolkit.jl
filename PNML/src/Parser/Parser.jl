@@ -11,7 +11,7 @@ import Base: eltype
 import EzXML
 import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
-import PNML: adjacent_place, elements, netdata, refid, source, target,
+import PNML: adjacent_place, elements, refid, source, target,
     sortdefinition, sortelements, sortref, tag, verify!
 import XMLDict
 
@@ -33,7 +33,7 @@ using Moshi.Match: @match
 using NamedTupleTools
 using PNML
 using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, FEConstant,
-    LabelParser, MalformedException, Maybe, MissingIDException, PnmlMultiset, PnmlNetData, PnmlNetKeys,
+    LabelParser, MalformedException, Maybe, MissingIDException, PnmlMultiset, PnmlNetKeys,
     ToolParser, XmlDictType, arbitrarysorts, arc, arc_idset, arcdict, basis, coordinate_type,
     decldict, feconstants, fill_builtin_enabled_filters!, fill_builtin_labelparsers!,
     fill_builtin_sorts!, fill_builtin_toolparsers!, fill_sort_tag!, has_arbitrarysort,

@@ -72,16 +72,6 @@ $(METHODLIST)
 """
 function pages end
 
-"""
-    netdata(x) -> PnmlNetData
-
-Access PnmlNet-level data structure.
-
-$(METHODLIST)
-"""
-function netdata end
-
-
 #--------------------------------------------
 # PLACES & MARKINGS
 #--------------------------------------------

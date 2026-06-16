@@ -15,7 +15,7 @@ See [`PnmlNet`](@ref)
     graphics::Maybe{Graphics} = nothing
     toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
     extralabels::LittleDict{Symbol,Any} = LittleDict{Symbol,Any}()
-    netsets::PnmlNetKeys # This page's keys of items owned in netdata/pagedict. Not shared.
+    netsets::PnmlNetKeys # This page's keys of items owned in net dictionaries. Not shared.
     # Note: `PnmlNet` only has `page_idset` becpage_setause all PNML net Objects
     # are attached to a `Page`. And there must be at least one `Page`.
     # There could be >1 nets. `netdata` is ordered, `netsets` are unordered.

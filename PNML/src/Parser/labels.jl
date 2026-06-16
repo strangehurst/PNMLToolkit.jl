@@ -429,7 +429,7 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
     # Here we support symmetric nets that restrict arcs and
     # assume exactly one is a place (and the other a transition).
 
-    # Find adjacent place's sorttype using `netdata`.
+    # Find adjacent place's sorttype using `net` data.
     adjacentplace = adjacent_place(net, source(pit), target(pit))
     placesort = sortref(adjacentplace)::SortRef
     # D()&& @show adjacentplace placesort
