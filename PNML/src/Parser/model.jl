@@ -14,6 +14,7 @@ XMLNode is an alias for EzXML.Node.
   - lp: optional label parser plugins, a collection of (Symbol, callable) tuples
   - tp: optional toolspecific parser plugins, a collection of(String, String, callable) tuples
   - ef: optional enabled filter plugins, a collection of (Symbol, callable) tuples
+  - idregistry: model-level ID registry shared by all nets, defaults to IdRegistry().
 """
 function pnmlmodel end
 
@@ -37,10 +38,11 @@ function pnmlmodel(node::XMLNode; kwargs...)
     check_nodename(node, "pnml")
     namespace = pnml_namespace(node)
     nets = LittleDict{Symbol,Any}()
+    idregistry = get(kwargs, :idregistry, IDRegistry())
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "net"
-            net = parse_net(child; kwargs...)::PnmlNet # Fully formed
+            net = parse_net(child; idregistry, kwargs...)::PnmlNet # Fully formed
             nets[pid(net)] = net
         else
             @error "<model> has unexpected child $tag"
@@ -90,9 +92,10 @@ end
  - lp: optional label parser plugins, a collection of (Symbol, callable) tuples
  - tp: optional toolspecific parser plugins, a collection of(String, String, callable) tuples
  - ef: optional enabled filter plugins, a collection of (Symbol, callable) tuples
+ - idregistry:
 """
 function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kwargs...)
-    idregistry = IDRegistry() # empty
+    idregistry = get(kwargs, :idregistry, IDRegistry())
     netid = register_idof!(idregistry, net_node)
 
     # Parse the pnml net type attribute. Not the place sort `<type>` label.

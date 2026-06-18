@@ -16,43 +16,43 @@
         </toolspecific>
         <name><text>pnmlcore with nested pages</text></name>
         <page id="net1page1">
-            <place id="p1"><initialMarking><text> 1 </text></initialMarking></place>
-            <transition id ="t1"></transition>
-            <arc id="a11" source="p1" target="t1"><inscription> <text> 2 </text> </inscription></arc>
-            <arc id="a12" source="t1" target="rp2"> </arc>
-            <arc id="a13" source="p1" target="rt11"> </arc>
-            <referencePlace id="rp2" ref="p2"/>
-            <referenceTransition id="rt11" ref="t11"/>
+            <place id="n1p1"><initialMarking><text> 1 </text></initialMarking></place>
+            <transition id ="n1t1"></transition>
+            <arc id="a11" source="n1p1" target="n1t1"><inscription> <text> 2 </text> </inscription></arc>
+            <arc id="a12" source="n1t1" target="n1rp2"> </arc>
+            <arc id="a13" source="n1p1" target="n1rt11"> </arc>
+            <referencePlace id="n1rp2" ref="n1p2"/>
+            <referenceTransition id="n1rt11" ref="n1t11"/>
 
-            <page id="net1page1sub1">
-                <place id="p11"></place>
-                <transition id ="t11"> </transition>
-                <arc id="a111" source="t11" target="rp111"> </arc>
-                <referencePlace id="rp111" ref="p111"/>
-                <page id="net1page1sub1sub1">
-                    <place id="p111"> <initialMarking> <text> 111 </text> </initialMarking> </place>
-                    <arc id="a1111" source="p111" target="rt22"> </arc>
-                    <referenceTransition id="rt22" ref="t2"/>
+            <page id="n1net1page1sub1">
+                <place id="n1p11"></place>
+                <transition id ="n1t11"> </transition>
+                <arc id="n1a111" source="n1t11" target="n1rp111"> </arc>
+                <referencePlace id="n1rp111" ref="n1p111"/>
+                <page id="n1net1page1sub1sub1">
+                    <place id="n1p111"> <initialMarking> <text> 111 </text> </initialMarking> </place>
+                    <arc id="n1a1111" source="n1p111" target="n1rt22"> </arc>
+                    <referenceTransition id="n1rt22" ref="n1t2"/>
                 </page>
             </page>
         </page>
 
         <page id="net1page2">
-            <place id="p2"></place>
-            <transition id ="t2"></transition>
-            <arc id="a21" source="p2" target="t2"></arc>
-            <arc id="a22" source="p2" target="rt3"></arc>
-            <arc id="a23" source="t2" target="rp3"></arc>
-            <referencePlace id="rp3" ref="p3"/>
-            <referenceTransition id="rt3" ref="t3"/>
+            <place id="n1p2"></place>
+            <transition id ="n1t2"></transition>
+            <arc id="n1a21" source="n1p2" target="n1t2"></arc>
+            <arc id="n1a22" source="n1p2" target="n1rt3"></arc>
+            <arc id="n1a23" source="n1t2" target="n1rp3"></arc>
+            <referencePlace id="n1rp3" ref="n1p3"/>
+            <referenceTransition id="n1rt3" ref="n1t3"/>
         </page>
 
-        <page id="net1page3">
-            <place id="p3"/>
-            <transition id ="t3"/>
-            <arc id="a31" source="p3" target="t3"/>
-            <arc id="a32" source="t3" target="rp1"/>
-            <referencePlace id="rp1" ref="p1"/>
+        <page id="n1net1page3">
+            <place id="n1p3"/>
+            <transition id ="n1t3"/>
+            <arc id="n1a31" source="n1p3" target="n1t3"/>
+            <arc id="n1a32" source="n1t3" target="n1rp1"/>
+            <referencePlace id="n1rp1" ref="n1p1"/>
         </page>
     </net>
 
@@ -138,17 +138,17 @@
             <structure>
                 <declarations>
                     <!-- Sorts declaration -->
-                    <namedsort id="pro" name="Pro">
+                    <namedsort id="n5pro" name="Pro">
                         <finiteintrange start="-1" end="10"/>
                     </namedsort>
                     <!-- Variables declaration -->
-                    <variabledecl id="varx" name="x"><usersort declaration="pro"/></variabledecl>
-                    <variabledecl id="varm" name="m"><usersort declaration="pro"/></variabledecl>
-                    <variabledecl id="varA" name="A"><usersort declaration="pro"/></variabledecl>
-                    <namedoperator id="id6" name="g">
+                    <variabledecl id="n5varx" name="x"><usersort declaration="n5pro"/></variabledecl>
+                    <variabledecl id="n5varm" name="m"><usersort declaration="n5pro"/></variabledecl>
+                    <variabledecl id="n5varA" name="A"><usersort declaration="n5pro"/></variabledecl>
+                    <namedoperator id="n5id6" name="g">
                         <parameter>
-                            <variabledecl id="id4" name="x"><usersort declaration="integer"/></variabledecl>
-                            <variabledecl id="id5" name="y"><usersort declaration="integer"/></variabledecl>
+                            <variabledecl id="n5id4" name="x"><usersort declaration="integer"/></variabledecl>
+                            <variabledecl id="n5id5" name="y"><usersort declaration="integer"/></variabledecl>
                         </parameter>
                         <def>
                             <numberconstant value="1"><positive/></numberconstant>
@@ -168,12 +168,12 @@
             <place id="pOwn">
                 <graphics><position x="35" y="35"/></graphics>
                 <name><text>OwnMemAcc</text></name>
-                <type><structure><usersort declaration="pro"/></structure></type>
+                <type><structure><usersort declaration="n5pro"/></structure></type>
             </place>
             <place id="pActive">
                 <graphics><position x="35" y="70"/></graphics>
                 <name><text>Active</text></name>
-                <type><structure><usersort declaration="pro"/></structure></type>
+                <type><structure><usersort declaration="n5pro"/></structure></type>
                 <hlinitialMarking>
                     <structure>
                         <add>
@@ -213,8 +213,8 @@
                 <condition>
                     <structure>
                         <equality>
-                            <subterm><variable refvariable="varm"/></subterm>
-                            <subterm><variable refvariable="varx"/></subterm>
+                            <subterm><variable refvariable="n5varm"/></subterm>
+                            <subterm><variable refvariable="n5varx"/></subterm>
                         </equality>
                     </structure>
                 </condition>
@@ -246,15 +246,15 @@
                             <feconstant id="true" name="T"/>
                         </cyclicenumeration>
                     </namedsort>
-                    <namedsort id="pro" name="Pro">
+                    <namedsort id="n7pro" name="Pro">
                         <finiteintrange start="-1" end="10"/>
                     </namedsort>
                     <!-- Variables declaration -->
-                    <variabledecl id="varA" name="A"><usersort declaration="pro"/></variabledecl>
-		            <namedsort id="Altitude" name="Altitude">
+                    <variabledecl id="n7varA" name="A"><usersort declaration="n7pro"/></variabledecl>
+		            <namedsort id="n7Altitude" name="Altitude">
 				<cyclicenumeration>
-				  <feconstant id="Altitude10" name="10"/>
-				  <feconstant id="Altitude20" name="20"/>
+				  <feconstant id="n7Altitude10" name="10"/>
+				  <feconstant id="n7Altitude20" name="20"/>
 				</cyclicenumeration>
 			    </namedsort>
 		            <namedsort id="cats" name="Cats">
@@ -267,7 +267,7 @@
             </structure>
         </declaration>
        <page id="net7page">
-            <place id="stp5">
+            <place id="n7stp5">
                 <name><text>stp5</text></name>
                 <type>
                     <text>Dot</text>
@@ -288,7 +288,7 @@
                 </hlinitialMarking>
             </place>
 
-            <transition id="t3_1">
+            <transition id="n7t3_1">
                 <name><text>t3_1</text></name>
                 <condition>
                     <text>(A) lt (Altitude10) and (A) ineq (Altitude20)</text>
@@ -297,20 +297,20 @@
                             <subterm>
                                 <lessthan>
                                     <subterm>
-                                        <variable refvariable="varA"/>
+                                        <variable refvariable="n7varA"/>
                                     </subterm>
                                     <subterm>
-                                        <useroperator declaration="Altitude10"/>
+                                        <useroperator declaration="n7Altitude10"/>
                                     </subterm>
                                 </lessthan>
                             </subterm>
                             <subterm>
                                 <inequality>
                                     <subterm>
-                                        <variable refvariable="varA"/>
+                                        <variable refvariable="n7varA"/>
                                     </subterm>
                                     <subterm>
-                                        <useroperator declaration="Altitude20"/>
+                                        <useroperator declaration="n7Altitude20"/>
                                     </subterm>
                                 </inequality>
                             </subterm>
@@ -318,7 +318,7 @@
                     </structure>
                 </condition>
             </transition>
-            <arc id="arc41" source="stp5" target="t3_1">
+            <arc id="n7arc41" source="n7stp5" target="n7t3_1">
                 <name><text>41</text></name>
                 <hlinscription>
                     <text>1'(dot)</text>

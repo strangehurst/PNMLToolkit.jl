@@ -11,7 +11,7 @@ println("-----------------------------------------\n")
     #     (:warn, "ignoring unexpected child of <condition>: 'name'"),
     #     (:warn, "parse unknown declaration: tag = unknowendecl, id = unk1, name = u"),
     #     pnmlmodel(fname)::PnmlModel)
-    model = pnmlmodel(fname)::PnmlModel
+    model = pnmlmodel(fname; idregistry=IDRegistry())::PnmlModel
     summary(stdout, model)
 
 #     # println("----"^10); @show model; println("----"^10)

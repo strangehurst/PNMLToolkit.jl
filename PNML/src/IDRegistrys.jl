@@ -1,5 +1,8 @@
 """
 Petri Net Markup Language identifier registry.
+
+A Petri Net Document contains one or more Petri Nets.
+Each object within a Petri net document has a unique identifier.
 """
 module IDRegistrys
 
@@ -7,7 +10,6 @@ using Preferences
 using Base: Base.IdSet
 using DocStringExtensions
 import SciMLPublic: @public
-import Base: eltype
 
 export IDRegistry, register_id!, isregistered, DuplicateIDException
 @public reset_reg!
@@ -22,7 +24,7 @@ struct DuplicateIDException <: Exception
 end
 
 """
-Holds a set of PNML ID symbols and, optionally, a lock to allow safe reentrancy.
+Holds a set of PNML ID symbols and a lock to allow safe reentrancy.
 
 $(TYPEDEF)
 """
