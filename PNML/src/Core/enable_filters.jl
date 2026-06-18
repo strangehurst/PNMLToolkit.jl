@@ -42,7 +42,7 @@ function enable_filter_capacity(net::AbstractPnmlNet, t::Symbol, marks)
         if cv > 0 && marks[p] >= pre(net, p, t)
             for p2 in postset(net, t)
                 @assert has_place(net, p2)
-                @show marks[p2] cv
+                #@show marks[p2] cv
                 if marks[p2] + post(net, t, p2) - pre(net, p2, t) > cv
                     return false
                 end
