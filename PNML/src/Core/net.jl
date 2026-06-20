@@ -89,7 +89,7 @@ function make_net(type::AbstractPNTD, id=:make_net,)
 end
 
 pntd_of(net::PnmlNet) = net.type
-nettype(net::PnmlNet) = typeof(net.type)
+nettype(net::PnmlNet) = typeof(pntd_of(net))
 
 "Return IDRegistry of a PnmlNet."
 registry_of(net::PnmlNet) = net.idregistry
