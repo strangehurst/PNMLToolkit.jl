@@ -60,7 +60,7 @@ abstract type AbstractPetriNet{PNTD <: AbstractPNTD} end
 #     return getfield(pn, prop_name)
 # end
 
-nettype(::AbstractPetriNet{T}) where {T <: AbstractPNTD} = T
+nettype(::AbstractPetriNet) = nettype(pnmlnet(petrinet))
 pid(petrinet::AbstractPetriNet)     = pid(pnmlnet(petrinet))
 name(petrinet::AbstractPetriNet)    = name(pnmlnet(petrinet))
 pnmlnet(petrinet::AbstractPetriNet) = petrinet.net
