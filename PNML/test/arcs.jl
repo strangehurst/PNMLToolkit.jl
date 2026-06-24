@@ -1,5 +1,4 @@
-using PNML, Test,
-JET, XMLDict
+using PNML, Test, OrderedCollections, JET, XMLDict
 
 include("TestUtils.jl")
 using .TestUtils
@@ -7,6 +6,7 @@ using .TestUtils
 #---------------------------------------------
 # ARC
 #---------------------------------------------
+"Construct `<hlinscription>` or `<inscription>` matching pntd."
 function insc_xml(pntd)
     if is_highlevel(pntd)
         """<hlinscription>
@@ -24,9 +24,10 @@ function insc_xml(pntd)
         """<inscription> <text>6</text> </inscription>"""
     end
 end
+
 #! arc needs :place1 for adjacent place
 "Parse place with marking, add to dict & id set"
-function pl_node(net, netsets)
+function pl_node(net::PnmlNet, netsets::PnmlNetKeys)
     node = if is_highlevel(pntd_of(net))
         xml"""
             <place id="place1">
@@ -59,7 +60,7 @@ end
 
 #! arc needs :transition1 for adjacent transition
 "Parse empty transition, add to dict & id set"
-function tr_node(net, netsets)
+function tr_node(net::PnmlNet, netsets::PnmlNetKeys)
     node = xml"""<transition id="transition1" />"""
     tr = parse_transition(node, net)
     push!(transition_idset(netsets), pid(tr))
@@ -111,7 +112,7 @@ end
     node = xmlnode("""
       <arc source="transition1" target="place1" id="arc1">
         <name> <text>Some arc</text> </name>
-        $insc_xml(pntd_of(net))
+        $(insc_xml(pntd_of(net)))
         <unknown id="unkn">
             <name> <text>unknown label</text> </name>
             <text>content text</text>
@@ -120,7 +121,6 @@ end
         <toolspecific tool=":test" version="1.0.0" />
       </arc>
     """)
-   a = @test_logs(match_mode=:any,
-                  (:info, "add PnmlLabel :unknown to :arc1"),
-                  parse_arc(node, net))
+   @test_logs(match_mode=:any, (:info, "add PnmlLabel :unknown to :arc1"),
+                parse_arc(node, net))
 end
