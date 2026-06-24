@@ -68,7 +68,7 @@ export @xml_str, APN, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
 
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
 @public namedsort, productsort, Coordinate
-@public basis, rates, mcontains, to_sort
+@public basis, name, rates, mcontains, to_sort
 @public is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
 
 Multisets.set_key_value_show()
