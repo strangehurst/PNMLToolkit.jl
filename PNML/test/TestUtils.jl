@@ -82,6 +82,6 @@ function pff(@nospecialize ft)
     return true
 end
 
-export VERBOSE_PNML, pff, t_modules, runopt, testshow, noisy
+export VERBOSE_PNML, noisy, pff, runopt, t_modules, testshow
 
 end # module TestUtils
