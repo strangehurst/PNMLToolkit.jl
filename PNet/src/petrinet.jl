@@ -60,27 +60,20 @@ abstract type AbstractPetriNet{PNTD <: AbstractPNTD} end
 #     return getfield(pn, prop_name)
 # end
 
-nettype(::AbstractPetriNet) = nettype(pnmlnet(petrinet))
+nettype(petrinet::AbstractPetriNet) = nettype(pnmlnet(petrinet))
 pid(petrinet::AbstractPetriNet)     = pid(pnmlnet(petrinet))
-name(petrinet::AbstractPetriNet)    = name(pnmlnet(petrinet))
-pnmlnet(petrinet::AbstractPetriNet) = petrinet.net
+name(petrinet::AbstractPetriNet)    = PNML.name(pnmlnet(petrinet))
+pnmlnet(petrinet::AbstractPetriNet) = petrinet.net::PnmlNet
 
-#------------------------------------------------------------------------------------------
-# Forward MANY THINGS to the IR implementation pnmlnet.
-# TODO Adopt a forwarder?
-# ! TODO SEE if there is a need for much forwarding.
-#------------------------------------------------------------------------------------------
+"""
+    inscriptions(net::PnmlNet) -> Iterator
 
+Return iterator over REFID => inscription(arc) pairs of `net`. This is the same order as `arcs`.
+"""
 inscriptions(petrinet::AbstractPetriNet) = inscriptions(pnmlnet(petrinet))
 conditions(petrinet::AbstractPetriNet) = conditions(pnmlnet(petrinet))
 #!rates(petrinet::AbstractPetriNet) = rates(pnmlnet(petrinet))
 initial_markings(petrinet::AbstractPetriNet) = initial_markings(pnmlnet(petrinet))
-
-
-#####################################################################################
-#
-#####################################################################################
-
 
 #-----------------------------------------------------------------
 # Show and Tell Section:
@@ -105,9 +98,6 @@ end
 
 #-----------------------------------------------------------------
 #-----------------------------------------------------------------
-#@assert @isdefined(PnmlNet) "PnmlNet should be defined."
-#@assert @isdefined(pnmlmodel) "pnmlmodel should be defined."
-
 """
     HLPetriNet(str::AbstractString)
     HLPetriNet(model::PnmlModel)
@@ -129,8 +119,6 @@ struct HLPetriNet{PNTD<:AbstractPNTD} <: AbstractPetriNet{PNTD}
 end
 
 function HLPetriNet(str::AbstractString)
-    @assert @isdefined(pnmlmodel) "pnmlmodel should be defined"
-
     HLPetriNet(pnmlmodel(PNML.xmlnode(str);
                          tp=(("nupn", "1.1", PNML.Parser.nupn_content),), ))
 end
