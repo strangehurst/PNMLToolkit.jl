@@ -4,9 +4,10 @@ CurrentModule = PNML
 
 # PNML.jl
 
-Documentation for the GitHub [PNML.jl](https://github.com/strangehurst/PNML.jl) repository.
-Which defines a Julia module named `PNML`.
-Which handles an XML markup language with the acronym [pnml](http://www.pnml.org) -- [Petri Net](https://en.wikipedia.org/wiki/Petri_net) Markup Language.
+Documentation for the GitHub [PNMLToolkit.jl](https://github.com/strangehurst/PNMLToolkit.jl) repository.
+An unregistered monorepo using Pkg.jl's workspace and source mechanisms.
+Which defines a Julia sub-package named `PNML` that handles an XML markup language with the
+acronym [pnml](http://www.pnml.org) -- [Petri Net](https://en.wikipedia.org/wiki/Petri_net) Markup Language.
 
 ```@eval
 using Markdown, Pkg, Dates, InteractiveUtils
@@ -20,6 +21,7 @@ end
 Markdown.parse("""
 	These docs were generated at $(now()) on $(gethostname()) using:
 		- $(print_dep_version("PNML"))
+		- $(print_dep_version("PNet"))
    """)
 ```
 
@@ -32,9 +34,9 @@ There are 2 flavors currently covered by PNML meta-models:
   - integer-valued, where tokens have collective identities.
   - High-level, where tokens have individual identities using a many-sorted algebra.
 
-The people behind PNML, and as stated in _15909-2_, are of the Model Driven Software Engineering camp and have chosen Java, Eclipse and its modeling framework (EMF).
+The people behind PNML, and as stated in _15909-2_, are of the Model Driven Software Engineering camp and have chosen Java, Eclipse and its modeling framework (EMF). Including Object Management Group UML2 models.
 
-See [*A primer on the Petri Net Markup Language and ISO/IEC 15909-2*](https://www.pnml.org/papers/pnnl76.pdf)(pdf) for more details. The rest of this page will hopefully make more sense if you are familiar with the primer's contents. Use the RelaxNG Schema as definitive like the 'primer' counsels.
+See [*A primer on the Petri Net Markup Language and ISO/IEC 15909-2*](https://www.pnml.org/papers/pnnl76.pdf)(pdf) for more details. The rest of this document will hopefully make more sense if you are familiar with the primer's contents. Use the RelaxNG Schema as definitive like the 'primer' counsels.
 
 See [Extending PNML Scope: a Framework to Combine Petri Nets Types](https://www.pnml.org/papers/topnoc-2012.pdf) for concepts relevant to *ISO/IEC 15909-3*.
 
@@ -46,14 +48,17 @@ that use RelaxNG and Schematron for validation of the interchange file's content
 Petri Net Type Definition schema files (pntd) are defined using RELAX-NG XML Schema files (rng).
 Petri Net Markup Language files (pnml) are intended to be validated against a pntd schema.
 
-For interchange of pnml between toolinfos it should be enough to support the same pntd schema.
+For interchange of pnml between tools it should be enough to support the same pntd schema.
+We will act as if that is true.
 
 Note that ISO released part 3 of the PNML standard covering extensions and structuring mechanisms in 2021. And some http://www.pnml.org files address these extensions.
 Including [Extending PNML Scope: a Framework to Combine Petri Nets Types](https://www.pnml.org/papers/topnoc-2012.pdf).
 
-
 It is possible to create a non-standard pntd. And more will be standardized, either
 formally or informally. Non-standard mostly means that the interchangibility is restricted.
+
+Some go so far as to used non-standard URIs for pntds.
+Note that the RelaxNG files are imbedded in ISO/IEC 15909-2 so can be easily duplicated.
 
 Since validation is not a goal of PNML.jl the uri is treated as a string.
 So non-standard pntds can be used for the URI of an XML `net` tag's `type` attribute.
@@ -118,6 +123,10 @@ See [apidocs](https://pnml.lip6.fr/pnmlframework/apidocs/index.html) and
 [ePNK](http://www.imm.dtu.dk/~ekki/projects/ePNK/index.shtml) a platform for developing Petri net tools based on the PNML transfer format is another Eclipse/Java EMF thing. Implements more complicated PNML than used in MCC. By some of the creators of PNML.
 [github](https://github.com/ekkart/ePNK) has the source, documentation, examples.
 
+[A simulator for high-level Petri nets: An ePNK application](https://www.imm.dtu.dk/~ekki/publications/copies/KiLa13-HLPNG-Sim-PNNL82.pdf)
+
+[A Simulator for high level Petri Nets: Model based design and implementation](https://www2.imm.dtu.dk/pubdb/edoc/imm6403.pdf) Mindaugas Laganeckas' masters thesis.
+
 "The [Model Checking Contest (MCC)](https://mcc.lip6.fr/) has two different parts:
 the Call for Models, which gathers Petri net models proposed by the scientific community,
 and the Call for Tools, which benchmarks verification tools developed within the scientific community."
@@ -125,6 +134,8 @@ Each year new models are added to the contest.
 
 [github.com/daemontus/pnml-parser](https://github.com/daemontus/pnml-parser)
 Rust language.
+
+[Renew (The Reference Net Workshop)](https://www.informatik.uni-hamburg.de/TGI/renew/renew.html) Java language "multi-formalism editor and simulator". One of which is PNML.
 
 [Browsable PNML Grammar from Grammar Zoo](https://slebok.github.io/zoo/automata/petri/pnml/standard/symmetric/extracted/index.html)
  For Symmetric Nets.
@@ -154,8 +165,7 @@ Has references to papers from pre-ISO 15909 covering modular Petri nets.
    - [Petri net](https://ncatlab.org/nlab/show/Petri+net)
 
 [Well-formed Petri nets](https://en.wikipedia.org/wiki/Well-formed_Petri_net)
-"...only a limited set of operators are available (identify, broadcast, successor and predecessor functions are allowed on circular finite types)".
-Restrictions that differentiates `SymmetricNet` and `HLPNG`.
+"...only a limited set of operators are available (identify, broadcast, successor and predecessor functions are allowed on circular finite types)". The restrictions that differentiates `SymmetricNet` and `HLPNG`.
 
 John Baez, Fabrizio Genovese, Jade Master, Michael Shulman, _Categories of Nets_, [arXiv:2101.04238](https://arxiv.org/abs/2101.04238)
 
@@ -187,20 +197,26 @@ Patterson, E., Lynch, O., Fairbanks, J.: [Categorical data structures for techni
 
 Joachim Kock. [Whole-grain Petri nets and processes](https://arxiv.org/abs/2005.05108)
 
-[Contexts.jl](https://cgutsche.github.io/Contexts.jl/dev/) is not registered.
-C. Gutsche, S. Götz, V. Prokopets and U. Aßmann, "Context-Role Oriented Programming in Julia: Advancing Swarm Programming," 2025 IEEE/ACM 20th Symposium on Software Engineering for Adaptive and Self-Managing Systems (SEAMS), Ottawa, ON, Canada, 2025, pp. 85-95,
-doi: 10.1109/SEAMS66627.2025.00017. keywords: {Performance evaluation;Surveillance;Collaboration;Programming;Software;Hardware;Multi-robot systems;Drones;Software engineering;Software development management;Roles;Teams;Contexts;Swarms;Drones;SelfAdaptive Systems;Julia}. Does not use an input file.
+---
+Julia things, small, random, stale, ...:
 
-[DistributedWorkflows.jl](https://github.com/FiroozehDastur/DistributedWorkflows.jl)
-Does not use a Petri net input file. Constructs one internally?
-Uses [GPI-Space](https://www.gpi-space.de) where Petri nets are represented in a
-XML format called XPNET that embedds C++ code fragments.
+  * [Contexts.jl](https://cgutsche.github.io/Contexts.jl/dev/) is not registered.
+    C. Gutsche, S. Götz, V. Prokopets and U. Aßmann, "Context-Role Oriented Programming in Julia: Advancing Swarm Programming," 2025 IEEE/ACM 20th Symposium on Software Engineering for Adaptive and Self-Managing Systems (SEAMS), Ottawa, ON, Canada, 2025, pp. 85-95,
+    doi: 10.1109/SEAMS66627.2025.00017. keywords: {Performance evaluation;Surveillance;Collaboration;Programming;Software;Hardware;Multi-robot systems;Drones;Software engineering;Software development management;Roles;Teams;Contexts;Swarms;Drones;SelfAdaptive Systems;Julia}. Does not use an input file.
 
-[BioSimulator.jl](https://github.com/alanderos91/BioSimulator.jl) uses a simple internal
-species-reaction Petri net.
+  * [DistributedWorkflows.jl](https://github.com/FiroozehDastur/DistributedWorkflows.jl)
+    Does not use a Petri net input file. Constructs one internally?
+    Uses [GPI-Space](https://www.gpi-space.de) where Petri nets are represented in a
+    XML format called XPNET that embedds C++ code fragments.
 
-[Dialectica Petri nets](https://arxiv.org/pdf/2105.12801)  Finally we would like to investigate whether we could
-code our nets using Catlab https://github.com/AlgebraicJulia/Catlab.jl.
+  * [BioSimulator.jl](https://github.com/alanderos91/BioSimulator.jl)
+    Uses a simple internal species-reaction Petri net.
+
+---
+
+[Dialectica Petri nets](https://arxiv.org/pdf/2105.12801)  "Finally we would like to investigate whether we could
+code our nets using Catlab https://github.com/AlgebraicJulia/Catlab.jl."
+
 [Linear Logic Flavoured Composition of Petri Nets](https://golem.ph.utexas.edu/category/2020/07/linear_logic_flavoured_composi.html).
 
 [Snoopy](https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Snoopy#imexport)
