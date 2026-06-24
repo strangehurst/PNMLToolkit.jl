@@ -11,6 +11,7 @@ import PNML
 import PNML: PnmlMultiset,
     initial_marking, initial_markings, inscription, metagraph, nettype, pid,
     pnmlmodel, pntd_of, rates
+import PNML.NetAPI: inscriptions, conditions
 import XMLDict
 
 using DocStringExtensions
@@ -19,7 +20,8 @@ using LoggingExtras
 using NamedTupleTools
 using PNML
 using PNML.NetAPI
-using PNML.PnmlTypes: AbstractPNTD, AbstractPNTD
+using PNML.Parser
+using PNML.PnmlTypes #!: AbstractPNTD, AbstractPNTD
 using TermInterface
 
 export AbstractPetriNet, SimpleNet, counted_transitions, input_matrix, labeled_transitions,
