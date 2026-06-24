@@ -168,7 +168,7 @@ methods(PNML.name) # hide
 methods(PNML.tag) # hide
 ```
 
-### nettype(x) - return PnmlType identifying PNTD
+### nettype(x) - return AbstractPNTD subtype identifying PNTD
 
 [`PNML.nettype`](@ref)
 ```@example methods
