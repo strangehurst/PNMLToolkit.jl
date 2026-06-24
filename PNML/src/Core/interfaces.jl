@@ -154,23 +154,6 @@ $(METHODLIST)
 """
 function transition_idset end
 
-"""
-    inscriptions(net::PnmlNet) -> Iterator
-
-Return iterator over REFID => inscription(arc) pairs of `net`. This is the same order as `arcs`.
-
-$(METHODLIST)
-"""
-function inscriptions end
-
-"""
-    conditions(net::PnmlNet) -> Iterator
-
-Return iterator  over REFID => condition(transaction) pairs of `net`.
-This is the same order as `transactions`.
-
-$(METHODLIST)
-"""
 function conditions end
 
 """

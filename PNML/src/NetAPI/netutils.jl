@@ -31,6 +31,12 @@ postset(net::AbstractPnmlNet , id::Symbol) = begin
 end
 
 
+"""
+    inscriptions(net::PnmlNet) -> Iterator
+
+Return iterator over REFID => inscription(arc) pairs of `net`. This is the same order as `arcs`.
+"""
+function inscriptions end
 function inscriptions(net::AbstractPnmlNet)
     Iterators.map((arc_id, a)->arc_id => inscription(a)(NamedTuple()), pairs(arcdict(net)))
 end
@@ -39,6 +45,13 @@ function inscriptions(net::AbstractHLCore) #TODO! non-ground terms for HL
     @error "high level net $(pid(net)) needs variable substitution"
 end
 
+"""
+    conditions(net::PnmlNet) -> Iterator
+
+Return iterator  over REFID => condition(transaction) pairs of `net`.
+This is the same order as `transactions`.
+"""
+function conditions end
 function conditions(net::AbstractPnmlNet)
     Iterators.map((tr_id, t)->tr_id => condition(t)(NamedTuple()), pairs(transitiondict(net)))
 end
