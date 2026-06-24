@@ -7,7 +7,7 @@ function enable_filter_true(::AbstractPnmlNet, t::Symbol, marks)
 end
 
 """
-Return `true` iff ∀p ∈ preset(t): inscription!=0 && marks[p] < inscription.``
+Return `true` iff ∀p ∈ preset(t): inscription != 0 && marks[p] < inscription.``
 """
 function enable_filter_inhibit(net::AbstractPnmlNet, t::Symbol, marks)
     for p in preset(net, t)

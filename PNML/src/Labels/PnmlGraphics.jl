@@ -90,8 +90,8 @@ end
 #---------------------------------------------------------
 #---------------------------------------------------------
 """
-PNML Graphics can be attached to 'AbstractPnmlObject`s and
-`Annotation` label parts of Pnml models.
+PNML Graphics can be attached to 'AbstractPnmlObject`s and `Annotation` label parts
+of Pnml models.
 
 $(TYPEDEF)
 $(TYPEDFIELDS)
