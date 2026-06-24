@@ -57,7 +57,7 @@ Including [Extending PNML Scope: a Framework to Combine Petri Nets Types](https:
 It is possible to create a non-standard pntd. And more will be standardized, either
 formally or informally. Non-standard mostly means that the interchangibility is restricted.
 
-Some go so far as to used non-standard URIs for pntds.
+Some go so far as to used non-standard URIs for pntds. We have not yet  made that decision.
 Note that the RelaxNG files are imbedded in ISO/IEC 15909-2 so can be easily duplicated.
 
 Since validation is not a goal of PNML.jl the uri is treated as a string.
