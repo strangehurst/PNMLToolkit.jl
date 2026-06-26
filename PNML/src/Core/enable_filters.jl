@@ -11,7 +11,7 @@ Return `true` iff ∀p ∈ preset(t): is_inhibitor(arc(p,t)) && inscription != 0
 """
 function enable_filter_inhibit(net::AbstractPnmlNet, t::Symbol, marks)
     for p in preset(net, t)
-        iarc = arc(net, p, t)
+        iarc = arc(net, p, t)::Arc
         #! WHY Union{PNML.Parser.ParseInscriptionTerm, PNML.Arc}
         isnothing(iarc) && continue
         is_inhibitor(iarc) || continue
