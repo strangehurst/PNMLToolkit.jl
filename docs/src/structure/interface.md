@@ -356,10 +356,6 @@ methods(PNML.initial_marking)  # hide
 ```
 ## Transition Related
 
-### conditions - collect evaluated conditions
-[`conditions`](@ref)
-```@example methods
-methods(PNML.conditions)  # hide
 ```
 ### condition - evaluate condition of one transition
 [`condition`](@ref)
