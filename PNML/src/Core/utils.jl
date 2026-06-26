@@ -38,3 +38,19 @@ sortref(::Type{UInt16}) = NamedSortRef(:natural)
 sortref(::Type{UInt32}) = NamedSortRef(:natural)
 sortref(::Type{UInt64}) = NamedSortRef(:natural)
 sortref(::Type{Float64}) = NamedSortRef(:real)
+
+"""
+    @outline
+See
+https://discourse.julialang.org/t/how-to-understand-reasons-for-some-unexpected-heap-allocations/137645/25?u=mrpurple
+
+Usage `@outline(i, @warn "i is negative" i)`
+"""
+macro outline(args...)
+    captures = esc.(args[1:end-1])
+    body = esc(args[end])
+    quote
+        @noinline thunk($(captures...),) = $body
+        thunk($(captures...),)
+    end
+end

@@ -227,7 +227,7 @@ function pnml_hl_outsort(tag::Symbol; insorts::Vector{UserSortRef})
     elseif is_multisetoperator(tag)
         if tag in (:add,)
             length(insorts) >= 2 ||
-                @error "pnml_hl_outsort length(insorts) < 2" tag insorts
+                @outline(tag, insorts, @error "pnml_hl_outsort length(insorts) < 2" tag insorts)
             last(insorts) # is it always last?
             #todo assert is multiset
         elseif tag in(:all, :numberof, :subtract, :scalarproduct)
@@ -248,7 +248,7 @@ function pnml_hl_outsort(tag::Symbol; insorts::Vector{UserSortRef})
     elseif is_finiteoperator(tag)
         #:lessthan, :lessthanorequal, :greaterthan, :greaterthanorequal, :finiteintrangeconstant
         length(insorts) == 2 || @error "pnml_hl_outsort length(insorts) != 2" tag insorts
-        @error("enumeration sort needs content")
+        @outline(@error("enumeration sort needs content"))
         first(insorts)
         #todo assert is finite enumeration
         #
@@ -258,7 +258,7 @@ function pnml_hl_outsort(tag::Symbol; insorts::Vector{UserSortRef})
         first(insorts)
         #todo assert is PartitionSort #! pnml_hl_outsort will need content
     elseif tag === :tuple
-        @warn "pnml_hl_outsort does not handle tuple yet"
+        @outline(@warn "pnml_hl_outsort does not handle tuple yet")
         length(insorts) == 2 || @error "pnml_hl_outsort length(insorts) != 2" tag insorts
         first(insorts)
     elseif tag === :numberconstant
@@ -268,10 +268,10 @@ function pnml_hl_outsort(tag::Symbol; insorts::Vector{UserSortRef})
     elseif tag === :booleanconstant
         UserSortRef(:bool)
     else
-         @error "$tag is not a known to pnml_hl_outsort, return NullSort()"
+         @outline(tag, @error "$tag is not a known to pnml_hl_outsort, return NullSort()")
          UserSortRef(:null)
     end
-    @warn outref
+    @outline(outref, @warn outref)
 end
 
 #===============================================================#
@@ -289,15 +289,16 @@ struct UserOperator{N <: AbstractPnmlNet} <: AbstractOperator
     net::N
 end
 
-# Forward to the NamedOperator or AbstractOperator declaration in the DeclDict.
-function (uo::UserOperator)(parameters) # TODO add variables
-    if has_operator(decldict(uo.net), uo.declaration)
-        op = operator(uo.net, uo.declaration) # Lookup operator in DeclDict.
-        r = op(parameters) # Operator objects are functors.
-        @warn "found operator for $(uo.declaration)" op r
-        return r
+# Lookup the NamedOperator or AbstractOperator of `uo.declaration` in `net`.
+function (uo::UserOperator)(parameters...) # TODO add variables
+    operator_id = uo.declaration
+    if has_operator(uo.net, operator_id)
+        op = operator(uo.net, uo.declaration) # Lookup operator.
+        result = op(parameters...) # Operator objects are functors.
+        @outline(operator_id, op, result, @warn "found operator $operator_id" op result)
+        return result
     end
-    error("found NO operator $(repr(uo.declaration))")
+    @outline(operator_id, error("found NO operator $operator_id"))
 end
 
 basis(uo::UserOperator)  = basis(operator(uo.net, uo.declaration))

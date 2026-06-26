@@ -111,7 +111,7 @@ function _update_maybe!(l, r, key::Symbol) # pass a type for assertion
     if isnothing(lval)
         setproperty!(l, key, rval)
     else
-        @info "append! " lval rval #!debug
+        @outline(lval, rval, @info "append! " lval rval) #!debug
         append!(lval, rval)
     end
 end
