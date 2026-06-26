@@ -67,6 +67,6 @@ value_type(::Type{Inscription}, ::AbstractContinuousNet) = eltype(RealSort) #::F
 value_type(::Type{Inscription}, ::PT_HLPNG) = eltype(DotSort)
 
 function value_type(::Type{Inscription}, pntd::AbstractHLCore)
-    @error("value_type(::Type{Inscription}, $pntd) undefined. Using DotSort.") #! XXX TODO XXX
+    @outline(pntd, @error("value_type(::Type{Inscription}, $pntd) undefined. Using DotSort.")) #! XXX TODO XXX
     eltype(DotSort) #! XXX TODO XXX
 end

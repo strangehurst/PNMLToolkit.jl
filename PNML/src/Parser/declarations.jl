@@ -41,7 +41,7 @@ function parse_declaration!(net::AbstractPnmlNet, nodes::Vector{XMLNode})
             elseif tag == "toolspecific"
                 toolspecinfos = add_toolinfo(toolspecinfos, child, net)
             else
-                @warn "ignoring unexpected child of <declaration>: '$tag'"
+                @outline(tag, @warn "ignoring unexpected child of <declaration>: '$tag'")
             end
         end
     end
@@ -190,8 +190,9 @@ function parse_namedoperator(node::XMLNode, net::AbstractPnmlNet)
     end
 
     isempty(definition_tj.vars) ||
-        @error("<namedoperator name=$name id=$operator_id> has variables: ", definition_tj)
-    @warn "operators are a work in progress"
+        @outline(name, operator_id, definition_tj,
+            @error("<namedoperator name=$name id=$operator_id> has variables: ", definition_tj))
+    @outline(@warn "operators are a work in progress")
     NamedOperator(operator_id, name, parameters, definition_tj.exp, net)
 end
 
@@ -249,7 +250,8 @@ function parse_unknowndecl(node::XMLNode, net::AbstractPnmlNet)
     decl_id = register_idof!(net.idregistry, node)
     name = attribute(node, "name")
     content = anyelement(decl_id, node)
-    @warn("parse unknown declaration: tag = $nn, id = $decl_id, name = $name", content)
+    @outline(nn, decl_id, name, content,
+        @warn("parse unknown declaration: tag = $nn, id = $decl_id, name = $name", content))
     return UnknownDeclaration(decl_id, name, nn, content, net)
 end
 
@@ -263,7 +265,8 @@ Access as 0-ary operator indexed by REFID
 """
 function parse_feconstants(node::XMLNode, net::AbstractPnmlNet, sortref::SortRef)
     sorttag = EzXML.nodename(node)
-    @assert sorttag in ("finiteenumeration", "cyclicenumeration") #? partition also?
+    sorttag in ("finiteenumeration", "cyclicenumeration") ||
+        throw(MalformedException("$sorttag is not a supported feconstant sort tag")) #? partition also?
     EzXML.haselement(node) ||
         throw(MalformedException("$sorttag has no child element"))
 
@@ -551,8 +554,6 @@ function parse_sort(::Val{:productsort}, node::XMLNode, net::AbstractPnmlNet, so
     namedsorts(net)[sort_id] = NamedSort(sort_id, string(sort_id),
                                          prod_sort, net)
     sr = make_sortref(net, productsorts, prod_sort, "product", sort_id, name)
-    #!@show sr net
-    #!println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     return sr
 end #= function parse_sort :productsort =#
 

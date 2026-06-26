@@ -18,7 +18,7 @@ using LoggingExtras
 using NamedTupleTools
 using PNML
 using PNML: AbstractLabel, AbstractPnmlObject, Annotation, AnyElement, BooleanConstant, D,
-    HLAnnotation, Maybe, ToolParser, XmlDictType, indent, namedsort, pntd_of
+    HLAnnotation, Maybe, ToolParser, XmlDictType, indent, namedsort, pntd_of, @outline
 using OrderedCollections: LittleDict
 
 export ArcType, ArcTypeEnum, Condition, Declaration, Graphics, Inscription, Marking, Name,

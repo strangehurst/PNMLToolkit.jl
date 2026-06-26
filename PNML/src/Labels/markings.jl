@@ -113,7 +113,7 @@ value_type(::Type{Marking}, ::AbstractContinuousNet) = eltype(RealSort) #::Float
 
 # These are networks were the tokens have individual identities.
 function value_type(::Type{Marking}, pntd::AbstractHLCore)
-    @error("value_type(::Type{Marking}, $pntd) undefined. Using DotSort.")
+    @outline(pntd, @error("value_type(::Type{Marking}, $pntd undefined. Using DotSort."))
     eltype(DotSort)
 end
 
