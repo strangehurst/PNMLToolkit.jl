@@ -183,15 +183,14 @@ $(TYPEDSIGNATURES)
 Non-high-level `AbstractPNTD` initial marking parser. Most things are assumed to be Numbers.
 See also [`parse_hlinitialMarking`](@ref), [`parse_fifoinitialMarking`](@ref).
 """
-function parse_initialMarking(node::XMLNode, placetype::Maybe{SortType}, net::AbstractPnmlNet;
+function parse_initialMarking(node::XMLNode, placetype::SortType, net::AbstractPnmlNet;
                                 parentid::Symbol)
     nn = check_nodename(node, "initialMarking")
-    isnothing(placetype) && error("parse_initialMarking expects placetype to be not-nothing")
     # See if there is a <structure> attached to the label. This is non-standard.
     # Use of same mechanism used for high-level nets: if there is a <structure> attached
     # to the label apply `parse_structure` as a `termparser`.
     l = parse_label_content(node, parse_structure, net)::NamedTuple
-    if !isnothing(l.exp) # There was a <structure> tag. It is now an expression.
+    if !isnothing(l.exp) # There was a <structure> tag. #todo+
         @warn "$nn place $parentid <structure> element in $(pntd_of(net)) net; parsed as $(l.exp)"
     end
     if isnothing(l.text) # Expected for non-HL values if there is an <initialMarking>.
@@ -584,7 +583,8 @@ For future support of structure elements in non-High-Level nets.
 function parse_structure(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "structure")
     @warn "parse_structure is not implemented for $(pntd_of(net)) " xmldict(node)
-    error("parse_structure is not implemented for $(pntd_of(net))")
+    #error("parse_structure is not implemented for $(pntd_of(net))")
+    return TermJunk(UserSortRef(:int), UserSortRef(:int), ())
 end
 
 function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)
