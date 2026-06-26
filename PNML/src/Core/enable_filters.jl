@@ -7,18 +7,24 @@ function enable_filter_true(::AbstractPnmlNet, t::Symbol, marks)
 end
 
 """
-Return `true` iff ∀p ∈ preset(t): inscription != 0 && marks[p] < inscription.``
+Return `true` iff ∀p ∈ preset(t): is_inhibitor(arc(p,t)) && inscription != 0 && marks[p] < inscription.``
 """
 function enable_filter_inhibit(net::AbstractPnmlNet, t::Symbol, marks)
     for p in preset(net, t)
-        iarc = arc(net, p, t, inhibit_arcdict)
+        iarc = arc(net, p, t)
+        #! WHY Union{PNML.Parser.ParseInscriptionTerm, PNML.Arc}
         isnothing(iarc) && continue
+        is_inhibitor(iarc) || continue
         inhibit = inscription(iarc)
-        if inhibit != 0 && marks[p] >= inhibit #! not always an integer XXX
+        if inhibited(inhibit, 0, marks[p])
             return false
         end
     end
     return true
+end
+#! z is a zero of proper type
+function inhibited(inhibit, z, mark)
+    (inhibit != z && mark >= inhibit) ? true : false
 end
 
 "Reset arc filter always returns `true`."

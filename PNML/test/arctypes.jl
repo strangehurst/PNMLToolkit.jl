@@ -29,7 +29,7 @@ using PNML: is_normal, is_inhibitor, is_read, is_reset
     @test length(Base.findall([is_normal(arct), is_inhibitor(arct), is_read(arct), is_reset(arct)])) == 1
 
     @test is_normal(a) == is_normal(atl) == is_normal(arct)
-    @test is_inhibitor(a) == is_inhibitor(atl) ==is_inhibitor(arct)
+    @test is_inhibitor(a) == is_inhibitor(atl) == is_inhibitor(arct)
     @test is_read(a) == is_read(atl) == is_read(arct)
 
     @test pid(a) === :a1

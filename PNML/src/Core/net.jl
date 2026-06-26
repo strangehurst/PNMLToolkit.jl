@@ -20,8 +20,8 @@ $(FIELDS)
     place_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     transition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    inhibit_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    read_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    #! inhibit_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    #! read_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     refplace_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     reftransition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     # Keys of pages in `pagedict` owned by this net.
@@ -103,8 +103,8 @@ page_idset(net::PnmlNet) = net.page_idset # Indices into `pagedict` directly own
 placedict(net::PnmlNet)         = net.place_dict
 transitiondict(net::PnmlNet)    = net.transition_dict
 arcdict(net::PnmlNet)           = net.arc_dict
-inhibit_arcdict(net::PnmlNet)   = net.inhibit_arc_dict
-read_arcdict(net::PnmlNet)      = net.read_arc_dict
+#! inhibit_arcdict(net::PnmlNet)   = net.inhibit_arc_dict
+#!  read_arcdict(net::PnmlNet)      = net.read_arc_dict
 refplacedict(net::PnmlNet)      = net.refplace_dict
 reftransitiondict(net::PnmlNet) = net.reftransition_dict
 
@@ -161,8 +161,9 @@ reftransition(net::PnmlNet, id::Symbol) = reftransitiondict(net)[id]
 Return `Arc` from 'src' to 'tgt' or `nothing`.
 Useful for graphs where arcs are represented by a tuple or pair (source,target).
 """
-function arc(net, src::Symbol, tgt::Symbol, dict=arcs)
-    x = Iterators.filter(a -> source(a) === src && target(a) === tgt, dict(net))
+function arc(net, src::Symbol, tgt::Symbol)
+    x = Iterators.filter(a -> source(a) === src &&
+                                          target(a) === tgt, values(arcdict(net)))
     isempty(x) ? nothing : first(x)
 end
 
@@ -180,8 +181,8 @@ end
 
 initial_marking(net::PnmlNet, placeid::Symbol) = initial_marking(place(net, placeid))
 inscription(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
-inhibitor(net::PnmlNet, arc_id::Symbol) = inscription(inhibit_arcdict(net)[arc_id])
-reader(net::PnmlNet, arc_id::Symbol) = inscription(read_arcdict(net)[arc_id])
+inhibitor(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
+reader(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
 condition(net::PnmlNet, trans_id::Symbol) = condition(transition(net, trans_id))
 
 #------------------------------------------------------------------------------
