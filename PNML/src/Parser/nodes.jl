@@ -7,7 +7,7 @@ Return a default instance of label `T` for `pntd`.
 function default end
 
 # parse nodes of graph
-"Fill place_set, place_dict."
+"Fill place_idset, placedict."
 function parse_place!(netsets, node, net::AbstractPnmlNet)
     pl = parse_place(node, net)::valtype(placedict(net))
     #@show valtype(placedict(net)) typeof(placedict(net))
@@ -16,7 +16,7 @@ function parse_place!(netsets, node, net::AbstractPnmlNet)
     return place_idset(netsets) #place_set
 end
 
-"Fill transition_set, transition_dict."
+"Fill transition_idset, transitiondict."
 function parse_transition!(netsets, node, net::AbstractPnmlNet)
     tr = parse_transition(node, net)::valtype(transitiondict(net))
     push!(transition_idset(netsets)::OrderedSet{Symbol}, pid(tr))
@@ -24,7 +24,7 @@ function parse_transition!(netsets, node, net::AbstractPnmlNet)
     return transition_idset(netsets)
 end
 
-"Fill arc_set, arc_dict."
+"Fill arc_idset, arcdict."
 function parse_arc!(netsets, node, net::AbstractPnmlNet)
     a = parse_arc(node, net)
     a isa valtype(arcdict(net)) ||
@@ -34,7 +34,7 @@ function parse_arc!(netsets, node, net::AbstractPnmlNet)
     return arc_idset(netsets)
 end
 
-"Fill refplace_set, refplace_dict."
+"Fill refplace_idset, refplacedict."
 function parse_refPlace!(netsets, node, net::AbstractPnmlNet)
     rp = parse_refPlace(node, net)::valtype(refplacedict(net))
     push!(refplace_idset(netsets)::OrderedSet{Symbol}, pid(rp))
@@ -42,7 +42,7 @@ function parse_refPlace!(netsets, node, net::AbstractPnmlNet)
     return refplace_idset(netsets)
 end
 
-"Fill reftransition_set, reftransition_dict."
+"Fill reftransition_idset, reftransitiondict."
 function parse_refTransition!(netsets, node, net::AbstractPnmlNet)
     rt = parse_refTransition(node, net)::valtype(reftransitiondict(net))
     push!(reftransition_idset(netsets)::OrderedSet{Symbol}, pid(rt))
@@ -252,7 +252,7 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
         end
     end
 
-    # We are using REFIDs to access both the adjacent place in a dictionary.
+    # We are using REFIDs to access the adjacent place in a dictionary.
     # This (an inscription) is an expression returning a ground term.
     # It may have non-ground terms as parameters.
 
@@ -286,9 +286,9 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
             # Try to deduce using the adjacent place.
             # NB: adjacent place may have not been parsed yet.
             sr = if has_place(net, source)
-                sortref(place(net, source))
+                sortref(place(net, source))::SortRef
             elseif has_place(net, target)
-                sortref(place(net, target))
+                sortref(place(net, target))::SortRef
             else
                 @error string("$(pntd_of(net)) inscription not provided for ",
                             "arc $arc_id ($source -> $target), ",
@@ -297,13 +297,14 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
             end
             inscription = default(Inscription, net, SortType("dummy HIGHLEVEL", sr,  net))
        else
-            error()
+            error("unknown token type for pntd $(pntd_of(net))")
         end
     end
 
     if isnothing(arc_type_label)
         arc_type_label = ArcType()
-        @assert is_normal(arc_type_label)
+        is_normal(arc_type_label) ||
+            error("default arc type is not normal: $arc_type_label")
     end
 
     Arc(; id=arc_id, source=Ref(source), target=Ref(target),

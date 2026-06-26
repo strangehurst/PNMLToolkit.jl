@@ -126,7 +126,6 @@ integer_operators = (:addition, # "Addition",
                      :leq, # "LessThanOrEqual",)
                     )
 is_integeroperator(tag::Symbol) = tag in integer_operators
-#integer_constants = (:one = one(Int), :zero = zero(Int))
 
 multiset_operators = (:add,
                       :all,
