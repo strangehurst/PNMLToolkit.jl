@@ -87,7 +87,7 @@ Condition
  Every postset variable is also a preset variable.
 
  Variable v is bound to preset marking value (element of a multiset)
-   - as tuple of place REFID index into marking_vector, and a mutiset element.
+   - as tuple of place REFID index into marking_vector, and a multiset element.
    - bv_sets is a vector of variable binding value sets, one for each variable
    - use multipicity(multiset, element) >= length(v in variables(inscription(arc)))
      to test enabled state of binding to an element
