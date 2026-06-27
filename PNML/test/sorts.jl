@@ -171,13 +171,11 @@ end
     fill_sort_tag!(net, :arbsort, sort) #~ test of method needed here
     #!@test occursin(r"^ArbitrarySort", sprint(show, sort))
     #!@show @test_logs eltype(sort)
-    #!@show decldict(net)
 
     #^ String
 
     IDRegistrys.reset_reg!(net.idregistry)
     #println()
-    #@show net typeof(decldict(net))
     sortref = parse_sort(xml"<string/>", net)
     sort = to_sort(sortref, net)::NamedSort
     @test sortelements(sort, net) == ("",)
