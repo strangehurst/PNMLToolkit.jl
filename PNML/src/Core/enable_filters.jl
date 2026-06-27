@@ -16,6 +16,7 @@ function enable_filter_inhibit(net::AbstractPnmlNet, t::Symbol, marks)
         isnothing(iarc) && continue
         is_inhibitor(iarc) || continue
         inhibit = inscription(iarc)
+        z = zero
         if inhibited(inhibit, 0, marks[p])
             return false
         end
@@ -24,7 +25,8 @@ function enable_filter_inhibit(net::AbstractPnmlNet, t::Symbol, marks)
 end
 #! z is a zero of proper type
 function inhibited(inhibit, z, mark)
-    (inhibit != z && mark >= inhibit) ? true : false
+    coalesce(inhibit != z, false) &&
+        coalesce(mark >= inhibit, false)
 end
 
 "Reset arc filter always returns `true`."
