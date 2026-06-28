@@ -47,10 +47,7 @@ Base.keys(ms::PnmlMultiset) = keys(multiset(ms))
 Base.values(ms::PnmlMultiset) = values(multiset(ms))
 Base.iterate(ms::PnmlMultiset, ss) = iterate(multiset(ms), ss)
 Base.iterate(ms::PnmlMultiset) = iterate(multiset(ms))
-Base.convert(Bool, ::PnmlMultiset{AbstractPnmlNet, DotConstant}) = begin
-    @assert Bool <: Number
-    true
-end
+Base.convert(Bool, ::PnmlMultiset{AbstractPnmlNet, DotConstant}) = true
 
 Base.:(==)(c::PnmlMultiset{APN, DotConstant}, n::Number)  = convert(Bool, c) == n
 Base.:(==)( n::Number, c::PnmlMultiset{APN, DotConstant}) = n == convert(Bool, c)
@@ -64,7 +61,19 @@ Base.isless( n::Number, c::PnmlMultiset{APN, DotConstant}) = isless(n, convert(B
 Base.:(<)(c::PnmlMultiset{APN, DotConstant}, n::Number)  = convert(Bool, c)< n
 Base.:(<)( n::Number, c::PnmlMultiset{APN, DotConstant}) = n < convert(Bool, c)
 
-is_singletonmultiset(ms::PnmlMultiset) = cardinality(ms) == 1
+"""
+    is_singletonmultiset(ms::PnmlMultiset) -> Bool
+
+Singleton multisets have at most one element.
+"""
+is_singletonmultiset(ms::PnmlMultiset) = cardinality(ms) <= 1
+
+"""
+    is_emptymultiset(ms::PnmlMultiset) -> Bool
+
+Empty multisets have no element.
+"""
+is_emptymultiset(ms::PnmlMultiset) = cardinality(ms) == 0
 
 """
     basis(ms::PnmlMultiset) -> SortRef
@@ -84,20 +93,20 @@ end
 
 # Return empty multiset with matching basis sort, element type.
 function Base.zero(pms::PnmlMultiset{N, T}) where {T, N <: AbstractPnmlNet}
-    z = PnmlMultiset{N,T}(basis(pms),
-                          Multiset{T}(), #^ empty multiset
-                          net)(pms)
-
-    @assert is_singletonmultiset(z)
+    b = basis(pms)
+    ms = Multiset{T}() #^ empty multiset
+    n = net(pms)
+    z = PnmlMultiset{N,T}(b, ms, n)
+    is_emptymultiset(z) || @error "not a empty multiset!: $z"
     return z
 end
 
 # Choose an arbitrary value `f` of `pms` to have multiplicity of 1.
 function Base.one(pms::PnmlMultiset{N, T}) where {T, N <: AbstractPnmlNet}
-    f = first(sortelements(basis(pms), net(pms)))::T
-    o = PnmlMultiset{N,T}(basis(pms),
-                           Multiset(f),
-                           net(pms))
+    b = basis(pms)
+    n = net(pms)
+    f = first(sortelements(b, n))::T
+    o = PnmlMultiset{N,T}(b, Multiset(f), n)
     @assert is_singletonmultiset(o)
     return o
 end
@@ -208,7 +217,6 @@ we always find a sort to use, And use dummy elements for their `typeof` for empt
 Expect to be called from a `@matchable` `Terminterface`, thusly:
   - `eval(toexpr(Bag(basis, x, multi; net), variable_substitutions))`
   - `eval(toexpr(Bag(basis); net), variable_substitutions))`
-
 """
 function pnmlmultiset end
 
@@ -244,10 +252,11 @@ function pnmlmultiset(basis::SortRef, ::Nothing, ::Nothing; net::AbstractPnmlNet
     end
     #^ Where/how is absence of sort loop checked?
     # Only expect finite sorts here. #! assert isfinitesort(basis)
-    M = Multiset{eltype(basis)}()
     sort = to_sort(basis, net)
+    t = eltype(sort)
+    M = Multiset{t}()
     for e in sortelements(sort, net) # iterator over elements
         push!(M, e)
     end
-    PnmlMultiset{typeof(net), eltype(M)}(basis, M, net)
+    PnmlMultiset{typeof(net), t}(basis, M, net)
 end
