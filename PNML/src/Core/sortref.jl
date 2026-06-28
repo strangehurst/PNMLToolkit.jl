@@ -141,16 +141,18 @@ end
 """
     to_sort(sortref::SortRef, net::AbstractPnmlNet) -> AbstractSort
 
-Return concrete sort from `net` using the `REFID` in `sortref`,
+Return concrete sort of `net` using the `REFID` in `sr`,
 """
 function to_sort(sr::SortRef, net::AbstractPnmlNet)
-    s = @match sr begin
-        SortRefImpl.NamedSortRef(; refid)     => namedsort(net, refid) # todo unwrap namedsort
-        SortRefImpl.ProductSortRef(; refid)   => productsort(net, refid) #! named sort
-        SortRefImpl.MultisetSortRef(; refid)  => multisetsort(net, refid) #! named sort
-        SortRefImpl.PartitionSortRef(; refid) => partitionsort(net, refid)
-        SortRefImpl.ArbitrarySortRef(; refid) => arbitrarysort(net, refid)
+    x = @match sr begin
+        SortRefImpl.NamedSortRef(; refid)     => (namedsort => refid)
+        SortRefImpl.ProductSortRef(; refid)   => (productsort=> refid) #! named sort
+        SortRefImpl.MultisetSortRef(; refid)  => (multisetsort => refid) #! named sort
+        SortRefImpl.PartitionSortRef(; refid) => (partitionsort => refid)
+        SortRefImpl.ArbitrarySortRef(; refid) => (arbitrarysort => refid)
         _ => error("to_sort no match for: $sr")
     end
+    s = x.first(net, x.second)::AbstractSort
+    #@show s
     return s
 end
