@@ -81,7 +81,7 @@ function fill_decl_dict!(net::AbstractPnmlNet, node::XMLNode)
             # NB: partition is a declaration of a new sort refering to the partitioned sort.
             part = parse_partition(child, net)::SortRef
             has_partitionsort(net, part) || error("no parition sort found: $part")
-            @assert is_namedsort(part) "expected partition sort found: $part"
+            @assert is_partitionsort(part) "expected partition sort found: $part"
         #! elseif tag === :partitionoperator
         #!      PartitionLessThan, PartitionGreaterThan, PartitionElementOf
         #!      partop = parse_partition_op(child, pntd)
@@ -90,7 +90,7 @@ function fill_decl_dict!(net::AbstractPnmlNet, node::XMLNode)
         elseif tag == "arbitrarysort"
             arb = parse_arbitrarysort(child, net)::SortRef
             has_arbitrarysort(net, arb) || error("no arbitrary sort found: $arb")
-            @assert is_namedsort(arb) "expected arbitrary sort found: $arb"
+            @assert is_arbitrarysort(arb) "expected arbitrary sort found: $arb"
        else
             push!(unknown_decls, parse_unknowndecl(child, net))
         end
