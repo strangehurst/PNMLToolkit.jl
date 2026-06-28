@@ -197,8 +197,8 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::AbstractP
         @warn "$nn place $parentid <text> element expected for $(pntd_of(net)) net"
     end
     @assert isempty(l.vars) # All markings are ground terms.
-    pt = eltype(to_sort(sortref(placetype), net))
-    mvt = eltype(value_type(Marking, pntd_of(net)))
+    pt = eltype(to_sort(sortref(placetype), net))::Type
+    mvt = value_type(Marking, pntd_of(net))::Type
     pt <: mvt ||
         @error("initial marking value type of $(pntd_of(net)) must be $mvt, found: $pt")
     value = isnothing(l.text) ? zero(pt) : number_value(pt, l.text)
