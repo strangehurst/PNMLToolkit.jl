@@ -56,14 +56,14 @@ function fill_sort_tag!(dd::DeclDict, idreg, tag::Symbol, sort, dict)
         !isregistered(idreg, tag) && register_id!(idreg, tag)
         dict(dd)[tag] = sort
     end
-    sr = @match skipmissing(dict) begin
+    d = coalesce(dict)
+    sr = @match d begin
         PNML.multisetsorts  => MultisetSortRef(tag)  # sort, basis is a builtin,
         PNML.productsorts   => ProductSortRef(tag)   # sort, tuple of SortRefs
         PNML.partitionsorts => PartitionSortRef(tag) # declaration
         PNML.arbitrarysorts => ArbitrarySortRef(tag) # declaration
         _ => NamedSortRef(tag)
     end
-    #!@show sr dd
     return sr
 end
 
