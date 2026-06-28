@@ -227,7 +227,7 @@ function toexpr(b::Bag, varsub::NamedTuple, net)
     #@show b varsub Expr(:parameters, Expr(:kw,:net, net))
     #^ Warning: b.element can be: `PnmlMultiset`, `tuple`
     #^ tuples are elements of a `ProductSort`
-    Expr(:call, pnmlmultiset,
+    Expr(:call, pnmlmultiset, # pnmlmultiset(bag.basis, bag.element, bag.multi; net=net)
         Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
         b.basis,
         toexpr(b.element, varsub, net),
@@ -540,9 +540,9 @@ function Base.show(io::IO, x::Addition)
     print(io, "Addition(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct Subtraction <: PnmlExpr #? Use `-` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct Subtraction{L,R} <: PnmlExpr #? Use `-` operator.
+    lhs::L
+    rhs::R
 end
 
 expr_sortref(a::Subtraction, net) = expr_sortref(a.lhs, net)::SortRef
@@ -555,9 +555,9 @@ function Base.show(io::IO, x::Subtraction)
     print(io, "Subtraction(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct Multiplication <: PnmlExpr #? Use `*` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct Multiplication{L,R} <: PnmlExpr #? Use `*` operator.
+    lhs::L
+    rhs::R
 end
 
 expr_sortref(a::Multiplication, net) = expr_sortref(a.lhs, net)::SortRef
@@ -570,9 +570,9 @@ function Base.show(io::IO, x::Multiplication)
     print(io, "Multiplication(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct Division <: PnmlExpr #? Use `div` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct Division{L,R} <: PnmlExpr #? Use `div` operator.
+    lhs::L
+    rhs::R
 end
 
 expr_sortref(a::Division, net) = expr_sortref(a.lhs, net)::SortRef
@@ -585,9 +585,9 @@ function Base.show(io::IO, x::Division)
     print(io, "Division(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct GreaterThan <: AbstractBoolExpr #? Use `>` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct GreaterThan{L,R} <: AbstractBoolExpr #? Use `>` operator.
+    lhs::L
+    rhs::R
 end
 
 function toexpr(op::GreaterThan, var::NamedTuple, net)
@@ -598,9 +598,9 @@ function Base.show(io::IO, x::GreaterThan)
     print(io, "GreaterThan(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct GreaterThanOrEqual <: AbstractBoolExpr #? Use `>=` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct GreaterThanOrEqual{L,R} <: AbstractBoolExpr #? Use `>=` operator.
+    lhs::L
+    rhs::R
 end
 
 function toexpr(op::GreaterThanOrEqual, var::NamedTuple, net)
@@ -611,9 +611,9 @@ function Base.show(io::IO, x::GreaterThanOrEqual)
     print(io, "GreaterThanOrEqual(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct LessThan <: AbstractBoolExpr #? Use `<` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct LessThan{L,R} <: AbstractBoolExpr #? Use `<` operator.
+    lhs::L
+    rhs::R
 end
 
 function toexpr(op::LessThan, var::NamedTuple, net)
@@ -624,9 +624,9 @@ function Base.show(io::IO, x::LessThan)
     print(io, "LessThan(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct LessThanOrEqual <: AbstractBoolExpr #? Use `<=` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct LessThanOrEqual{L,R} <: AbstractBoolExpr #? Use `<=` operator.
+    lhs::L
+    rhs::R
 end
 
 function toexpr(op::LessThanOrEqual, var::NamedTuple, net)
@@ -637,9 +637,9 @@ function Base.show(io::IO, x::LessThanOrEqual)
     print(io, "LessThanOrEqual(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct Modulo <: PnmlExpr #? Use `mod` operator.
-    lhs::Any
-    rhs::Any
+@matchable struct Modulo{L,R} <: PnmlExpr #? Use `mod` operator.
+    lhs::L
+    rhs::R
 end
 
 expr_sortref(a::Modulo, net) = sortref(a.lhs)::SortRef
@@ -673,9 +673,9 @@ end
 
 #> comparison functions on the partition elements which is based on
 #> the order in which they occur in the declaration of the partition
-@matchable struct PartitionLessThan <: AbstractBoolExpr
-    lhs::Any #PartitionElement
-    rhs::Any #PartitionElement
+@matchable struct PartitionLessThan{L,R} <: AbstractBoolExpr
+    lhs::L #PartitionElement
+    rhs::R #PartitionElement
 end
 
 function ltp_impl(lhs, rhs)
@@ -690,9 +690,9 @@ function Base.show(io::IO, x::PartitionLessThan)
     print(io, "PartitionLessThan(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct PartitionGreaterThan <: AbstractBoolExpr
-    lhs::Any #PartitionElement
-    rhs::Any #PartitionElement
+@matchable struct PartitionGreaterThan{L,R} <: AbstractBoolExpr
+    lhs::L #PartitionElement
+    rhs::R #PartitionElement
     # return AbstractBoolExpr
 end
 
@@ -712,8 +712,8 @@ function Base.show(io::IO, x::PartitionGreaterThan)
 end
 
 # 0-arity despite the refpartition
-@matchable struct PartitionElementOf <: PnmlExpr
-    arg::Any # TODO variable that should be a feconstant
+@matchable struct PartitionElementOf{T} <: PnmlExpr
+    arg::T # TODO variable that should be a feconstant
     refpartition::Symbol # TODO! wrap in PartitionSortRef
 end
 
@@ -789,9 +789,9 @@ end
 #& Lists
 
 #
-@matchable struct ListEx <: PnmlExpr
+@matchable struct ListEx{T} <: PnmlExpr
     basis::SortRef
-    els::Vector{Any} #
+    els::Vector{T} #
 end
 
 function toexpr(op::ListEx, varsub::NamedTuple, net)
