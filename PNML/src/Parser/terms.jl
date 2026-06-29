@@ -562,7 +562,7 @@ function parse_term(::Val{:tuple}, node::XMLNode, net::AbstractPnmlNet; vars)
         # Use the one already in the dictionary (abandon prod_sort)
         ProductSortRef(sorttag)
     end
-    @assert is_productsort(sortref)
+    @assert is_productsort(sortref) "expected product sort, found $sortref"
     return TermJunk(expr_tup, sortref, ())
 end
 
