@@ -128,7 +128,7 @@ end
                                 <integer/>
                         </productsort>""", net, :redundant, "redundant")
     #@show net sortref
-    sort = to_sort(sortref, net)::NamedSort |> sortdefinition
+    sort = to_sort(sortref, net)::ProductSort |> sortdefinition
     @test occursin(r"^ProductSort", sprint(show, sort))
     @test eltype(sort) == Tuple{Int64,Int64} #! TODO XXX
 
