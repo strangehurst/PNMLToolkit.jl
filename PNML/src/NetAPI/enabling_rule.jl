@@ -1,4 +1,6 @@
 # Enabling Rule
+"Debug print switch for enabline rule."
+ER() = false
 
 """
     accum_var_binding_sets!(tr_binding_sets, arc_binding_sets) -> Bool
@@ -8,6 +10,7 @@ Return enabled status of false if any variable does not have a substitution.
 """
 function accum_var_binding_sets!(tr_binding_sets::OrderedDict,
                                  arc_binding_sets::OrderedDict)
+    ER()&& println("#-- accum_var_binding_sets!")
     for v in keys(arc_binding_sets)
         #accum_binding_set!(tr_var_binding_sets, arc_var_binding_sets, v)
         @assert !isempty(arc_binding_sets[v])
@@ -29,14 +32,11 @@ end
 If marking wraps a PnmlMultiset, extract a singleton.
 """
 function unwrap_pmset(mark)
-    if mark isa PnmlMultiset
-        # That contains PnmlMultisets
-        if eltype(mark) <: PnmlMultiset
-            single = only(multiset(mark))
-            eltype(single) <: PnmlMultiset &&
-                error("recursive PnmlMultisets not allowed here")
-            return single # Replace mark with the wrapped PnmlMultiset
-        end
+    if mark isa PnmlMultiset && eltype(mark) <: PnmlMultiset
+        single = only(multiset(mark))
+        eltype(single) <: PnmlMultiset &&
+            error("recursive PnmlMultisets not allowed here")
+        return single # Replace mark with the wrapped PnmlMultiset's only element.
     end
     return mark
 end
@@ -65,6 +65,7 @@ $(METHODLIST)
 function enabled end
 
 function enabled(net::AbstractPnmlNet, marking)
+    ER()&& println("#-- enabled $(pid(net)) ", marking)
     # Start by assuming all transitions are enabled.
     # dictionary with key of transaction id, value of enabled state boolean
     enabled_dict = OrderedDict{Symbol, Bool}(id=>true for (id,_) in pairs(transitiondict(net)))
@@ -103,17 +104,38 @@ and trasnsition guard is true.
 function sufficient_tokens! end
 
 function sufficient_tokens!(mark_dict::AbstractDict, net::AbstractPnmlNet, transition_id)
+    ER()&& print("#-- sufficient_tokens! ",
+                     "$(pntd_of(net)) $(pid(net)) $transition_id = ")
     # There are no varibles possible here and the guard is `true`.
     # Evaluate preset inscription expressions, compare to mark value.
-    all(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
-                                         for place_id in preset(net, transition_id))
+    s = all(skipmissing(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
+                                         for place_id in preset(net, transition_id)))
+    s = coalesce(s, false)
+    ER()&& println(s)
+    return s
+end
+
+function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet{PT_HLPNG}, transition_id)
+    ER()&& print("#-- sufficient_tokens! ",
+                     "$(pntd_of(net)) $(pid(net)) $transition_id = ")
+    # There are no varibles possible here and the guard is `true`.
+    # Evaluate preset inscription expressions, compare to mark value.
+    s = all(skipmissing(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
+                                         for place_id in preset(net, transition_id)))
+    s = coalesce(s, false)
+    ER()&& println(s)
+    return s
 end
 
 function sufficient_tokens!(mark_dict::AbstractDict,
                             net::PnmlNet{T}, transition_id) where (T <: AbstractHLCore)
+    ER()&& println("#-- sufficient_tokens! ",
+                    "$(pntd_of(net)) $(pid(net)) $transition_id")
     tr_vars = haskey(net.vars, transition_id) ? net.vars[transition_id] : Set{Symbol}()
     tr_varsubs = haskey(net.varsubs, transition_id) ? net.varsubs[transition_id] : Vector{NamedTuple}()
-    sufficient_tokens2!(mark_dict, net, transition_id,tr_vars, tr_varsubs)
+    s = sufficient_tokens2!(mark_dict, net,  transition_id,
+                            tr_vars, tr_varsubs)
+    return coalesce(s, false)
 end
 
 function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{T}, transition_id,
@@ -128,8 +150,13 @@ function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{T}, transitio
 
     # Get transition variable substitution from preset arcs.
     # Update vars.
-    get_variable_substitutions!(tr_var_binding_set, net, transition_id,
-                                tr_vars, mark_dict) || return false # no substution found
+    if !get_variable_substitutions!(tr_var_binding_set, net, transition_id,
+                                tr_vars, mark_dict)
+        ER() && println("#-- sufficient_tokens2! $(pntd_of(net))",
+                " $(pid(net))",
+                " $transition_id = false")
+       return false # no substution found
+    end
     #^--------------------------------------------------------------------------------
     #& XXX variable substitutions fully specified by preset of transition XXX
     #& tr.vars is complete. tr_var_binding_set has valid substitutions for all variables.
@@ -137,10 +164,14 @@ function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{T}, transitio
 
     # Return enabled status based on comparing mark and inscription.
     # Update varsubs, a vector of possible substitutions.
-    comp_mark_inscription(net, mark_dict, transition_id,
-                            term(condition(transition(net, transition_id))),
-                            tr_var_binding_set, tr_vars, tr_varsubs)
-    #! REMEMBER marking multiset element may be a PnmlMultiset.
+    r = comp_mark_inscription(net, mark_dict, transition_id,
+                              term(condition(transition(net, transition_id))),
+                              tr_var_binding_set, tr_vars, tr_varsubs)
+    #! REMEMBER marking multiset element may be a tuple.
+    ER()&& println("#-- sufficient_tokens2! $(pntd_of(net))",
+                " $(pid(net))",
+                " $transition_id) = $r")
+    return r
 end
 
 """
@@ -157,7 +188,7 @@ function comp_mark_inscription end
 #                                 tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractHLCore}
 #     for place_id in preset(net, transition_id)
 #         mark = mark_dict[place_id]
-#         z = zero_marking(place(net, place_id))
+#         z = zero_marking(place(net, place_idcomp_mark_inscription))
 #         __compare_mi_impl(net, mark, cond_term, place_id, transition_id,
 #                                 tr_var_binding_set, tr_vars, tr_varsubs, z) || return false
 #     end
@@ -173,17 +204,23 @@ function comp_mark_inscription end
 #     end
 #     return true # transition is enabled
 # end
-function comp_mark_inscription(net::AbstractPnmlNet, mark_dict, transition_id, cond_term,
-                                tr_var_binding_set, tr_vars, tr_varsubs)
-   for place_id in preset(net, transition_id)
+function comp_mark_inscription(net::PnmlNet{T}, mark_dict::AbstractDict, transition_id, cond_term,
+                                tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractPNTD}
+    ER()&& println("#-- comp_mark_inscription! ",
+                    "$(pntd_of(net)) $(pid(net)) ", transition_id)
+    for place_id in preset(net, transition_id)
         mark = mark_dict[place_id]
         z = zero_marking(place(net, place_id))
-        __compare_mi_impl(net, mark, cond_term, place_id, transition_id,
-                                tr_var_binding_set, tr_vars, tr_varsubs, z) || return false
-     end
+        if !__compare_mi_impl(net, mark, cond_term,
+                               place_id, transition_id,
+                               tr_var_binding_set, tr_vars, tr_varsubs, z)
+            return false
+        end
+    end
     return true # transition is enabled
 end
 
+# Assume no variables
 function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transition_id,
                            _, _, _, z) where {T <: AbstractPNTD}
     eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
@@ -191,6 +228,7 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transitio
     return mark >= inscription_val
  end
 
+# Variables supported for High-level nets    s = comp_mark_inscription(net, mark_dict, transition_id,
 function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transition_id,
                            tr_var_binding_set, tr_vars, tr_varsubs, z) where {T <: AbstractHLCore}
     if isempty(tr_vars) # 0-ary operators or constants
@@ -234,10 +272,12 @@ end
 Return enabled state, update `tr_vars`  and `binding_sets`.
 """
 function get_variable_substitutions!(binding_sets, net::AbstractPnmlNet, transition_id, tr_vars, mark_dict)
+    ER()&& println("#-- get_variable_substitutions! $(pntd_of(net)) $(pid(net)) ", transition_id)
     for place_id in preset(net, transition_id)
         ar = arc(net, place_id, transition_id)::Maybe{Arc}
         isnothing(ar) && error("did not find arc: $place_id -> $transition_id")
         mark = unwrap_pmset(mark_dict[place_id])
+        ER()&& @show place_id => mark
         arc_vars = Multiset(PNML.Labels.variables(PNML.inscription(ar))...) # Count variables.
         isempty(arc_vars) || union!(tr_vars, keys(arc_vars)) # Cache variable ids.
 
@@ -252,7 +292,7 @@ end
 
 
 """
-    get_arc_var_binding_setss!(arc_var_binding_set, arc_vars, placesort, mark, net) -> Bool
+    get_arc_var_binding_sets!(arc_var_binding_set, arc_vars, placesort, mark, net) -> Bool
 
 Fill `arc_var_binding_set` with an entry for each key in `arc_vars`.
 Return `true` if no variables are present or all variables have at least 1 substition.
@@ -260,17 +300,29 @@ Indicates that transition is able to fire (enabled fro selection to fire).
 """
 function get_arc_var_binding_sets! end
 
-# function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
-#                                     net::PnmlNet{T}) where {T <: AbstractPNTD}
-#     # mark is a Number
-# end
-# function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
-#                                     net::PnmlNet{T}) where {T <: PT_HLPNG}
-#     # mark is a
-# end
+function get_arc_var_binding_sets!(_arc_vars::Multiset, placesort::SortRef, mark,
+                                    net::PnmlNet{T}) where {T <: AbstractPNTD}
+    # mark is a Number, no variables
+    ER()&& println("#-- get_arc_var_binding_sets! 1 $(pntd_of(net)) $(pid(net)) ", mark)
+    return true, OrderedDict{Symbol, Multiset{Symbol}}()
+end
+function get_arc_var_binding_sets!(_arc_vars::Multiset, _placesort::SortRef, mark,
+                                    net::PnmlNet{PT_HLPNG})
+    # mark value is cardinality of singleton multiset, `Int`. No varibles.
+    ER()&& println("#-- get_arc_var_binding_sets! 2 $(pntd_of(net)) $(pid(net)) ", mark)
+    return true, OrderedDict{Symbol, Multiset{Symbol}}()
+end
 function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
                                     net::PnmlNet{T}) where {T <: AbstractHLCore}
-    # mark is a
+    ER()&& println("#-- get_arc_var_binding_sets! 3 $(pntd_of(net)) $(pid(net)) ", mark)
+    get_arc_vbs_impl!(arc_vars, placesort, mark, net)
+end
+
+function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef,
+                           mark,
+                           net::PnmlNet{T}) where {T <: AbstractHLCore}
+   # mark is a
+    ER()&& println("#-- get_arc_vbs_impl! mark = ", mark)
     arc_binding_sets = OrderedDict{Symbol, Multiset{Symbol}}()
     for v in keys(arc_vars)
         # Each variable must have a non-empty substitution.

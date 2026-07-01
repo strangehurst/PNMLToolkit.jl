@@ -15,7 +15,7 @@ Return the marking vector after firing transition: marking + incidence * enabled
 `marking` values added to product of `incidence'` matrix and firing vector `enabled`.
 """
 function fire(incidence, enabled, m₀)
-    #println("fire")
+    #println("fire $incidence $enabled $m₀ ")
     #@show typeof(incidence) enabled typeof(m₀)
     #@show permutedims(incidence) * enabled
     #! Multisets do not have negative multiplicities so fail here with incorrect marking!
