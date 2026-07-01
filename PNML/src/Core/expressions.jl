@@ -200,7 +200,7 @@ end
 ###################################################################################
 """
 Bag:
-Expression calling pnmlmultiset(basis, x, multi) to construct a [`PnmlMultiset`](@ref).
+Expression calling pnmlmultiset(basis, x, multi; net) to construct a [`PnmlMultiset`](@ref).
 """
 Bag # Need to avoid @matchable to have docstring
 @matchable struct Bag{E <: Any, M <: Any} <: PnmlExpr
