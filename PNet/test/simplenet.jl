@@ -338,8 +338,9 @@ const ex_types = ("continuous",)
         </net>
     </pnml>
     """
+    println(pntd)
     anet = SimpleNet(PNML.Parser.xmlnode(str3))::AbstractPetriNet
-    mg = PNML.metagraph(pnmlnet(anet))
+    PNML.metagraph(pnmlnet(anet))
     #! mg2 = PNML.metagraph(anet)
 
     m₀ = initial_markings(anet.net)
