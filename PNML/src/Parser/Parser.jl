@@ -77,7 +77,7 @@ Uses `fill_sort_tag!`.
 Return concrete SortRef matching `dict`, wrapping `id`.
 """
 function make_sortref(net, dict, sort, seed, sort_id, name=nothing)
-    D()&& println("\n## make_sortref dict=$dict sort=$(nameof(typeof(sort))) sort_id=$(repr(sort_id)) '$name'")
+    D()&& println("## make_sortref dict=$dict sort=$(nameof(typeof(sort))) sort_id=$(repr(sort_id)) '$name'")
     # See if there is an existing `sort` in `dict`
     if isnothing(sort_id) # No provided id, if no existing sort found, invent an id.
         if isnothing(find_valuekey(dict(net), sort))
