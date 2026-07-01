@@ -56,8 +56,7 @@ function fill_sort_tag!(dd::DeclDict, idreg, tag::Symbol, sort, dict)
         !isregistered(idreg, tag) && register_id!(idreg, tag)
         dict(dd)[tag] = sort
     end
-    d = coalesce(dict)
-    sr = @match d begin
+    sr = @match dict begin
         PNML.multisetsorts  => MultisetSortRef(tag)  # sort, basis is a builtin,
         PNML.productsorts   => ProductSortRef(tag)   # sort, tuple of SortRefs
         PNML.partitionsorts => PartitionSortRef(tag) # declaration
@@ -92,9 +91,9 @@ function fill_builtin_labelparsers!(labelparser::AbstractDict)
     labelparser[:inscription]      = Parser.parse_inscription
     labelparser[:hlinscription]    = Parser.parse_hlinscription
     labelparser[:condition]        = Parser.parse_condition
-#!    labelparser[:graphics]         = Parser.parse_graphics #! graphics are not labels! XXX
     labelparser[:name]             = Parser.parse_name
     labelparser[:type]             = Parser.parse_sorttype
+    # labelparser[:graphics] = Parser.parse_graphics #! graphics are not labels! XXX
 
     # Extensions to ISO 15909-2:2011, some mentioned in ISO 15909-1:2019, ISO 15909-3:2021.
     labelparser[:fifoinitialMarking] = Parser.parse_fifoinitialMarking
@@ -109,9 +108,8 @@ function __insert_lp!(labelparser, tag, parser)
     return nothing
 end
 
-
 """
-fill_builtin_toolparsers!(net)
+    fill_builtin_toolparsers!(net) -> Nothing
     fill_builtin_toolparsers!(toolparsers::AbstractDict) -> Nothing
 
 Fill context with the base built-in tool parsers.

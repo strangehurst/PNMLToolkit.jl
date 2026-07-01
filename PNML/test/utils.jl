@@ -78,6 +78,7 @@ end
 end
 
 @testset "add_nettype" begin
+    f=nothing # JETLS is confused
     add_type! = PnmlTypes.add_nettype!
     typemap   = PnmlTypes.pnmltype_map
     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pnmlcore, PnmlCoreNet())
