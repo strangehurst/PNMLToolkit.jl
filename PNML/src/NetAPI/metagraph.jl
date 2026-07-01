@@ -41,7 +41,7 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
         tuple(a -> inscription(a)(NamedTuple()), # No variable substitutions here.
               PNML.Parser.default(Inscription, net))
     else
-        @error "graph edge weight function of multiset in $(pntd_of(net)) $(pid(net))"
+        #!@error "graph edge weight function of multiset in $(pntd_of(net)) $(pid(net))"
         tuple(a -> 1, 1)
     end
 

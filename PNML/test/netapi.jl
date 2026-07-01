@@ -78,14 +78,15 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
     """
 
     model = pnmlmodel(xmlnode(str3))
-    anet = first(nets(model))
-    mg = PNML.metagraph(anet)
-    @show mg
+    anet = first(nets(model))::PnmlNet
+    #~ @show anet
+    @test_logs PNML.metagraph(anet)
+    #@show mg
 
     m₀ = PNML.initial_markings(anet)
     imatrix  = PNML.incidence_matrix(anet) # Matrix of PnmlMultiset
     enabled_vec  = PNML.enabled(anet, m₀)
-    @show pntd m₀ imatrix enabled_vec #typeof(e)
+    #~ @show pntd m₀ imatrix enabled_vec #typeof(e)
     # 3 representations of the enabled vector.
     @test enabled_vec == Bool[1,0,0,0]
     @test enabled_vec == [true,false,false,false]
