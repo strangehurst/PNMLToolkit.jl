@@ -355,7 +355,7 @@ end
 
 # No indent here.
 function Base.show(io::IO, net::PnmlNet)
-    print(io, indent(io), nameof(typeof(net)), "(", )
+    print(io, indent(io), typeof(net), "(", )
     print(repr(pid(net)), ", ")
     print(repr(name(net)), ", ")
     print(repr(nettype(net)), ", ")
