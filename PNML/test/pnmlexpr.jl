@@ -12,11 +12,12 @@ using ExproniconLite: xtuple, xnamedtuple, xcall, xpush, xgetindex, xfirst, xlas
 
 using PNML: mcontains
 
-const pntd = HLCoreNet()
-const net = make_net(pntd, :pnmlexpr_net)
-const varsub = NamedTuple()
+@testset "pnmlexpr" begin
+    pntd = HLCoreNet()
+    net = make_net(pntd, :pnmlexpr_net)
+    varsub = NamedTuple()
 
-const node = xml"""
+    node = xml"""
     <declaration>
         <structure>
             <declarations>
@@ -138,5 +139,5 @@ end
     @test eval(toexpr(PNML.Not([b1, b1]), varsub, net)) == false
     @test eval(toexpr(PNML.Not([b2, b2]), varsub, net)) == true
 end
-
+end
 # And, Or
