@@ -292,11 +292,16 @@ end
 
 
 """
-    get_arc_var_binding_sets!(arc_var_binding_set, arc_vars, placesort, mark, net) -> Bool
+    get_arc_var_binding_sets!(arc_vars, placesort, mark, net) -> Bool, AbstractDictionary
 
-Fill `arc_var_binding_set` with an entry for each key in `arc_vars`.
-Return `true` if no variables are present or all variables have at least 1 substition.
-Indicates that transition is able to fire (enabled fro selection to fire).
+Return tuple of boolean status and `arc_var_binding_set` dictionary.
+
+The status is `true` if no variables are present or all variables have at least 1 substition.
+Indicates that transition is able to fire (enabled for selection to fire).
+The dictioary keys are the variable ids in the arc's inscription.
+Dictionary values are multisets of all valid substitutions for key variable.
+
+`arc_vars` is a multiset of variable ids with multiplicities as how many times it must be substituted.
 """
 function get_arc_var_binding_sets! end
 
@@ -308,18 +313,19 @@ function get_arc_var_binding_sets!(_arc_vars::Multiset, placesort::SortRef, mark
 end
 function get_arc_var_binding_sets!(_arc_vars::Multiset, _placesort::SortRef, mark,
                                     net::PnmlNet{PT_HLPNG})
-    # mark value is cardinality of singleton multiset, `Int`. No varibles.
+    # mark is a singleton multiset. No varibles.
     ER()&& println("#-- get_arc_var_binding_sets! 2 $(pntd_of(net)) $(pid(net)) ", mark)
     return true, OrderedDict{Symbol, Multiset{Symbol}}()
 end
-function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark,
+function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark::PnmlMultiset,
                                     net::PnmlNet{T}) where {T <: AbstractHLCore}
     ER()&& println("#-- get_arc_var_binding_sets! 3 $(pntd_of(net)) $(pid(net)) ", mark)
     get_arc_vbs_impl!(arc_vars, placesort, mark, net)
 end
 
+"Return tuple of boolean status and `arc_var_binding_set` dictionary."
 function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef,
-                           mark,
+                           mark::PnmlMultiset,
                            net::PnmlNet{T}) where {T <: AbstractHLCore}
    # mark is a
     ER()&& println("#-- get_arc_vbs_impl! mark = ", mark)
@@ -353,7 +359,8 @@ function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef,
             if multiplicity >= arc_vars[v]
                 # Variable multiplicity is per-arc, value is shared among arcs.
                 if element isa Tuple # mark is a ProductSort.
-                    # Select the tuple member(s) matching variable sort.
+                    # Select the tuple member(s) matching variable sort.Return tuple of boolean status and `arc_var_binding_set` dictionary.
+
                     for expr in element
                         if PNML.refid(expr) === v_refid
                             push!(arc_binding_sets[v], expr())
