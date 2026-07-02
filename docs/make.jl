@@ -25,6 +25,7 @@ mathengine = MathJax3(Dict(:loader => Dict("load" => ["[tex]/require", "[tex]/ma
 pages=[
     "Petri Net Markup Language" => "index.md",
     "Status"                    => "status.md",
+    "References"                => "references.md",
     "Structure" => [
         "Intermediate Representation" => "structure/layers.md",
         "Petri Net Type Definition" => "structure/pntd.md",
