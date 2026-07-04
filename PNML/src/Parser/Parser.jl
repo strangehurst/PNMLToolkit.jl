@@ -32,7 +32,7 @@ using Moshi.Data: @data, is_data_type, isa_variant
 using Moshi.Match: @match
 using NamedTupleTools
 using PNML
-using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, FEConstant,
+using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, DotConstant, FEConstant,
     LabelParser, MalformedException, Maybe, MissingIDException, PnmlMultiset, PnmlNetKeys,
     ToolParser, XmlDictType, arbitrarysorts, arc, arc_idset, arcdict, basis, coordinate_type,
     decldict, feconstants, fill_builtin_enabled_filters!, fill_builtin_labelparsers!,
