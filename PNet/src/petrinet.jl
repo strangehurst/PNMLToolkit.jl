@@ -168,7 +168,7 @@ Uses a flattened net to avoid the page level of the pnml hierarchy.
 Note: A multi-page petri net can always be flattened by removing
 referenceTransitions & referencePlaces, and merging pages into the first page.
 """
-struct SimpleNet{PNTD} <: AbstractPetriNet{PNTD}
+struct SimpleNet{PNTD <: AbstractPNTD} <: AbstractPetriNet{PNTD}
     id::Symbol # Redundant copy of the net's ID for dispatch.
     net::PnmlNet{PNTD}
 end
