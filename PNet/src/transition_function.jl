@@ -19,13 +19,17 @@ transition_function(net::PnmlNet) =
 """
     civ(net, arcid) -> inscription_value
 
-Lookup the `Arc`, find its inscription's value and if PT_HLPNG convert to integer-valued.
+Lookup the `Arc`, find its inscription's value.
 #TODO add variables for full HL support
 """
+function civ end
 function civ(net::AbstractPnmlNet, arc_id)
     a = PNML.arcdict(net)[arc_id]::Arc
-    z = PNML.zero_marking(PNML.adjacent_place(net, a)) # 0 or empty multiset similar to placetype
-    inscription_value(net, a, z, NamedTuple())
+    inscription_value(net, a, NamedTuple())
+end
+function civ(net::PnmlNet{PT_HLPNG}, arc_id)
+    a = PNML.arcdict(net)[arc_id]::Arc
+    PNML.cardinality(inscription_value(net, a, NamedTuple()))
 end
 
 """
@@ -73,9 +77,13 @@ For use in a transition function.
 #TODO When do these get called "pre" and "post"?
 """
 function in_out end
-in_out(petrinet::AbstractPetriNet, transition_id) = in_out(pnmlnet(petrinet), transition_id)
-in_out(net::PnmlNet, transition_id) = (in_inscriptions(net, transition_id),
-                                       out_inscriptions(net, transition_id))
+function in_out(petrinet::AbstractPetriNet, transition_id)
+    in_out(pnmlnet(petrinet), transition_id)
+end
+function in_out(net::PnmlNet, transition_id)
+    (in_inscriptions(net, transition_id),
+    out_inscriptions(net, transition_id))
+end
 
 # """
 #     ins(net, transition_id) -> LVector

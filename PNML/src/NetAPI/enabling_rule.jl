@@ -210,10 +210,9 @@ function comp_mark_inscription(net::PnmlNet{T}, mark_dict::AbstractDict, transit
                     "$(pntd_of(net)) $(pid(net)) ", transition_id)
     for place_id in preset(net, transition_id)
         mark = mark_dict[place_id]
-        z = zero_marking(place(net, place_id))
-        if !__compare_mi_impl(net, mark, cond_term,
-                               place_id, transition_id,
-                               tr_var_binding_set, tr_vars, tr_varsubs, z)
+        a = arc(net, place_id, transition_id)::Arc
+        if !__compare_mi_impl(net, mark, cond_term, a,
+                               tr_var_binding_set, tr_vars, tr_varsubs)
             return false
         end
     end
@@ -221,20 +220,21 @@ function comp_mark_inscription(net::PnmlNet{T}, mark_dict::AbstractDict, transit
 end
 
 # Assume no variables
-function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transition_id,
-                           _, _, _, z) where {T <: AbstractPNTD}
+function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
+                            _, _, _) where {T <: AbstractPNTD}
+    # evaluate condition expression
     eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-    inscription_val = inscription_value(net, place_id, transition_id,z, NamedTuple()) # Number
+    inscription_val = inscription_value(net, a, NamedTuple()) # Number:: value_type(Inscription)
     return mark >= inscription_val
  end
 
 # Variables supported for High-level nets    s = comp_mark_inscription(net, mark_dict, transition_id,
-function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transition_id,
-                           tr_var_binding_set, tr_vars, tr_varsubs, z) where {T <: AbstractHLCore}
+function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
+                           tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractHLCore}
     if isempty(tr_vars) # 0-ary operators or constants
         # PT_HLPNG will have no vars
         eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-        inscription_val = inscription_value(net, place_id, transition_id, z, NamedTuple()) # convert bag{dot} to Int
+        inscription_val = inscription_value(net, a, NamedTuple())
         mark = unwrap_pmset(mark)
         return issubset(inscription_val, mark)
    else
@@ -251,12 +251,12 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, place_id, transitio
             # Check guard condition expression that may contain variables.
             # Must be evaluated for each candidate_parms.
             eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
-            inscription_val = inscription_value(net, place_id, transition_id, z, tr_vsub) # bag
+            inscription_val = inscription_value(net, a, tr_vsub) # bag
             mark = unwrap_pmset(mark)
             issubset(inscription_val, mark) || continue # not a valid substitution
             push!(tr_varsubs, tr_vsub)
         end
-        return !isempty(tr_varsubs) # no sunstitution found if empty
+        return !isempty(tr_varsubs) # no substitution found if empty
     end
 end
 

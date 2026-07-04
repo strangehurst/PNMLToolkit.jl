@@ -182,32 +182,22 @@ function parse_transition(node::XMLNode, net::AbstractPnmlNet)
             namelabel, graphics, toolspecinfos, extralabels, net)
 end #= function parse_transition =#
 
-function default(::Type{<:Inscription}, net::AbstractPnmlNet)
-    #! Move this check to a verify! method! XXX
-    # if refid(placetype) !== :positive
-    #     @error(string("$(pntd_of(net)) default Inscription $placetype mismatch ",
-    #                   "$(repr(refid(placetype))) != :positive"))
-    # end
-    Inscription(nothing, NumberEx(NamedSortRef(:positive), one(Int)), nothing, nothing, REFID[], net)
-end
 
-function default(::Type{<:Inscription}, net::PnmlNet{T}) where {T <: AbstractContinuousNet}
-    #! Move this check to a verify! method! XXX
-    # if refid(placetype) !== :real
-    #     @error "$pntd default Inscription $placetype mismatch $(refid(placetype)) != :real"
-    # end
-    Inscription(nothing, NumberEx(NamedSortRef(:real), one(Float64)), nothing, nothing, REFID[], net)
-end
-
-function default(::Type{<:Inscription}, net::PnmlNet{T}) where {T <: PT_HLPNG}
-    Inscription(nothing, DotConstantEx(), nothing, nothing, REFID[], net)
-end
-
-# Requires placetype
-function default(::Type{<:Inscription}, net::PnmlNet{T}, placetype::SortType) where {T <: AbstractHLCore}
-    basis = sortref(placetype)::SortRef
-    el = def_sort_element(placetype)
-    Inscription(nothing, Bag(basis, el, 1), nothing, nothing, REFID[], net)
+function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{SortType}=nothing)
+    pntd = pntd_of(net)
+    if pntd isa PT_HLPNG
+        ex = Bag(NamedSortRef(:dot), DotConstant(), 1)
+    elseif pntd isa AbstractContinuousNet
+        ex = NumberEx(NamedSortRef(:real), one(Float64))
+    elseif pntd isa AbstractHLCore
+        isnothing(placetype) &&
+            throw(ArgumentError("placetype needed for $pntd"))
+        basis = sortref(placetype)::SortRef
+        ex = Bag(basis, def_sort_element(placetype), 1)
+    else pntd isa AbstractPnmlNet
+        ex = NumberEx(NamedSortRef(:positive), one(Int))
+    end
+    Inscription(nothing, ex, nothing, nothing, REFID[], net)
 end
 
 """
@@ -257,29 +247,6 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
     # It may have non-ground terms as parameters.
 
     if isnothing(inscription)
-    #     dummy_placetype = if is_highlevel(pntd_of(net))
-    #         if pntd isa PT_HLPNG
-    #             SortType("dummy PT_HLPNG", NamedSortRef(:dot), net)
-    #         else
-    #             # For other high-level nets, try to deduce using the adjacent place.
-    #             # Note that the adjacent place may have not been parsed yet.
-    #             sr = if has_place(net, source)
-    #                 sortref(place(net, source))
-    #             elseif has_place(net, target)
-    #                 sortref(place(net, target))
-    #             else
-    #                 @error string("$pntd inscription not provided for ",
-    #                             "arc $arc_id ($source -> $target), ",
-    #                             "and we failed to deduce a sorttype, will use :dot.")
-    #                 NamedSortRef(:dot)
-    #             end
-    #             SortType("dummy HIGHLEVEL", sr,  net)
-    #        end
-    #     elseif is_continuous(pntd_of(net))
-    #         SortType("dummy CONTINUOUS", NamedSortRef(:real), net)
-    #     elseif is_discrete(pntd_of(net))
-    #         SortType("dummy DISCRETE", NamedSortRef(:positive), net)
-    #     end
         if is_collective_token(pntd_of(net))
             inscription = default(Inscription, net)
         elseif is_individual_token(pntd_of(net))
@@ -295,6 +262,7 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
                             "and we failed to deduce a sorttype, will use :dot.")
                 NamedSortRef(:dot)
             end
+            #!@show sr
             inscription = default(Inscription, net, SortType("dummy HIGHLEVEL", sr,  net))
        else
             error("unknown token type for pntd $(pntd_of(net))")

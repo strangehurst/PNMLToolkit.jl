@@ -66,38 +66,53 @@ function rates(net::AbstractPnmlNet)
 end
 
 """
-inscription_value(a::Maybe{Arc}, default_value, varsub) -> T
+    inscription_value(a::Arc, varsub) -> T
 
-If `a` is nothing return `default_value` else evaluate inscription expression with varsub,
-where `default` is a same sort as adjacent place.
-and `varsub` is a possibly empty variable substitution.
-
-Used to create arrays where the default value is used when
-there is no arc between an place and transition of the net.
+Evaluate inscription expression of `a` with  `varsub`, a possibly empty variable substitution.
 """
 function inscription_value end
-function inscription_value(net::PnmlNet{T}, a::Maybe{Arc}, default_value, varsub) where {T <: AbstractPNTD}
-    #!@warn typeof(net) a default_value
-    if isnothing(a)
-        return default_value
-    else
-        return eval(toexpr(term(inscription(a)), varsub, net))
-    end
+
+function inscription_value(net::PnmlNet{T}, a::Arc, varsub) where {T <: AbstractPNTD}
+    return eval(toexpr(term(inscription(a)), varsub, net))
 end
-function inscription_value(net::PnmlNet{PT_HLPNG}, a::Maybe{Arc}, default_value, varsub)
-    val = if isnothing(a)
-        default_value
-    else
-        eval(toexpr(term(inscription(a)), varsub, net))
-    end
+function inscription_value(net::PnmlNet{PT_HLPNG}, a::Arc, varsub)
+    #! @show a inscription(a) term(inscription(a))
+    val = eval(toexpr(term(inscription(a)), varsub, net))
     return cardinality(val)
 end
-function inscription_value(net::APN, source_id::Symbol, target_id::Symbol, default_value, varsub)
-    inscription_value(net, arc(net, source_id, target_id)::Maybe{Arc}, default_value, varsub)
+function inscription_value(net::APN, a::Arc, varsub)
+    pntd = pntd_of(net)
+    val = eval(toexpr(term(inscription(a)), varsub, net))
+    return cardinality(val)
 end
-function inscription_value(net::APN, arc_id::Symbol, default_value, varsub)
-    inscription_value(net, arc(net, arc_id), default_value, varsub)
-end
+
+
+# function inscription_value(net::APN, source_id::Symbol, target_id::Symbol, varsub)
+#     a = arc(net, source_id, target_id)
+#     #! Why inferred to maybe be a ParseInscriptionTerm      XXX
+#     if isnothing(a)
+#         pntd = pntd_of(net)
+#         if pntd isa PT_HLPNG
+#             cardinality(default_value)::Number
+#         elseif pntd isa PT_HLPNG
+#         else # tokens have identities
+#             default_value isa Number ||
+#                 throw(ArgumentError("default inscription value expected to be a `Number`, found $default_value"))
+#             default_value
+#         end
+#     else
+#         inscription_value(net, a::Arc, varsub)
+#     end
+# end
+# function inscription_value(net::APN, arc_id::Symbol, varsub)
+#     a = arc(net, arc_id)
+#     if isnothing(a)
+#         default_value
+#     else
+#         inscription_value(net, a::Arc, varsub)
+#     end
+# end
+
 #==========================================================================
 Notes based on ISO/IEC 15909-1:2019 (Part 1, 2nd Edition).
 
@@ -177,9 +192,14 @@ end
 function input_matrix!(imatrix, net::AbstractPnmlNet)
     varsub = NamedTuple()  #todo! add Symmetric and HL support
     for (p, place_id) in enumerate(place_idset(net))
-        z = zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
         for (t, transition_id) in enumerate(transition_idset(net))
-            imatrix[t, p] = inscription_value(net, place_id, transition_id, z, varsub)
+            a = arc(net, place_id, transition_id)::Maybe{Arc}
+            val = if isnothing(a)
+                zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
+            else
+                inscription_value(net, a, varsub)
+            end
+            imatrix[t, p] = _dot2int(pntd_of(net), val)
         end
     end
     return imatrix
@@ -209,23 +229,39 @@ function output_matrix(net::PnmlNet{T}) where {T <: AbstractHLCore}
 end
 
 function output_matrix!(omatrix, net::AbstractPnmlNet)
-    varsub = NamedTuple() #todo! add Symmetric and HL support
+    varsub = NamedTuple() #todo! add Symmetric and HL support, variables
     for (p, place_id) in enumerate(place_idset(net))
-        z = zero_marking(place(net, place_id))
         for (t, transition_id) in enumerate(transition_idset(net))
-            iv = inscription_value(net, transition_id, place_id, z, varsub)
-            omatrix[t, p] = iv
+            a = arc(net, transition_id, place_id)::Maybe{Arc}
+            val = if isnothing(a)
+                z = zero_marking(place(net, place_id))
+                if pntd_of(net) isa PT_HLPNG
+                    @assert _dot2int(pntd_of(net), z) == 0
+                end
+                z
+            else
+                inscription_value(net, a, varsub)
+            end
+            #@show typeof(omatrix) typeof(val)
+            omatrix[t, p] = _dot2int(pntd_of(net), val)
         end
     end
     return omatrix
 end
+_dot2int(::PT_HLPNG, v) = cardinality(v)
+_dot2int(::AbstractHLCore, v) = v
+_dot2int(::AbstractPNTD, v) = v
 
 "backward (input) incidence matrix element"
 function pre(net::AbstractPnmlNet, p::Symbol, t::Symbol, varsubs=NamedTuple())
     @assert PNML.has_transition(net, t)
     @assert PNML.has_place(net, p)
-    z = zero_marking(place(net, p))
-    iv = inscription_value(net, arc(net, p, t)::Maybe{Arc}, z, varsubs)
+    a = arc(net, p, t)::Maybe{Arc}
+    iv = if isnothing(a)
+        zero_marking(place(net, p))
+    else
+        inscription_value(net, a, varsubs)
+    end
     println("pre(net, $p, $t) = ", iv)
     return iv
 end
@@ -234,8 +270,12 @@ end
 function post(net::AbstractPnmlNet, t::Symbol, p::Symbol, varsubs=NamedTuple())
     @assert PNML.has_transition(net, t)
     @assert PNML.has_place(net, p)
-    z = zero_marking(place(net, p))
-    iv = inscription_value(net, arc(net, t, p)::Maybe{Arc}, z, varsubs)
+    a = arc(net, t, p)::Maybe{Arc}
+    iv = if isnothing(a)
+        zero_marking(place(net, p))
+    else
+        inscription_value(net, a, varsubs)
+    end
     println("post(net, $t, $p) = ", iv)
     return iv
 end
