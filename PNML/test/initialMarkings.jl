@@ -5,57 +5,84 @@ using EzXML: EzXML
 using XMLDict: XMLDict
 
 #------------------------------------------------
-@testset "PT initMarking $pntd" for pntd in (PnmlCoreNet(), ContinuousNet())
-    node = xmlnode("""
-    <initialMarking>
-        <text> $(is_continuous(pntd) ? "123.0" : "123") </text>
-        <toolspecific tool="org.pnml.tool" version="1.0">
-            <tokengraphics> <tokenposition x="6" y="9"/> </tokengraphics>
-        </toolspecific>
-        <unknown id="unkn">
-            <name> <text>unknown label</text> </name>
-            <text>content text</text>
-        </unknown>
-    </initialMarking>
-    """)
-    #println(str)
+@testset "PT initMarking" begin
+     @testset "PnmlCoreNet" begin
+        pntd = PnmlCoreNet()
+        node = xmlnode("""
+        <initialMarking>
+            <text> 123 </text>
+            <toolspecific tool="org.pnml.tool" version="1.0">
+                <tokengraphics> <tokenposition x="6" y="9"/> </tokengraphics>
+            </toolspecific>
+            <unknown id="unkn">
+                <name> <text>unknown label</text> </name>
+                <text>content text</text>
+            </unknown>
+        </initialMarking>
+        """)
 
-    net = make_net(pntd, :pt_initmark)
-    #@show value_type(Marking, pntd)
-    #@show sortref(value_type(Marking, pntd))
+        net = make_net(pntd, :pt_initmark)
+        placetype = SortType("$pntd initMarking",
+            sortref(value_type(Marking, pntd))::SortRef,
+            nothing, nothing, net)
 
-    placetype = SortType("$pntd initMarking",
-        sortref(value_type(Marking, pntd))::SortRef,
-        nothing, nothing, net)
+        # Parse ignoring unexpected child
+        mark = @test_logs(match_mode=:any, (:warn, r"^ignoring unexpected child"),
+                    parse_initialMarking(node, placetype, net; parentid=:xxx)::Marking)
+        #@test typeof(value(mark)) <: Union{Int,Float64}
+        @test mark()::Union{Int,Float64} == 123
 
-    # Parse ignoring unexpected child
-    mark = @test_logs(match_mode=:any, (:warn, r"^ignoring unexpected child"),
-                parse_initialMarking(node, placetype, net; parentid=:xxx)::Marking)
-    #@test typeof(value(mark)) <: Union{Int,Float64}
-    @test mark()::Union{Int,Float64} == 123
+        # Integer
+        mark1 = Marking(23, net)
+        @test_opt broken=false Marking(23, net)
+        @test_call Marking(23, net)
+        @test typeof(mark1()) == typeof(23)
+        @test mark1() == 23
+        @show mark1()
+        @test_call mark1()
+        @test_opt broken=false mark1()
 
-    # Integer
-    mark1 = Marking(23, net)
-    @test_opt broken=false Marking(23, net)
-    @test_call Marking(23, net)
-    @test typeof(mark1()) == typeof(23)
-    @test mark1() == 23
-    @test_opt broken=false mark1()
-    @test_call mark1()
+        @test graphics(mark1) === nothing
+        @test toolinfos(mark1) === nothing || isempty(toolinfos(mark1))
+    end
 
-    @test graphics(mark1) === nothing
-    @test toolinfos(mark1) === nothing || isempty(toolinfos(mark1))
+   @testset "ContinuousNet" begin
+        pntd = ContinuousNet()
+        node = xmlnode("""
+        <initialMarking>
+            <text> 123.0 </text>
+            <toolspecific tool="org.pnml.tool" version="1.0">
+                <tokengraphics> <tokenposition x="6" y="9"/> </tokengraphics>
+            </toolspecific>
+            <unknown id="unkn">
+                <name> <text>unknown label</text> </name>
+                <text>content text</text>
+            </unknown>
+        </initialMarking>
+        """)
 
-    # Floating point
-    mark2 = Marking(3.5, net)
-    #@show mark2 mark2()
-    @test_opt broken=false Marking(3.5, net)
-    @test_call Marking(3.5, net)
-    @test typeof(mark2()) == typeof(3.5)
-    @test mark2() ≈ 3.5
-    @test_call mark2()
-    @test graphics(mark2) === nothing
-    @test toolinfos(mark2) === nothing || isempty(toolinfos(mark2))
+        net = make_net(pntd, :pt_initmark)
+        placetype = SortType("$pntd initMarking",
+            sortref(value_type(Marking, pntd))::SortRef,
+            nothing, nothing, net)
+
+        # Parse ignoring unexpected child
+        mark = @test_logs(match_mode=:any, (:warn, r"^ignoring unexpected child"),
+                    parse_initialMarking(node, placetype, net; parentid=:xxx)::Marking)
+        #@test typeof(value(mark)) <: Union{Int,Float64}
+        @test mark()::Union{Int,Float64} == 123
+
+        # Floating point
+        mark2 = Marking(3.5, net)
+        @show mark2 mark2() mark2.net
+        @test_opt broken=false Marking(3.5, net)
+        @test mark2() ≈ 3.5
+        @test_call Marking(3.5, net)
+        @test typeof(mark2()) == typeof(3.5)
+        @test_call mark2()
+        @test graphics(mark2) === nothing
+        @test toolinfos(mark2) === nothing || isempty(toolinfos(mark2))
+   end
 end
 
 @testset "HL initMarking" begin

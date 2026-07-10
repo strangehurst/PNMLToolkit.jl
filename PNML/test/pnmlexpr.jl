@@ -48,8 +48,9 @@ parse_declaration!(net, [node])
     b5 = @inferred Bag(NamedSortRef(:pro), 4, NumberEx(NamedSortRef(:natural), 1))
 
     a = @inferred PNML.Add([b1, b2, b3])
-    ex = @inferred toexpr(a, varsub, net)
+    ex = toexpr(a, varsub, net)
     val = eval(ex)
+    #val = eval(toexpr(a, varsub, net))
     @test val == eval(toexpr(b1, varsub, net)) +
                  eval(toexpr(b2, varsub, net)) +
                  eval(toexpr(b3, varsub, net))

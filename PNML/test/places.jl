@@ -60,7 +60,7 @@ end
     @test @inferred(pid(place)) === :place1
     @test @inferred(name(place)) == "with text"
     @test_call target_modules=t_modules initial_marking(place)
-    #@show pntd, initial_marking(place)
+    @show pntd, initial_marking(place) PNML.cardinality(initial_marking(place)::PnmlMultiset)
     @test PNML.cardinality(initial_marking(place)::PnmlMultiset) == 101
     @test get_label(place, :nosuchlabel) === nothing
 end
