@@ -1,8 +1,12 @@
 
 """
-    default(::Type{T<:AbstractLabel}, net::AbstractPnmlNet) -> T
+    $(TYPEDSIGNATURES)
 
-Return a default instance of label `T` for `pntd`.
+    default(::Type{T<:Union{Marking,Condition,Inscription}}, net::AbstractPnmlNet, [placetype]) -> T
+
+Return a default instance of label `T` for `pntd` of `net`.
+
+For high-level nets a `placetype` may be needed.
 """
 function default end
 
@@ -48,22 +52,6 @@ function parse_refTransition!(netsets, node, net::AbstractPnmlNet)
     push!(reftransition_idset(netsets)::OrderedSet{Symbol}, pid(rt))
     reftransitiondict(net)[pid(rt)] = rt
     return reftransition_idset(netsets)
-end
-
-
-"""
-$(TYPEDSIGNATURES)
-Return default marking value based on `AbstractPNTD`. Has meaning of empty, as in `zero`.
-For high-level nets, the marking is an empty multiset whose basis matches `placetype`.
-Others have a marking that is a `Number`.
-"""
-function default(::Type{<:Marking}, net::AbstractPnmlNet, _placetype::SortType)
-    Marking(zero(value_type(Marking, pntd_of(net))), net) # not high-level!
-end
-
-function default(::Type{<:Marking}, net::PnmlNet{T}, placetype::SortType) where {T <: AbstractHLCore}
-    el = def_sort_element(placetype)
-    Marking(Bag(sortref(placetype), el, 0), "default", net) # el used for its type
 end
 
 """
@@ -142,10 +130,6 @@ function parse_place(node::XMLNode, net::AbstractPnmlNet)
     Place(placeid, mark, sorttype, namelabel, graphics, toolspecinfos, extralabels, net)
 end
 
-function default(::Type{<:Labels.Condition}, net::AbstractPnmlNet)
-    Labels.Condition(BooleanEx(BooleanConstant(true)), net)
-end
-
 """
 $(TYPEDSIGNATURES)
 """
@@ -155,7 +139,6 @@ function parse_transition(node::XMLNode, net::AbstractPnmlNet)
     D()&& println("## parse_transition ", repr(transitionid))
 
     cond::Maybe{PNML.Labels.Condition} = nothing
-
     namelabel::Maybe{Name} = nothing
     graphics::Maybe{Graphics} = nothing
     toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
@@ -181,24 +164,6 @@ function parse_transition(node::XMLNode, net::AbstractPnmlNet)
             something(cond, default(Labels.Condition, net)),
             namelabel, graphics, toolspecinfos, extralabels, net)
 end #= function parse_transition =#
-
-
-function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{SortType}=nothing)
-    pntd = pntd_of(net)
-    if pntd isa PT_HLPNG
-        ex = Bag(NamedSortRef(:dot), DotConstant(), 1)
-    elseif pntd isa AbstractContinuousNet
-        ex = NumberEx(NamedSortRef(:real), one(Float64))
-    elseif pntd isa AbstractHLCore
-        isnothing(placetype) &&
-            throw(ArgumentError("placetype needed for $pntd"))
-        basis = sortref(placetype)::SortRef
-        ex = Bag(basis, def_sort_element(placetype), 1)
-    else pntd isa AbstractPnmlNet
-        ex = NumberEx(NamedSortRef(:positive), one(Int))
-    end
-    Inscription(nothing, ex, nothing, nothing, REFID[], net)
-end
 
 """
     parse_arc(node::XMLNode, net::AbstractPnmlNet) -> Arc
@@ -340,4 +305,34 @@ function parse_refTransition(node::XMLNode, net::AbstractPnmlNet)
     end
 
     RefTransition(reft_id, ref, namelabel, graphics, toolspecinfos, extralabels, net)
+end
+
+function default(::Type{<:Marking}, net::AbstractPnmlNet, _placetype::SortType)
+    Marking(zero(value_type(Marking, pntd_of(net))), net) # not high-level!
+end
+
+function default(::Type{<:Marking}, net::PnmlNet{T}, placetype::SortType) where {T <: AbstractHLCore}
+    el = def_sort_element(placetype)
+    Marking(Bag(sortref(placetype), el, 0), "default", net) # el used for its type
+end
+
+function default(::Type{<:Labels.Condition}, net::AbstractPnmlNet)
+    Labels.Condition(BooleanEx(BooleanConstant(true)), net)
+end
+
+function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{SortType}=nothing)
+    pntd = pntd_of(net)
+    if pntd isa PT_HLPNG
+        ex = Bag(NamedSortRef(:dot), DotConstant(), 1)
+    elseif pntd isa AbstractContinuousNet
+        ex = NumberEx(NamedSortRef(:real), one(Float64))
+    elseif pntd isa AbstractHLCore
+        isnothing(placetype) &&
+            throw(ArgumentError("placetype needed for $pntd"))
+        basis = sortref(placetype)::SortRef
+        ex = Bag(basis, def_sort_element(placetype), 1)
+    else pntd isa AbstractPnmlNet
+        ex = NumberEx(NamedSortRef(:positive), one(Int))
+    end
+    Inscription(nothing, ex, nothing, nothing, REFID[], net)
 end
