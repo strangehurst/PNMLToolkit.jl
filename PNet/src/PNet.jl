@@ -24,8 +24,8 @@ using PNML.Parser
 using PNML.PnmlTypes #!: AbstractPNTD, AbstractPNTD
 using TermInterface
 
-export AbstractPetriNet, SimpleNet, counted_transitions, input_matrix, labeled_transitions,
-    output_matrix, pnmlnet, transition_function
+export AbstractPetriNet, SimpleNet, counted_transitions, dot2int, input_matrix,
+    labeled_transitions, output_matrix, pnmlnet, transition_function
 
 include("petrinet.jl")
 include("transition_function.jl")
