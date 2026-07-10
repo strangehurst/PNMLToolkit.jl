@@ -618,7 +618,7 @@ end
 end
 
 function toexpr(op::LessThan, var::NamedTuple, net)
-    Expr(:call, :(<), toexpr(op.lhs, var, net), toexpr(op.rhs, var), net)
+    Expr(:call, :(<), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
 end
 
 function Base.show(io::IO, x::LessThan)
@@ -631,7 +631,7 @@ end
 end
 
 function toexpr(op::LessThanOrEqual, var::NamedTuple, net)
-    Expr(:call, :(<=), toexpr(op.lhs, var, net), toexpr(op.rhs, var), net)
+    Expr(:call, :(<=), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
 end
 
 function Base.show(io::IO, x::LessThanOrEqual)
