@@ -22,14 +22,9 @@ transition_function(net::PnmlNet) =
 Lookup the `Arc`, find its inscription's value.
 #TODO add variables for full HL support
 """
-function civ end
 function civ(net::AbstractPnmlNet, arc_id)
     a = PNML.arcdict(net)[arc_id]::Arc
-    inscription_value(net, a, NamedTuple())
-end
-function civ(net::PnmlNet{PT_HLPNG}, arc_id)
-    a = PNML.arcdict(net)[arc_id]::Arc
-    PNML.cardinality(inscription_value(net, a, NamedTuple()))
+    dot2int(inscription_value(net, a, NamedTuple()))
 end
 
 """
