@@ -15,6 +15,7 @@ using Base: @kwdef, isempty, length
 using DocStringExtensions
 using Logging
 using LoggingExtras
+using Memoization
 using NamedTupleTools
 using PNML
 using PNML: AbstractLabel, AbstractPnmlObject, Annotation, AnyElement, BooleanConstant, D,

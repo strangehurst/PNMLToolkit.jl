@@ -188,7 +188,7 @@ struct NamedOperator{N <: AbstractPnmlNet, T} <: OperatorDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     parameter::Vector{VariableDeclaration{N}} # constants,variables with inferred sorts #TODO XXX
-    def::T # expression  terms (with inferred output sort) #TODO! XXX how to infer from expression ===
+    def::T # expression  terms (with inferred output sort)
     net::N
 end
 
@@ -196,9 +196,13 @@ end
 NamedOperator(id::Symbol, str::AbstractString, net::AbstractPnmlNet) =
     NamedOperator(id, str, VariableDeclaration{typeof(net)}[], DotConstant(), net)
 
-#operator(no::NamedOperator) = operator(no.net, no.def) #! XXX def is an expression
 parameters(no::NamedOperator) = no.parameter
-(no::NamedOperator)(vars) = eval(toexpr(no.def, vars, no.net))(parameters(no))
+
+@memoize Dict function evaluate(no::NamedOperator, vars)
+    eval(toexpr(no.def, vars, no.net))(parameters(no))
+end
+
+(no::NamedOperator)(vars) = evaluate(no, vars)
 
 function Base.show(io::IO, op::NamedOperator)
     print(io, nameof(typeof(op)), "(", repr(op.id), ", ", repr(op.name), ", ",

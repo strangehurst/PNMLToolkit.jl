@@ -50,11 +50,15 @@ Use `args`, a dictionary of variable substitutions into the expression to return
     return cond_implementation(c, varsub)
 end
 
+@memoize Dict function evaluate(c::Condition, varsub)::eltype(c)
+    eval(toexpr(term(c), varsub, c.net))::eltype(c) # Bool isa Number
+end
+
 # color function?
 function cond_implementation(c::Condition, varsub::NamedTuple)
     # BooleanEx is a literal. AbstractBoolExpr <: PnmlExpr can be non-literal (non-ground term).
     isa(term(c), BooleanEx) || @warn term(c) varsub  #! debug
-    eval(toexpr(term(c), varsub, c.net))::eltype(c) # Bool isa Number
+    evaluate(c, varsub)
 end
 
 

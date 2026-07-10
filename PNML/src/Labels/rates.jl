@@ -21,8 +21,12 @@ term(r::Rate) = r.term
 sortref(r::Rate) = expr_sortref(term(r), r.net)::SortRef
 value(r::Rate) = r()
 
-function (rate::Rate)(varsub::NamedTuple=NamedTuple())
+@memoize Dict function evaluate(rate::Rate, varsub)
     eval(toexpr(term(rate), varsub, rate.net))::value_type(Rate)
+end
+
+function (rate::Rate)(varsub::NamedTuple=NamedTuple())
+    evaluate(rate, varsub)::value_type(Rate)
 end
 
 

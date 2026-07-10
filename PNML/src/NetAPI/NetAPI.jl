@@ -13,6 +13,7 @@ using DocStringExtensions
 using Graphs: Edge, SimpleDiGraphFromIterator
 using Logging
 using LoggingExtras
+using Memoization
 using MetaGraphsNext: MetaGraph
 using Moshi.Data: isa_variant, variant_type
 using Moshi.Match: @match
@@ -31,7 +32,7 @@ using PNML.Declarations
 using PNML.PnmlGraphics
 using PNML.Sorts
 
-export conditions, enabled, fire, fire2, incidence_matrix, initial_markings, input_matrix,
+export conditions, dot2int, enabled, fire, fire2, incidence_matrix, initial_markings, input_matrix,
     inscription_value, inscriptions, metagraph, output_matrix, post, postset, pre, preset,
     rates
 

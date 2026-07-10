@@ -7,7 +7,7 @@ Label of [`Place`](@ref).
 Is a functor that returns the `value`.
 ```
 """
-struct Marking{N <: AbstractPnmlNet, T <: PnmlExpr} <: Annotation
+@auto_hash_equals cache=true typearg=false struct Marking{N <: AbstractPnmlNet, T <: PnmlExpr} <: Annotation
     term::T #! expression
     text::Maybe{String} # Supposed to be for human consumption.
     graphics::Maybe{Graphics} # PTNet uses TokenGraphics in toolspecinfos rather than graphics.
@@ -85,7 +85,10 @@ HL Net Marking values are a ground terms of this multi-sorted algebra.
 
 Used to initialize a marking vector that will then be updated by firing a transition.
 """
-(mark::Marking)() = eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net))
+(mark::Marking)() = evaluate_mark(mark)
+@memoize function evaluate_mark(mark::Marking)
+    eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net)) #::value_type(Marking, pntd_of(mark.net))
+end
 
 basis(m::Marking) = sortref(term(m))::SortRef
 sortref(m::Marking) = expr_sortref(term(m), m.net)::SortRef
@@ -113,7 +116,7 @@ value_type(::Type{Marking}, ::AbstractContinuousNet) = eltype(RealSort) #::Float
 
 # These are networks were the tokens have individual identities.
 function value_type(::Type{Marking}, pntd::AbstractHLCore)
-    @outline(pntd, @error("value_type(::Type{Marking}, $pntd undefined. Using DotSort."))
+     @outline(pntd, @error("value_type(::Type{Marking}, $pntd undefined. Using DotSort."))
     eltype(DotSort)
 end
 

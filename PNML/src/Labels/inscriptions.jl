@@ -19,8 +19,12 @@ end
 term(i::Inscription) = i.term
 sortref(i::Inscription) = expr_sortref(term(i), i.net)::SortRef
 
-function (inscription::Inscription)(varsub::NamedTuple = NamedTuple())
+@memoize Dict function evaluate(inscription::Inscription, varsub)
     eval(toexpr(term(inscription), varsub, inscription.net))
+end
+
+function (inscription::Inscription)(varsub::NamedTuple = NamedTuple())
+    evaluate(inscription, varsub)
 end
 
 variables(inscription::Inscription) = inscription.vars

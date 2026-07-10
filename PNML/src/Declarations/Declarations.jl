@@ -9,9 +9,10 @@ using Base: isempty, length
 using DocStringExtensions
 using Logging
 using LoggingExtras
+using Memoization
 using PNML
-using PNML:
-    AnyElement, DotConstant, REFID, inc_indent, indent, namedsort, partitionsort, toexpr
+using PNML: AnyElement, DotConstant, REFID, inc_indent, indent, namedsort,
+    partitionsort, toexpr
 
 export AbstractDeclaration, ArbitraryOperator, ArbitrarySort, NamedOperator, NamedSort,
     OperatorDeclaration, PartitionElement, PartitionSort, SortDeclaration,

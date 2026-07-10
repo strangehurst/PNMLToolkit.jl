@@ -24,8 +24,12 @@ Base.eltype(::Type{Time}) = value_type(Time)
 term(i::Time) = i.term
 sortref(i::Time) = expr_sortref(term(i), i.net)::SortRef
 
-function (time::Time)(varsub::NamedTuple=NamedTuple())
+@memoize Dict function evaluate(time::Time, varsub)
     eval(toexpr(term(time), varsub, time.net))::value_type(Time)
+end
+
+function (time::Time)(varsub::NamedTuple=NamedTuple())
+    evaluate(time, varsub)::value_type(Time)
 end
 
 value(r::Time) = r()

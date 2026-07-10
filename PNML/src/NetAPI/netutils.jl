@@ -72,46 +72,19 @@ Evaluate inscription expression of `a` with  `varsub`, a possibly empty variable
 """
 function inscription_value end
 
-function inscription_value(net::PnmlNet{T}, a::Arc, varsub) where {T <: AbstractPNTD}
+@memoize Dict function inscription_value(net::PnmlNet{T}, a::Arc, varsub) where {T <: AbstractPNTD}
     return eval(toexpr(term(inscription(a)), varsub, net))
 end
-function inscription_value(net::PnmlNet{PT_HLPNG}, a::Arc, varsub)
+@memoize Dict function inscription_value(net::PnmlNet{PT_HLPNG}, a::Arc, varsub)
     #! @show a inscription(a) term(inscription(a))
     val = eval(toexpr(term(inscription(a)), varsub, net))
     return cardinality(val)
 end
-function inscription_value(net::APN, a::Arc, varsub)
+@memoize Dict function inscription_value(net::APN, a::Arc, varsub)
     pntd = pntd_of(net)
     val = eval(toexpr(term(inscription(a)), varsub, net))
     return cardinality(val)
 end
-
-
-# function inscription_value(net::APN, source_id::Symbol, target_id::Symbol, varsub)
-#     a = arc(net, source_id, target_id)
-#     #! Why inferred to maybe be a ParseInscriptionTerm      XXX
-#     if isnothing(a)
-#         pntd = pntd_of(net)
-#         if pntd isa PT_HLPNG
-#             cardinality(default_value)::Number
-#         elseif pntd isa PT_HLPNG
-#         else # tokens have identities
-#             default_value isa Number ||
-#                 throw(ArgumentError("default inscription value expected to be a `Number`, found $default_value"))
-#             default_value
-#         end
-#     else
-#         inscription_value(net, a::Arc, varsub)
-#     end
-# end
-# function inscription_value(net::APN, arc_id::Symbol, varsub)
-#     a = arc(net, arc_id)
-#     if isnothing(a)
-#         default_value
-#     else
-#         inscription_value(net, a::Arc, varsub)
-#     end
-# end
 
 #==========================================================================
 Notes based on ISO/IEC 15909-1:2019 (Part 1, 2nd Edition).
@@ -199,7 +172,7 @@ function input_matrix!(imatrix, net::AbstractPnmlNet)
             else
                 inscription_value(net, a, varsub)
             end
-            imatrix[t, p] = _dot2int(pntd_of(net), val)
+            imatrix[t, p] = dot2int(pntd_of(net), val)
         end
     end
     return imatrix
@@ -236,21 +209,21 @@ function output_matrix!(omatrix, net::AbstractPnmlNet)
             val = if isnothing(a)
                 z = zero_marking(place(net, place_id))
                 if pntd_of(net) isa PT_HLPNG
-                    @assert _dot2int(pntd_of(net), z) == 0
+                    @assert dot2int(pntd_of(net), z) == 0
                 end
                 z
             else
                 inscription_value(net, a, varsub)
             end
             #@show typeof(omatrix) typeof(val)
-            omatrix[t, p] = _dot2int(pntd_of(net), val)
+            omatrix[t, p] = dot2int(pntd_of(net), val)
         end
     end
     return omatrix
 end
-_dot2int(::PT_HLPNG, v) = cardinality(v)
-_dot2int(::AbstractHLCore, v) = v
-_dot2int(::AbstractPNTD, v) = v
+dot2int(::PT_HLPNG, v) = cardinality(v)
+dot2int(::AbstractHLCore, v) = v
+dot2int(::AbstractPNTD, v) = v
 
 "backward (input) incidence matrix element"
 function pre(net::AbstractPnmlNet, p::Symbol, t::Symbol, varsubs=NamedTuple())

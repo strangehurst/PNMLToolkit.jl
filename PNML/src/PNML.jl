@@ -56,13 +56,15 @@ using ExproniconLite: JLCall, JLExpr, JLField, JLFor, JLFunction, JLIfElse, JLKw
 using Graphs: Edge, SimpleDiGraphFromIterator
 using Logging
 using LoggingExtras
+using Memoization
 using MetaGraphsNext: MetaGraph
 using NamedTupleTools
 using Preferences: load_preference, set_preferences!
 using TermInterface
 
 export @xml_str, APN, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
-    MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place, PnmlModel, PnmlNet,
+    MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place,
+    PnmlExpr, PnmlModel, PnmlNet,
     ProductSortRef, REFID, RefPlace, RefTransition, SortRef, SortRefImpl,
     Transition, UserSortRef, pnmlmodel, xmlnode
 

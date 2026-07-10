@@ -25,8 +25,12 @@ Base.eltype(::Type{Priority}) = value_type(Priority)
 term(i::Priority{N, T}) where {N <: AbstractPnmlNet, T <: PnmlExpr} = i.term
 sortref(i::Priority) = expr_sortref(term(i), i.net)::SortRef
 
-function (priority::Priority)(varsub::NamedTuple=NamedTuple())
+@memoize Dict function evaluate(priority::Priority, varsub)
     eval(toexpr(term(priority), varsub, priority.net))::value_type(Priority)
+end
+
+function (priority::Priority)(varsub::NamedTuple=NamedTuple())
+    evaluate(priority, varsub)
 end
 
 value(r::Priority) = r()
