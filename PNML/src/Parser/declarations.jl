@@ -181,19 +181,18 @@ function parse_namedoperator(node::XMLNode, net::AbstractPnmlNet)
     # NamedOperators have a def element that is a  term/expression of existing
     # operators &/or variable parameters that define the operation.
     # The sort of the operator is the output sort of def.
-    if !isnothing(dnode)
+    if isnothing(dnode)
         # contains 1 term
-        definition_tj = parse_term(EzXML.firstelement(dnode), net; vars=())::TermJunk
-    else
         ERR_MSG ="<namedoperator name=$name id=$operator_id> does not have a <def> element"
         throw(MalformedException(ERR_MSG))
     end
+    definition_tj = parse_term(EzXML.firstelement(dnode), net; vars=())::TermJunk
 
-    isempty(definition_tj.vars) ||
+    isempty(definition_tj.vars) || #! bring-up
         @outline(name, operator_id, definition_tj,
             @error("<namedoperator name=$name id=$operator_id> has variables: ", definition_tj))
     @outline(@warn "operators are a work in progress")
-    NamedOperator(operator_id, name, parameters, definition_tj.exp, net)
+    NamedOperator(operator_id, name, parameters, definition_tj.exp::PnmlExpr, net)
 end
 
 
