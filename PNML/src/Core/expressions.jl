@@ -324,6 +324,7 @@ expr_sortref(a::Add, net) = expr_sortref(first(a.args), net)::SortRef
 function toexpr(op::Add, varsub::NamedTuple, net)
     @assert length(op.args) >= 2
     # Expr(:call, sum, [eval(toexpr(arg, varsub, net)) for arg in op.args])
+    #! is eval needed here? YES
     :(sum(eval(toexpr(arg, $varsub, $net)) for arg in $(op.args))) # creates PnmlMultiset
 end
 

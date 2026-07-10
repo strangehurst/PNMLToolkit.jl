@@ -18,16 +18,16 @@ export is_collective_token, is_continuous, is_discrete, is_highlevel, is_individ
 $(TYPEDEF)
 Abstract root of a dispatch type based on Petri Net Type Definitions (pntd).
 
-Each Petri Net Markup Language (PNML) `<net>` element will have a single URI
-as a required 'type' XML attribute. That URI should refer to a RelaxNG schema defining
-the syntax and semantics of the XML model.
+Each Petri Net Markup Language (PNML) `<net>` element will have a 'type' XML attribute.
+That string should refer to a RelaxNG schema defining the syntax and semantics of a meta-module
+of a Petri net family. Some examples are Place/Transition and High-level.
 See ISO 15909-2, http://www.pnml.org/ for details.
 
 Selected abbreviations and URIs that do not resolve to a valid schema file
 are suported by this tool. See [`pntd_map`](@ref).
 
 Refer to [`pntd_symbol`](@ref) and [`pnmltype`](@ref) for
-how to get from the URI to a singleton.
+how to get from the string to a pntd singleton.
 """
 abstract type AbstractPNTD end
 "Abbreviation for AbstractPNTD"
@@ -157,7 +157,7 @@ const pntd_map = Dict{String, Symbol}(
             "inhibitorptnet" => :ptnet,
             "resetinhibitorptnet" => :ptnet,
 
-            "continuous" => :continuous,
+            "continuous" => :continuous, # PTNet with Float64
             #"stochastic" => :stochastic, #^ `rate` transition label
             #"capacity" => :capacity #^ `capacity` place label
             #"priority" => :priority #^ `priority` transition label

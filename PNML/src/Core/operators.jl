@@ -17,17 +17,17 @@ locates the FEConstant element in the DeclDict and return its value/id/name(TBD)
 there are 4 kinds of operator declarations:
     feconstant, nameoperator, arbitraryoperator, partitionelement
 each have different types.
-See decldictcore.jl
 
 #~sortdefinition(outsort) isa FEConstant, inexprs, insorts are empty.
-
-
-eval(::FEXEx)
 =#
 """
 PNML Operator as Functor
 
-tag maps to func, a functor/function callable. Its arity is same as length of inexprs and insorts
+tag maps to func, a functor/function callable.
+Its arity is same as length of inexprs and insorts
+
+#TODO
+
 """
 struct Operator{N <: AbstractPnmlNet} <: AbstractOperator
     tag::Symbol
