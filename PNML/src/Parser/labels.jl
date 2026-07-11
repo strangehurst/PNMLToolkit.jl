@@ -119,7 +119,7 @@ function parse_label_content(node::XMLNode, termparser::F, net::AbstractPnmlNet)
     EzXML.haselement(node) || error("xml node is empty")
 
     text::Maybe{Union{String,SubString{String}}} = nothing
-    exp::Maybe{Any} = nothing # Filled by `termparser`.
+    exp::Maybe{PnmlExpr} = nothing # Filled by `termparser`.
     ref::Maybe{SortRef} = nothing # Filled by `termparser`.
     vars = () # Will be replaced/updated by `termparer`.
     graphics::Maybe{Graphics} = nothing
@@ -130,7 +130,7 @@ function parse_label_content(node::XMLNode, termparser::F, net::AbstractPnmlNet)
         if tag == "text"
             text = parse_text(child, pntd_of(net))
         elseif tag == "structure"
-            (; exp, ref, vars) = termparser(child, net) #collects variables
+            (; exp, ref, vars) = termparser(child, net)::TermJunk #collects variables
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -545,10 +545,9 @@ function parse_sorttype(node::XMLNode, net::AbstractPnmlNet; parentid)
     check_nodename(node, "type")
     l = parse_label_content(node, parse_sorttype_term, net)::NamedTuple
     @assert isempty(l.vars) # No variables as sort is not a term.
-    # High-level nets are expected to have a sorttype defined
-    # or inferred from initial marking value.
-
-    SortType(; l.text, sort=l.exp, l.graphics, l.toolspecinfos, net)
+    # High-level nets expected to have a sorttype defined or be inferred from initial marking value.
+    sort=l.sort::SortRef
+    SortType(; l.text, sort, l.graphics, l.toolspecinfos, net)
 end
 
 """
@@ -566,13 +565,14 @@ See [`parse_sorttype`](@ref) for the rest of the `AnnotationLabel` structure.
 """
 function parse_sorttype_term(typenode::XMLNode, net::AbstractPnmlNet)
     check_nodename(typenode, "structure")
-    EzXML.haselement(typenode) || throw(ArgumentError("missing <type> element in <structure>"))
+    EzXML.haselement(typenode) ||
+        throw(ArgumentError("missing <type> element in <structure>"))
     # Expect only child element to be a sort.
     sort_node = EzXML.firstelement(typenode)::XMLNode
     sort_type = parse_sort(sort_node, net, nothing, "")::SortRef
-    is_multisetsort(sort_type) && error("multiset sort not allowed for place <type>")
-    # We use TermJunk because it is convenient. #! Does it work?
-    return TermJunk(sort_type, sort_type, ()) # Not a term; has no variables.
+    is_multisetsort(sort_type) &&
+        error("multiset sort not allowed for place <type>")
+    return TermJunk(SortRefEx(sort_type), sort_type, ()) # Not a term; has no variables.
 end
 
 """
@@ -584,7 +584,7 @@ function parse_structure(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "structure")
     @warn "parse_structure is not implemented for $(pntd_of(net)) " xmldict(node)
     #error("parse_structure is not implemented for $(pntd_of(net))")
-    return TermJunk(UserSortRef(:int), UserSortRef(:int), ())
+    return TermJunk(SortRefEx(UserSortRef(:int)), UserSortRef(:int), ())
 end
 
 function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)

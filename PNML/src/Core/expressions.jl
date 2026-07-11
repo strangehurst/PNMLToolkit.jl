@@ -19,7 +19,7 @@ export expr_sortref, toexpr
 # abstract types
 export AbstractBoolExpr, AbstractOpExpr, PnmlExpr
 # concrete types
-export BooleanEx, DotConstantEx, NumberEx, PnmlTupleEx, UserOperatorEx, VariableEx
+export BooleanEx, DotConstantEx, NumberEx, SortRefEx, PnmlTupleEx, UserOperatorEx, VariableEx
 export Add, Bag, Cardinality, CardinalityOf, Contains, ScalarProduct, Subtract
 export And, Equality, Imply, Inequality, Not, Or, Predecessor, Successor
 export PartitionElementOf, PartitionGreaterThan, PartitionLessThan
@@ -133,6 +133,17 @@ end
 # function Base.:(==)(a::PnmlExpr, b::PnmlExpr)
 #     a.head == b.head && a.args == b.args && a.foo == b.foo #! is this corrct XXX
 # end
+
+###################################################################################
+# Expression holdine a SortRef
+@matchable struct SortRefEx <: PnmlExpr
+    ref::SortRef
+end
+toexpr(sr::SortRefEx, _::NamedTuple, _) = QuoteNode{sr.ref}
+expr_sortref(sr::SortRefEx, _) = sr.ref
+function Base.show(io::IO, x::SortRefEx)
+    print(io, "SortRefEx(", x.ref, ")" )
+end
 
 ###################################################################################
 # expression constructing a `Variable` wrapping a REFID symbol to a `VariableDeclaration`.

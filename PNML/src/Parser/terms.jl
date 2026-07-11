@@ -1,10 +1,13 @@
 """
-    TermJunk
+    $(TYPEDEF)
 
-`parse_term` returns a triple of: PnmlExpr, SortRef, NTuple{N,REFID}
+    $(TYPEDFIELDS)
+
+A triple representing an expression, its output sort and variable ids of its arguments.
+Returned by `parse_term`.
 """
-struct TermJunk{N,T <: Union{PnmlExpr,SortRef}}
-    exp::T # see `parse_sorttype_term` for why SortRef. #TODO make sortref PnmlExpr?
+struct TermJunk{N, T <: PnmlExpr}
+    exp::T
     ref::SortRef
     vars::NTuple{N,Symbol}
 end
@@ -31,17 +34,13 @@ where condition and inscription expressions may contain non-ground terms (using 
 function parse_term(node::XMLNode, net::AbstractPnmlNet; vars)
     tag = Symbol(EzXML.nodename(node))
     tag === :namedoperator && error("namedoperator is a declaration, not a term!")
-    tjtuple = parse_term(Val(tag), node, net; vars)::TermJunk
-    # tjtupel is (expression, sortref, vars) like all parse_term methods.
+    tj = parse_term(Val(tag), node, net; vars)::TermJunk
     # Collect varible REFIDs in `vars`. `length(vars) == 0` means is a ground term.
-    # Ensure that there is a `toexpr` method. #! DEBUG only?
-    if !isa(which(toexpr, (typeof(tjtuple.exp), NamedTuple, DeclDict)), Method)
-        error("No `toexpr` method for expression in $tjtuple")
+    # Ensure that there is a `toexpr(::PnmlExpr, ::NamedTuple, ::PnmlNet)` method.
+    if !isa(which(toexpr, (typeof(tj.exp), NamedTuple, AbstractPnmlNet)), Method)
+        error("No `toexpr` method for expression in $tj")
     end
-    if tjtuple.exp isa Number
-        @info "TermJunk expression is a Number $tjtuple"
-    end
-    return tjtuple
+    return tj
 end
 
 """
@@ -292,7 +291,7 @@ function parse_term(::Val{:scalarproduct}, node::XMLNode, net::AbstractPnmlNet; 
     product2_tj = parse_term(Val(tag2), stnode2, net; product1_tj.vars)::TermJunk # bag
 
     return TermJunk(ScalarProduct(product1_tj.exp, product2_tj.exp),
-                    basis(product2_tj.exp),
+                    basis(product2_tj.exp)::SortRef,
                     product2_tj.vars) #
 end
 
