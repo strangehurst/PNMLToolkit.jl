@@ -182,7 +182,7 @@ function parse_namedoperator(node::XMLNode, net::AbstractPnmlNet)
     # operators &/or variable parameters that define the operation.
     # The sort of the operator is the output sort of def.
     if isnothing(dnode)
-        # contains 1 term
+        # Expect 1 child
         ERR_MSG ="<namedoperator name=$name id=$operator_id> does not have a <def> element"
         throw(MalformedException(ERR_MSG))
     end
