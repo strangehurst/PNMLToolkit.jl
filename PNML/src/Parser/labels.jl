@@ -442,9 +442,6 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
         error("missing inscription term of arc $(source(pit)) -> $(target(pit))")
     tj = parse_term(EzXML.firstelement(node), net; vars=())::TermJunk
 
-    isa(tj.exp, PnmlExpr) ||
-        error("inscription is a $(nameof(typeof(tj.exp))), expected PnmlExpr")
-
     if !equalSorts(net, tj.ref, placesort)
         @error("arc $(source(pit)) -> $(target(pit)) inscription term sort mismatch: $(tj.ref) != $placesort",
                 tj, adjacentplace)
@@ -551,7 +548,7 @@ function parse_sorttype(node::XMLNode, net::AbstractPnmlNet; parentid)
 end
 
 """
-    parse_sorttype_term(::XMLNode, ::AbstractPNTD; net::AbstractPnmlNet) -> PnmlExpr, SortRef, Tuple
+    parse_sorttype_term(::XMLNode, net::AbstractPnmlNet) -> TermJunk
 
 The PNML `<type>` of a `<place>` is a "sort" of the high-level many-sorted algebra.
 Because we are using the HL implementation with the other meta-models,
