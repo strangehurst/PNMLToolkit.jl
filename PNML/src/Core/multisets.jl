@@ -54,7 +54,7 @@ Base.keys(ms::PnmlMultiset) = keys(multiset(ms))
 Base.values(ms::PnmlMultiset) = values(multiset(ms))
 Base.iterate(ms::PnmlMultiset, ss) = iterate(multiset(ms), ss)
 Base.iterate(ms::PnmlMultiset) = iterate(multiset(ms))
-Base.convert(Bool, ::PnmlMultiset{DotConstant}) = true
+Base.convert(::Type{Bool}, ::PnmlMultiset{DotConstant}) = true
 
 Base.:(==)(c::PnmlMultiset{DotConstant}, n::Number)  = convert(Bool, c) == n
 Base.:(==)( n::Number, c::PnmlMultiset{DotConstant}) = n == convert(Bool, c)
