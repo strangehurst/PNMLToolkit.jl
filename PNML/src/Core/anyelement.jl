@@ -8,28 +8,12 @@ const XmlDictType = LittleDict{Union{Symbol,String}, Any} #Union{XmlDictType, St
 tag(d::XmlDictType) = first(keys(d)) # String or Symbol
 
 """
-$(TYPEDSIGNATURES)
-Find first :text and return its :content as string.
-"""
-function text_content end
+    _attribute(xd::AbstractDict, key::Symbol) -> AbstractString
 
-function text_content(vx::Vector{Any})
-    isempty(vx) && throw(ArgumentError("empty `Vector` not expected"))
-    text_content(first(vx))
-end
-
-function text_content(d::XmlDictType)
-    x = get(d, "text", nothing)
-    isnothing(x) && throw(ArgumentError("missing <text> element in $d"))
-    return x
-end
-text_content(s::Union{String,SubString{String}}) = s
-
+XMLDict uses symbols as dictionary keys for XML attributes. Value returned is a string.
 """
-XMLDict uses symbols as keys for XML attributes. Value returned is a string.
-"""
-function _attribute(vx::XmlDictType, key::Symbol)
-    x = get(vx, key, nothing)
+function _attribute(@nospecialize(xd::AbstractDict), key::Symbol)
+    x = get(xd, key, nothing)
     isnothing(x) && throw(ArgumentError("missing $key value"))
     isa(x, AbstractString) || throw(ArgumentError("expected AbstractString got $x"))
     return x
