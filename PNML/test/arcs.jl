@@ -27,7 +27,7 @@ end
 
 #! arc needs :place1 for adjacent place
 "Parse place with marking, add to dict & id set"
-function pl_node(net::PnmlNet, netsets::PnmlNetKeys)
+function pl_node(net::AbstractPnmlNet, netsets::PnmlNetKeys)
     node = if is_highlevel(pntd_of(net))
         xml"""
             <place id="place1">
@@ -60,7 +60,7 @@ end
 
 #! arc needs :transition1 for adjacent transition
 "Parse empty transition, add to dict & id set"
-function tr_node(net::PnmlNet, netsets::PnmlNetKeys)
+function tr_node(net::AbstractPnmlNet, netsets::PnmlNetKeys)
     node = xml"""<transition id="transition1" />"""
     tr = parse_transition(node, net)
     push!(transition_idset(netsets), pid(tr))

@@ -42,11 +42,11 @@ function unwrap_pmset(mark)
 end
 
 """
-    labeled_places(net::PnmlNet, marking_vector)
+    labeled_places(net::AbstractPnmlNet, marking_vector)
 
 Return Vector of place_id=>marking_value of that pace.
 """
-function labeled_places(net::PnmlNet, markings)
+function labeled_places(net::AbstractPnmlNet, markings)
     [k=>v for (k,v) in zip(map(pid, places(net)), markings)]
 end
 

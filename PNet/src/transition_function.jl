@@ -13,7 +13,7 @@ Values are inscriptions of the arc.
 function transition_function end
 
 transition_function(petrinet::AbstractPetriNet) = transition_function(pnmlnet(petrinet))
-transition_function(@nospecialize(net::PnmlNet)) =
+transition_function(@nospecialize(net::AbstractPnmlNet)) =
     [tid => in_out(net, tid) for tid in PNML.transition_idset(net)]
 
 """
@@ -28,7 +28,7 @@ function civ(@nospecialize(net::AbstractPnmlNet), arc_id::Symbol)
 end
 
 """
-    labeled_transitions((net::PnmlNet)) -> `(t_name=>t_rate)=>((input_states)=>(output_states))`
+    labeled_transitions((net::AbstractPnmlNet)) -> `(t_name=>t_rate)=>((input_states)=>(output_states))`
 
 Iterates over transitions producing a pair for each tansition :=
     `Pair{Pair{Symbol,Number}, Pair{Tuple,Tuple}}`
@@ -37,7 +37,7 @@ the Tuples are transition's input and out place IDs tupled with arc's inscriptio
 """
 function labeled_transitions end
 labeled_transitions(petrinet::AbstractPetriNet) = labeled_transitions(pnmlnet(petrinet))
-function labeled_transitions(@nospecialize(net::PnmlNet))
+function labeled_transitions(@nospecialize(net::AbstractPnmlNet))
     Iterators.map(PNML.transitions(net)) do tr # states are places
         # tuple of tuple place id, arc inscription value as integer
         ins = tuple(zip(PNML.preset(net, pid(tr)),
@@ -56,7 +56,7 @@ Useful for petri net meta-models that need special handling to expand when inscr
 """
 function counted_transitions end
 counted_transitions(petrinet::AbstractPetriNet) = counted_transitions(pnmlnet(petrinet))
-function counted_transitions(net::PnmlNet)
+function counted_transitions(net::AbstractPnmlNet)
     Iterators.map(PNML.transitions(net)) do tr
         in_counts = tuple(map(arcid  -> civ(net, arcid), PNML.tgt_arcs(net, pid(tr))))
         out_counts = tuple(map(arcid -> civ(net, arcid), PNML.src_arcs(net, pid(tr))))
@@ -75,7 +75,7 @@ function in_out end
 function in_out(petrinet::AbstractPetriNet, transition_id)
     in_out(pnmlnet(petrinet), transition_id)
 end
-function in_out(net::PnmlNet, transition_id)
+function in_out(net::AbstractPnmlNet, transition_id)
     (in_inscriptions(net, transition_id),
     out_inscriptions(net, transition_id))
 end
@@ -85,14 +85,14 @@ end
 
 # Inscription values labeled with source place id for arcs with `transition_id` as the target id.
 # """
-# ins(net::PnmlNet, transition_id::Symbol) = LVector((; collect(in_inscriptions(net, transition_id))...))
+# ins(net::AbstractPnmlNet, transition_id::Symbol) = LVector((; collect(in_inscriptions(net, transition_id))...))
 
 # """
 #     outs(net, transition_id) -> LVector
 
 # Inscription values labeled with target place id for arcs with `transition_id` as the source id.
 # """
-# outs(net::PnmlNet, transition_id::Symbol) = LVector((; collect(out_inscriptions(net, transition_id))...))
+# outs(net::AbstractPnmlNet, transition_id::Symbol) = LVector((; collect(out_inscriptions(net, transition_id))...))
 
 #
 # See input flow #todo cite ISO 15909-1:2019
@@ -101,7 +101,7 @@ end
 
 Iterate over preset of transition, returning source place id => inscription value pairs.
 """
-function in_inscriptions(net::PnmlNet, transitionid)
+function in_inscriptions(net::AbstractPnmlNet, transitionid)
     Iterators.map(PNML.preset(net, transitionid)) do placeid
         a = PNML.arc(net, placeid, transitionid)::Union{Arc, Nothing}
         isnothing(a) &&
@@ -116,7 +116,7 @@ end
 
 Iterate over postset of transition, returning target place id => inscription value pairs.
 """
-function out_inscriptions(net::PnmlNet, transitionid)
+function out_inscriptions(net::AbstractPnmlNet, transitionid)
     Iterators.map(PNML.postset(net, transitionid)) do placeid
         a = PNML.arc(net, transitionid, placeid)::Union{Arc, Nothing}
         isnothing(a) &&
@@ -139,7 +139,7 @@ struct TransitionMatrices{T<:Number} #Int except for ContinuousNet where it is F
     input::Matrix{T}
     output::Matrix{T}
 end
-function TransitionMatrices(p::PnmlNet)
+function TransitionMatrices(p::AbstractPnmlNet)
     input  = input_matrix(p)
     output = output_matrix(p)
     TransitionMatrices(input, output)

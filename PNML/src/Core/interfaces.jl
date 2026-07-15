@@ -157,7 +157,7 @@ function transition_idset end
 function conditions end
 
 """
-    rates(net::PnmlNet) -> Iterator
+    rates(net::AbstractPnmlNet) -> Iterator
 
 Return iterator over REFID => rate_value(transaction) pairs of `net`.
 This is the same order as `transactions`.
@@ -181,7 +181,7 @@ function condition end
 # ARCS & INSCRIPTIONS
 #--------------------------------------------
 """
-    arcs(n::PnmlNet) -> iterator
+    arcs(n::AbstractPnmlNet) -> iterator
     arcs(p::AbstractPetriNet) -> iterator
 
 Return iterator over arc ids.
@@ -440,8 +440,8 @@ Return the dictionary produced by `xmldict` in a `AnyElement`, `PnmlLabel` or `T
 function elements end
 
 """
-    adjacent_place(net::PnmlNet, arc::Arc) -> Place
-    adjacent_place(net::PnmlNet, source,::Symbol target::Symbol) -> Place
+    adjacent_place(net::AbstractPnmlNet, arc::Arc) -> Place
+    adjacent_place(net::AbstractPnmlNet, source,::Symbol target::Symbol) -> Place
 
 Adjacent place of an arc is either the `source` or `target`.
 """

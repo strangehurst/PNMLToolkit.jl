@@ -50,12 +50,12 @@ by [`PNML.flatten_pages!`](@ref) without losing any Petri Net semantics.
 """
 abstract type AbstractPetriNet{PNTD <: AbstractPNTD} end
 
-# Interface is having id::Symbol, net::PnmlNet.
+# Interface is having id::Symbol, net::AbstractPnmlNet.
 # function Base.getproperty(pn::AbstractPetriNet, prop_name::Symbol)
 #     if prop_name === :id
 #         return getfield(pn, :id)::Symbol
 #     # elseif prop_name === :net
-#     #     return getfield(pn, :net)::PnmlNet # abstract
+#     #     return getfield(pn, :net)::AbstractPnmlNet # abstract
 #     end
 #     return getfield(pn, prop_name)
 # end
@@ -63,10 +63,10 @@ abstract type AbstractPetriNet{PNTD <: AbstractPNTD} end
 nettype(petrinet::AbstractPetriNet) = nettype(pnmlnet(petrinet))
 pid(petrinet::AbstractPetriNet)     = pid(pnmlnet(petrinet))
 name(petrinet::AbstractPetriNet)    = PNML.name(pnmlnet(petrinet))
-pnmlnet(petrinet::AbstractPetriNet) = petrinet.net::PnmlNet
+pnmlnet(petrinet::AbstractPetriNet) = petrinet.net::AbstractPnmlNet
 
 """
-    inscriptions(net::PnmlNet) -> Iterator
+    inscriptions(net::AbstractPetriNet) -> Iterator
 
 Return iterator over REFID => inscription(arc) pairs of `net`. This is the same order as `arcs`.
 """
@@ -181,7 +181,7 @@ SimpleNet(node::PNML.XMLNode) = SimpleNet(PNML.Parser.pnmlmodel(node)) #TODO lp,
 
 # These two use the flattened 1st net of the PnmlModel.
 SimpleNet(model::PnmlModel) = SimpleNet(PNML.firstnet(model))
-function SimpleNet(net::PnmlNet)
+function SimpleNet(net::AbstractPnmlNet)
     PNML.flatten_pages!(net)
     SimpleNet(PNML.pid(net), net)
 end

@@ -2,7 +2,7 @@
 # TODO Check for illegal intra-page references? WHERE?
 
 """
-    flatten_pages!(net::PnmlNet[; options])
+    flatten_pages!(net::AbstractPnmlNet[; options])
 
 Merge page content into the 1st page of the net.
 
@@ -12,8 +12,8 @@ Options
 """
 function flatten_pages! end
 
-# Most content is already in the PnmlNet database so mostly involves shuffling keys
-function flatten_pages!(net::PnmlNet; trim::Bool = true, verbose::Bool = CONFIG.verbose)
+# Most content is already in the net database so mostly involves shuffling keys
+function flatten_pages!(net::AbstractPnmlNet; trim::Bool = true, verbose::Bool = CONFIG.verbose)
     if length(pagedict(net)) > 1 # Place content of other pages into 1st page.
         pageids = keys(pagedict(net))
 
@@ -43,8 +43,7 @@ function flatten_pages!(net::PnmlNet; trim::Bool = true, verbose::Bool = CONFIG.
 end
 
 "Verify a `PnmlNet` after it has been flattened or is otherwise expected to be a single-page net."
-function post_flatten_verify(net::PnmlNet,
-                          verbose::Bool = CONFIG.verbose)
+function post_flatten_verify(net::AbstractPnmlNet, verbose::Bool = CONFIG.verbose)
     verbose && @info "post_flatten_verify"
     errors = String[]
 
@@ -130,7 +129,7 @@ as part of [`flatten_pages!`](@ref),
   3) All ids are valid.
   4) No cycles.
 """
-function deref!(net::PnmlNet; trim::Bool = true, verbose::Bool = CONFIG.verbose)
+function deref!(net::AbstractPnmlNet; trim::Bool = true, verbose::Bool = CONFIG.verbose)
     if isempty(refplaces(net)) && isempty(nreftransitions(net))
         verbose && println("no references")
         return nothing # net
@@ -167,7 +166,7 @@ end
 
 Return id of referenced place. If trim is `true` (default) the reference is removed.
 """
-function deref_place(net::PnmlNet, id::Symbol; trim::Bool = true)
+function deref_place(net::AbstractPnmlNet, id::Symbol; trim::Bool = true)
     netid = pid(net)
     has_refplace(net, id) ||
         throw(ArgumentError("expected refplace $id to be found in net $netid"))
@@ -191,7 +190,7 @@ end
 
 Return id of referenced transition. If trim is `true` (default) the reference is removed.
 """
-function deref_transition(net::PnmlNet, id::Symbol; trim::Bool = true)
+function deref_transition(net::AbstractPnmlNet, id::Symbol; trim::Bool = true)
     netid = pid(net)
     has_reftransition(net, id) || (throw ∘ ArgumentError)("expected reftransition $id in net $netid")
     rt = reftransition(net, id)

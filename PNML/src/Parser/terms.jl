@@ -36,7 +36,7 @@ function parse_term(node::XMLNode, net::AbstractPnmlNet; vars)
     tag === :namedoperator && error("namedoperator is a declaration, not a term!")
     tj = parse_term(Val(tag), node, net; vars)::TermJunk
     # Collect varible REFIDs in `vars`. `length(vars) == 0` means is a ground term.
-    # Ensure that there is a `toexpr(::PnmlExpr, ::NamedTuple, ::PnmlNet)` method.
+    # Ensure that there is a `toexpr(::PnmlExpr, ::NamedTuple, ::AbstractPnmlNet)` method.
     if !isa(which(toexpr, (typeof(tj.exp), NamedTuple, AbstractPnmlNet)), Method)
         error("No `toexpr` method for expression in $tj")
     end
