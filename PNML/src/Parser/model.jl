@@ -31,7 +31,7 @@ end
 function pnmlmodel(@nospecialize(filename::AbstractString); kwargs...)
     D()&& println("\n## pnmlmodel filename $filename")
     isempty(filename) && throw(ArgumentError("must have a non-empty file name argument"))
-    pnmlmodel(EzXML.root(EzXML.readxml(convert(String, filename)::String); kwargs...))
+    pnmlmodel(EzXML.root(EzXML.readxml(convert(String, filename)::String)); kwargs...)
 end
 
 function pnmlmodel(node::XMLNode; kwargs...)
