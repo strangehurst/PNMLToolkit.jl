@@ -54,7 +54,7 @@ const t_modules = (PNML,)
 const testshow = devnull # nothing turns off redirection
 
 "Ignore some dynamically-designed functions."
-function pff(@nospecialize ft)
+function pff(@nospecialize(ft))
     #if ft === typeof(IDRegistrys.register_id!) ||
     if  ft === Preferences.load_preference ||
         ft === EzXML.nodename ||

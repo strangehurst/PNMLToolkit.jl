@@ -13,7 +13,7 @@ Values are inscriptions of the arc.
 function transition_function end
 
 transition_function(petrinet::AbstractPetriNet) = transition_function(pnmlnet(petrinet))
-transition_function(net::PnmlNet) =
+transition_function(@nospecialize(net::PnmlNet)) =
     [tid => in_out(net, tid) for tid in PNML.transition_idset(net)]
 
 """
@@ -22,7 +22,7 @@ transition_function(net::PnmlNet) =
 Lookup the `Arc`, find its inscription's value.
 #TODO add variables for full HL support
 """
-function civ(net::AbstractPnmlNet, arc_id)
+function civ(@nospecialize(net::AbstractPnmlNet), arc_id::Symbol)
     a = PNML.arcdict(net)[arc_id]::Arc
     dot2int(pntd_of(net), inscription_value(net, a, NamedTuple()))
 end
@@ -37,7 +37,7 @@ the Tuples are transition's input and out place IDs tupled with arc's inscriptio
 """
 function labeled_transitions end
 labeled_transitions(petrinet::AbstractPetriNet) = labeled_transitions(pnmlnet(petrinet))
-function labeled_transitions(net::PnmlNet)
+function labeled_transitions(@nospecialize(net::PnmlNet))
     Iterators.map(PNML.transitions(net)) do tr # states are places
         # tuple of tuple place id, arc inscription value as integer
         ins = tuple(zip(PNML.preset(net, pid(tr)),
