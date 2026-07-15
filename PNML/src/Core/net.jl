@@ -67,7 +67,7 @@ $(FIELDS)
 end #= mutable struct PnmlNet =#
 
 "Iterate enable filters"
-function filters(net::AbstractPnmlNet)
+function filters(net::PnmlNet)
     # @show net.enabled_filters
     values(net.enabled_filters)
 end
@@ -103,8 +103,6 @@ page_idset(net::PnmlNet) = net.page_idset # Indices into `pagedict` directly own
 placedict(net::PnmlNet)         = net.place_dict
 transitiondict(net::PnmlNet)    = net.transition_dict
 arcdict(net::PnmlNet)           = net.arc_dict
-#! inhibit_arcdict(net::PnmlNet)   = net.inhibit_arc_dict
-#!  read_arcdict(net::PnmlNet)      = net.read_arc_dict
 refplacedict(net::PnmlNet)      = net.refplace_dict
 reftransitiondict(net::PnmlNet) = net.reftransition_dict
 
@@ -188,81 +186,81 @@ condition(net::PnmlNet, trans_id::Symbol) = condition(transition(net, trans_id))
 #------------------------------------------------------------------------------
 # DeclDict access
 #------------------------------------------------------------------------------
-useroperators(net::AbstractPnmlNet)  = useroperators(decldict(net))
-variabledecls(net::AbstractPnmlNet)  = variabledecls(decldict(net))
-namedsorts(net::AbstractPnmlNet)     = namedsorts(decldict(net))
-arbitrarysorts(net::AbstractPnmlNet) = arbitrarysorts(decldict(net))
-partitionsorts(net::AbstractPnmlNet) = partitionsorts(decldict(net))
-namedoperators(net::AbstractPnmlNet) = namedoperators(decldict(net))
-arbitraryops(net::AbstractPnmlNet)   = arbitraryops(decldict(net))
-partitionops(net::AbstractPnmlNet)   = partitionops(decldict(net))
-feconstants(net::AbstractPnmlNet)    = feconstants(decldict(net))
-multisetsorts(net::AbstractPnmlNet)  = multisetsorts(decldict(net))
-productsorts(net::AbstractPnmlNet)   = productsorts(decldict(net))
+useroperators(net::PnmlNet)  = useroperators(decldict(net))
+variabledecls(net::PnmlNet)  = variabledecls(decldict(net))
+namedsorts(net::PnmlNet)     = namedsorts(decldict(net))
+arbitrarysorts(net::PnmlNet) = arbitrarysorts(decldict(net))
+partitionsorts(net::PnmlNet) = partitionsorts(decldict(net))
+namedoperators(net::PnmlNet) = namedoperators(decldict(net))
+arbitraryops(net::PnmlNet)   = arbitraryops(decldict(net))
+partitionops(net::PnmlNet)   = partitionops(decldict(net))
+feconstants(net::PnmlNet)    = feconstants(decldict(net))
+multisetsorts(net::PnmlNet)  = multisetsorts(decldict(net))
+productsorts(net::PnmlNet)   = productsorts(decldict(net))
 
-variabledecl(net::AbstractPnmlNet, id::Symbol)  = variabledecls(net)[id]
-namedsort(net::AbstractPnmlNet, id::Symbol)     = namedsorts(net)[id]
-arbitrarysort(net::AbstractPnmlNet, id::Symbol) = arbitrarysorts(net)[id]
-partitionsort(net::AbstractPnmlNet, id::Symbol) = partitionsorts(net)[id]
-multisetsort(net::AbstractPnmlNet, id::Symbol)  = multisetsorts(net)[id]
-productsort(net::AbstractPnmlNet, id::Symbol)   = productsorts(net)[id]
-namedop(net::AbstractPnmlNet, id::Symbol)       = namedoperators(net)[id]
-arbitraryop(net::AbstractPnmlNet, id::Symbol)   = arbitraryops(net)[id]
-partitionop(net::AbstractPnmlNet, id::Symbol)   = partitionops(net)[id]
-feconstant(net::AbstractPnmlNet, id::Symbol)    = feconstants(net)[id]
-useroperator(net::AbstractPnmlNet, id::Symbol)  = useroperators(net)[id]
+variabledecl(net::PnmlNet, id::Symbol)  = variabledecls(net)[id]
+namedsort(net::PnmlNet, id::Symbol)     = namedsorts(net)[id]
+arbitrarysort(net::PnmlNet, id::Symbol) = arbitrarysorts(net)[id]
+partitionsort(net::PnmlNet, id::Symbol) = partitionsorts(net)[id]
+multisetsort(net::PnmlNet, id::Symbol)  = multisetsorts(net)[id]
+productsort(net::PnmlNet, id::Symbol)   = productsorts(net)[id]
+namedop(net::PnmlNet, id::Symbol)       = namedoperators(net)[id]
+arbitraryop(net::PnmlNet, id::Symbol)   = arbitraryops(net)[id]
+partitionop(net::PnmlNet, id::Symbol)   = partitionops(net)[id]
+feconstant(net::PnmlNet, id::Symbol)    = feconstants(net)[id]
+useroperator(net::PnmlNet, id::Symbol)  = useroperators(net)[id]
 
-#useroperator(net::AbstractPnmlNet)  = useroperator(decldict(net))
-#variabledecl(net::AbstractPnmlNet)  = variabledecl(decldict(net))
-namedsort(net::AbstractPnmlNet, ref::SortRef)     = namedsort(net, refid(ref))
-arbitrarysort(net::AbstractPnmlNet, ref::SortRef) = arbitrarysort(net, refid(ref))
-partitionsort(net::AbstractPnmlNet, ref::SortRef) = partitionsort(net, refid(ref))
-#namedoperator(net::AbstractPnmlNet) = namedoperator(decldict(net))
-#arbitraryop(net::AbstractPnmlNet)   = arbitraryoperator(decldict(net))
-#partitionop(net::AbstractPnmlNet)   = partitionop(decldict(net))
-feconstant(net::AbstractPnmlNet, ref::SortRef)    = feconstant(net, refid(ref))
-multisetsort(net::AbstractPnmlNet, ref::SortRef)  = multisetsort(net, refid(ref))
-productsort(net::AbstractPnmlNet, ref::SortRef)   = productsort(net, refid(ref))
+#useroperator(net::PnmlNet)  = useroperator(decldict(net))
+#variabledecl(net::PnmlNet)  = variabledecl(decldict(net))
+namedsort(net::PnmlNet, ref::SortRef)     = namedsort(net, refid(ref))
+arbitrarysort(net::PnmlNet, ref::SortRef) = arbitrarysort(net, refid(ref))
+partitionsort(net::PnmlNet, ref::SortRef) = partitionsort(net, refid(ref))
+#namedoperator(net::PnmlNet) = namedoperator(decldict(net))
+#arbitraryop(net::PnmlNet)   = arbitraryoperator(decldict(net))
+#partitionop(net::PnmlNet)   = partitionop(decldict(net))
+feconstant(net::PnmlNet, ref::SortRef)    = feconstant(net, refid(ref))
+multisetsort(net::PnmlNet, ref::SortRef)  = multisetsort(net, refid(ref))
+productsort(net::PnmlNet, ref::SortRef)   = productsort(net, refid(ref))
 
 "Lookup operator with `id` in DeclDict.::Symbol May be namedop, feconstant, etc"
-operator(net::AbstractPnmlNet, id::Symbol) = operator(decldict(net), id)
+operator(net::PnmlNet, id::Symbol) = operator(decldict(net), id)
 """
-    operators(net::AbstractPnmlNet)-> Iterator
+    operators(net::PnmlNet)-> Iterator
 Iterate over each operator in the operator subset of declaration dictionaries .
 """
-operators(net::AbstractPnmlNet) = operators(decldict(net))
+operators(net::PnmlNet) = operators(decldict(net))
 
-has_operator(net::AbstractPnmlNet, id::Symbol) = has_operator(decldict(net), id)
+has_operator(net::PnmlNet, id::Symbol) = has_operator(decldict(net), id)
 
 """
-    has_key(net::AbstractPnmlnet, dict, key::Symbol) -> Bool
+    has_key(net::PnmlNet, dict, key::Symbol) -> Bool
 Where `dict` is the access method for a dictionary in `DeclDict`.
 """
-has_key(net::AbstractPnmlNet, dict, key::Symbol) = haskey(dict(decldict(net)), key)
+has_key(net::PnmlNet, dict, key::Symbol) = haskey(dict(decldict(net)), key)
 
-has_variabledecl(net::AbstractPnmlNet, id::Symbol)   = has_key(net, variabledecls, id)
-has_namedsort(net::AbstractPnmlNet, id::Symbol)      = has_key(net, namedsorts, id)
-has_arbitrarysort(net::AbstractPnmlNet, id::Symbol)  = has_key(net, arbitrarysorts, id)
-has_partitionsort(net::AbstractPnmlNet, id::Symbol)  = has_key(net, partitionsorts, id)
-has_multisetsort(net::AbstractPnmlNet, id::Symbol)   = has_key(net, multisetsorts, id)
-has_productsort(net::AbstractPnmlNet, id::Symbol)    = has_key(net, productsorts, id)
-has_namedop(net::AbstractPnmlNet, id::Symbol)        = has_key(net, namedoperators, id)
-has_arbitraryop(net::AbstractPnmlNet, id::Symbol)    = has_key(net, arbitraryops, id)
-has_partitionop(net::AbstractPnmlNet, id::Symbol)    = has_key(net, partitionops, id)
-has_feconstant(net::AbstractPnmlNet, id::Symbol)     = has_key(net, feconstants, id)
-has_useroperator(net::AbstractPnmlNet, id::Symbol)   = has_key(net, useroperators, id)
+has_variabledecl(net::PnmlNet, id::Symbol)   = has_key(net, variabledecls, id)
+has_namedsort(net::PnmlNet, id::Symbol)      = has_key(net, namedsorts, id)
+has_arbitrarysort(net::PnmlNet, id::Symbol)  = has_key(net, arbitrarysorts, id)
+has_partitionsort(net::PnmlNet, id::Symbol)  = has_key(net, partitionsorts, id)
+has_multisetsort(net::PnmlNet, id::Symbol)   = has_key(net, multisetsorts, id)
+has_productsort(net::PnmlNet, id::Symbol)    = has_key(net, productsorts, id)
+has_namedop(net::PnmlNet, id::Symbol)        = has_key(net, namedoperators, id)
+has_arbitraryop(net::PnmlNet, id::Symbol)    = has_key(net, arbitraryops, id)
+has_partitionop(net::PnmlNet, id::Symbol)    = has_key(net, partitionops, id)
+has_feconstant(net::PnmlNet, id::Symbol)     = has_key(net, feconstants, id)
+has_useroperator(net::PnmlNet, id::Symbol)   = has_key(net, useroperators, id)
 
-has_variabledecl(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, variabledecls, refid(ref))
-has_namedsort(net::AbstractPnmlNet, ref::SortRef)     = has_key(net, namedsorts, refid(ref))
-has_arbitrarysort(net::AbstractPnmlNet, ref::SortRef) = has_key(net, arbitrarysorts, refid(ref))
-has_partitionsort(net::AbstractPnmlNet, ref::SortRef) = has_key(net, partitionsorts, refid(ref))
-has_multisetsort(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, multisetsorts, refid(ref))
-has_productsort(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, productsorts,refid(ref) )
-has_namedop(net::AbstractPnmlNet, ref::SortRef)       = has_key(net, namedoperators, refid(ref))
-has_arbitraryop(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, arbitraryops, refid(ref))
-has_partitionop(net::AbstractPnmlNet, ref::SortRef)   = has_key(net, partitionops, refid(ref))
-has_feconstant(net::AbstractPnmlNet, ref::SortRef)    = has_key(net, feconstants, refid(ref))
-has_useroperator(net::AbstractPnmlNet, ref::SortRef)  = has_key(net, useroperators, refid(ref))
+has_variabledecl(net::PnmlNet, ref::SortRef)  = has_key(net, variabledecls, refid(ref))
+has_namedsort(net::PnmlNet, ref::SortRef)     = has_key(net, namedsorts, refid(ref))
+has_arbitrarysort(net::PnmlNet, ref::SortRef) = has_key(net, arbitrarysorts, refid(ref))
+has_partitionsort(net::PnmlNet, ref::SortRef) = has_key(net, partitionsorts, refid(ref))
+has_multisetsort(net::PnmlNet, ref::SortRef)  = has_key(net, multisetsorts, refid(ref))
+has_productsort(net::PnmlNet, ref::SortRef)   = has_key(net, productsorts,refid(ref) )
+has_namedop(net::PnmlNet, ref::SortRef)       = has_key(net, namedoperators, refid(ref))
+has_arbitraryop(net::PnmlNet, ref::SortRef)   = has_key(net, arbitraryops, refid(ref))
+has_partitionop(net::PnmlNet, ref::SortRef)   = has_key(net, partitionops, refid(ref))
+has_feconstant(net::PnmlNet, ref::SortRef)    = has_key(net, feconstants, refid(ref))
+has_useroperator(net::PnmlNet, ref::SortRef)  = has_key(net, useroperators, refid(ref))
 
 
 #------------------------------------------------------------------------------
@@ -329,12 +327,12 @@ function verify!(errors::Vector{String}, net::PnmlNet, verbose::Bool)
 end
 
 """
-    verify_ids!(errors, str, iterable, net::AbstractPnmlNet) -> Vector{String}
+    verify_ids!(errors, str, iterable, net::PnmlNet) -> Vector{String}
 
 Iterate over `iterable` testing that `pid` is registered in `net`.
 `str` used in message appended to `errors` vector of strings.
 """
-function verify_ids!(errors, str::AbstractString, iterable, net::AbstractPnmlNet)
+function verify_ids!(errors, str::AbstractString, iterable, net::PnmlNet)
     for x in iterable
         if !isregistered(registry_of(net), pid(x))
             push!(errors, string(str, " ", pid(x), " not registered")::String)
@@ -396,4 +394,4 @@ function Base.show(io::IO, net::PnmlNet)
     end
 end
 
-show_sorts(net::AbstractPnmlNet) = show_sorts(decldict(net))
+show_sorts(net::PnmlNet) = show_sorts(decldict(net))
