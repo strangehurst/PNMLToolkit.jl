@@ -56,7 +56,7 @@ println("-----------------------------------------")
 # finiteenumeration
 @testset let fname=joinpath(@__DIR__, oracle, "full_sn.xml")
     model = @test_logs((:error, r".*inscription not provided for arc.*"),
-                       (:error, r".*has neither a mark nor sorttype, use :dot.*"),
+                       (:error, r".*has no sorttype, cannot infer initial marking sort"),
                        match_mode=:any,
         pnmlmodel(fname)::PnmlModel)
     summary(stdout, model)
@@ -77,7 +77,7 @@ println("full_hlpn.xml") # modified
 println("-----------------------------------------")
 @testset let fname=joinpath(@__DIR__, oracle, "full_hlpn.xml")
     model = @test_logs((:error, r".*inscription not provided for arc.*"),
-                       (:error, r".*has neither a mark nor sorttype, use :dot.*"),
+                       (:error, r".*has no sorttype, cannot infer initial marking sort"),
                        match_mode=:any,
         pnmlmodel(fname)::PnmlModel)
     summary(stdout, model)
