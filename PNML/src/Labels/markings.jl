@@ -7,20 +7,40 @@ Label of [`Place`](@ref).
 Is a functor that returns the `value`.
 ```
 """
-@auto_hash_equals cache=true typearg=false struct Marking{N <: AbstractPnmlNet, T <: PnmlExpr} <: Annotation
+@kwdef struct Marking{N <: AbstractPnmlNet, T <: PnmlExpr} <: Annotation
     term::T #! expression
-    text::Maybe{String} # Supposed to be for human consumption.
-    graphics::Maybe{Graphics} # PTNet uses TokenGraphics in toolspecinfos rather than graphics.
-    toolspecinfos::Maybe{Vector{ToolInfo}}
+    text::Maybe{String} = nothing # Supposed to be for human consumption.
+    graphics::Maybe{Graphics} = nothing# PTNet uses TokenGraphics in toolspecinfos rather than graphics.
+    toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
     net::N
+    place::Symbol
+end
+
+import Base: ==, hash
+function Base.:(==)(a::Marking, b::Marking)
+    return coalesce((a.term == b.term), false) &&
+        (a.text == b.text) &&
+        (a.graphics == b.graphics) &&
+        (a.toolspecinfos == b.toolspecinfos) &&
+        (a.net == b.net) &&
+        (a.place == b.place)
+end
+
+function Base.hash(u::Marking, h::UInt)
+    # Mix the type symbol and the field hashes with the incoming salt 'h'
+    return Base.hash(u.term,
+                     hash(u.text,
+                     hash(u.graphics,
+                     hash(u.toolspecinfos,
+                     hash(u.net,
+                     hash(:Marking,
+                     h))))))
 end
 
 # Allow any Number subtype, only a few concrete subtypes are expected.
-function Marking(m::Number, net::AbstractPnmlNet)
-    Marking(NumberEx(sortref(m)::SortRef, m), net)
+function Marking(m::Number, net::AbstractPnmlNet, place::Symbol)
+    Marking(; term=NumberEx(sortref(m)::SortRef, m), net, place)
 end
-Marking(nx::NumberEx, net::AbstractPnmlNet) = Marking(nx, nothing, nothing, nothing, net)
-Marking(t::PnmlExpr, s::Maybe{AbstractString}, net::AbstractPnmlNet) = Marking(t, s, nothing, nothing, net)
 
 term(marking::Marking) = marking.term
 
@@ -85,7 +105,7 @@ HL Net Marking values are a ground terms of this multi-sorted algebra.
 
 Used to initialize a marking vector that will then be updated by firing a transition.
 """
-(mark::Marking)() = evaluate_mark(mark)
+(mark::Marking)() = evaluate_mark(mark) #::value_type(Marking, pntd_of(mark.net))
 @memoize function evaluate_mark(mark::Marking)
     eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net)) #::value_type(Marking, pntd_of(mark.net))
 end
@@ -115,8 +135,12 @@ value_type(::Type{Marking}, ::AbstractPNTD) = eltype(NaturalSort) #::Int
 value_type(::Type{Marking}, ::AbstractContinuousNet) = eltype(RealSort) #::Float64
 
 # These are networks were the tokens have individual identities.
+# Each place may have a different sort type.
 function value_type(::Type{Marking}, pntd::AbstractHLCore)
-     @outline(pntd, @error("value_type(::Type{Marking}, $pntd undefined. Using DotSort."))
+     #@outline(pntd,
+        @error("value_type(::Type{Marking}, $pntd undefined. Using DotSort.",
+                stacktrace())
+            #))
     eltype(DotSort)
 end
 

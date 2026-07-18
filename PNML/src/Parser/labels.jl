@@ -203,7 +203,9 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::AbstractP
         @error("initial marking value type of $(pntd_of(net)) must be $mvt, found: $pt")
     value = isnothing(l.text) ? zero(pt) : number_value(pt, l.text)
     # We ate the text to make the expression.
-    Marking(NumberEx(sortref(placetype), value), nothing, l.graphics, l.toolspecinfos, net)
+    Marking(; term = NumberEx(sortref(placetype), value),
+              text=nothing, l.graphics,
+              l.toolspecinfos, net, place=parentid)
 end
 
 """
@@ -288,7 +290,7 @@ function parse_hlinitialMarking(node::XMLNode, default_sorttype::Maybe{SortType}
     else
         l.exp
     end
-    Marking(markexp, l.text, l.graphics, l.toolspecinfos, net)
+    Marking(; term=markexp, l.text, l.graphics, l.toolspecinfos, net, place=parentid)
 end # parse_hlinitialMarking
 
 
@@ -311,13 +313,14 @@ function parse_fifoinitialMarking(node::XMLNode, default_sorttype::Maybe{SortTyp
 
     l = parse_label_content(node, ParseMarkingTerm(defsort), net)::NamedTuple
     isnothing(l.exp) &&
-        error("Missing expression for $(pntd_of(net)) net")
+        error("Missing parse_fifoinitialMarking expression for $(pntd_of(net)) net")
     isnothing(l.sort) &&
         error("Missing parse_fifoinitialMarking sort")
     placetype = l.sort
 
     if !(is_namedsort(placetype) ||
-            (is_productsort(placetype) && all(is_namedsort, Sorts.sorts(placetype, net))))
+            (is_productsort(placetype) &&
+                all(is_namedsort, Sorts.sorts(placetype, net))))
         @error(string("$(pntd_of(net)) placetype of $parentid expected to be NamedSortRef",
                       " or product of named sorts, found $placetype"))
         is_productsort(placetype) && foreach(println, Sorts.sorts(placetype, net))
@@ -338,15 +341,10 @@ function parse_fifoinitialMarking(node::XMLNode, default_sorttype::Maybe{SortTyp
         end
     end
 
-    markexp = if isnothing(l.exp)
-        # Default is an empty queue whose eltype matches placetype.
-        Bag(sortref(placetype), def_sort_element(placetype), 0)
-    else
-        l.exp
-    end
-    Marking(markexp, l.text, l.graphics, l.toolspecinfos, net)
+    Marking(; term=l.exp, l.text,
+            l.graphics, l.toolspecinfos,
+            net, place=parentid)
 end # parse_fifoinitialMarking
-
 
 """
     ParseMarkingTerm(defsort) -> Functor

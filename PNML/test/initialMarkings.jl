@@ -33,9 +33,9 @@ using XMLDict: XMLDict
         @test mark()::Union{Int,Float64} == 123
 
         # Integer
-        mark1 = Marking(23, net)
-        @test_opt broken=false Marking(23, net)
-        @test_call Marking(23, net)
+        mark1 = Marking(23, net, :xxx)
+        @test_opt broken=false Marking(23, net, :xxx)
+        @test_call Marking(23, net, :xxx)
         @test typeof(mark1()) == typeof(23)
         @test mark1() == 23
         @show mark1()
@@ -73,11 +73,11 @@ using XMLDict: XMLDict
         @test mark()::Union{Int,Float64} == 123
 
         # Floating point
-        mark2 = Marking(3.5, net)
+        mark2 = Marking(3.5, net, :xxx)
         @show mark2 mark2() mark2.net
-        @test_opt broken=false Marking(3.5, net)
+        @test_opt broken=false Marking(3.5, net, :xxx)
         @test mark2() ≈ 3.5
-        @test_call Marking(3.5, net)
+        @test_call Marking(3.5, net, :xxx)
         @test typeof(mark2()) == typeof(3.5)
         @test_call mark2()
         @test graphics(mark2) === nothing
