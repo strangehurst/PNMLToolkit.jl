@@ -2,9 +2,9 @@
 """
     $(TYPEDSIGNATURES)
 
-    default(::Type{T<:Union{Marking,Condition,Inscription}}, net::AbstractPnmlNet, [placetype]) -> T
+    default(::Type{T<:Union{Marking,Condition,Inscription}}, net::AbstractPnmlNet [, placetype]) -> T
 
-Return a default instance of label `T` for `pntd` of `net`.
+Return a default instance of label `T` for `pntd_of(net)`.
 
 For high-level nets a `placetype` may be needed.
 """
@@ -113,15 +113,18 @@ function parse_place(node::XMLNode, net::AbstractPnmlNet)
         end
     end
 
-    if isnothing(mark) # Use additive identity of proper sort as default value.
-        effective_sorttype = if is_highlevel(pntd_of(net)) && isnothing(sorttype)
-            @error("$(pntd_of(net)) parse_place $(repr(placeid)) has neither a mark nor sorttype, " *
-                            "use :dot even if it is WRONG")
+    # Every place has an initial marking.
+    if isnothing(mark)
+        # Use additive identity of proper sort as default value.
+        eff_sorttype = if isnothing(sorttype)
+            # nothing means infer from mark, but mark not defined
+            @error(string(" parse_place $placeid has no sorttype, ",
+                    "cannot infer initial marking sort needed to generate a default value, use DotSort"))
             SortType("dummy", NamedSortRef(:dot), net)
         else
-            sorttype # Already parsed a <type> or default for non-HL.
+            sorttype
         end
-        mark = default(Marking, net, effective_sorttype::SortType)
+        mark = default(Marking, net, placeid, eff_sorttype)::Marking
     end
 
     if isnothing(sorttype) # Infer sortype of place from mark.
@@ -307,32 +310,45 @@ function parse_refTransition(node::XMLNode, net::AbstractPnmlNet)
     RefTransition(reft_id, ref, namelabel, graphics, toolspecinfos, extralabels, net)
 end
 
-function default(::Type{<:Marking}, net::AbstractPnmlNet, _placetype::SortType)
-    Marking(zero(value_type(Marking, pntd_of(net))), net) # not high-level!
-end
-
-function default(::Type{<:Marking}, net::PnmlNet{T}, placetype::SortType) where {T <: AbstractHLCore}
-    el = def_sort_element(placetype)
-    Marking(Bag(sortref(placetype), el, 0), "default", net) # el used for its type
+function default(::Type{<:Marking}, net::AbstractPnmlNet, place::Symbol, placetype::Maybe{SortType}=nothing)
+    pntd = pntd_of(net)
+    ex = if pntd isa AbstractHLCore
+        isnothing(placetype) &&
+             throw(ArgumentError("placetype needed for $pntd"))
+        el = def_sort_element(placetype) # ::value_type(Marking, pntd_of(net))
+        #@show placetype  el
+        # the value type of DotSort is Bool <: Number
+        Bag(sortref(placetype), el, 0)
+        # # el used for its type
+    elseif pntd isa AbstractContinuousNet
+        NumberEx(NamedSortRef(:real), zero(Float64))
+    else
+        NumberEx(NamedSortRef(:natural), zero(Int))
+    end
+    Marking(; term = ex, net, place) # not high-level!
 end
 
 function default(::Type{<:Labels.Condition}, net::AbstractPnmlNet)
     Labels.Condition(BooleanEx(BooleanConstant(true)), net)
 end
 
+# placetype is needed for SymmetricNet and HLPNG
 function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{SortType}=nothing)
     pntd = pntd_of(net)
-    if pntd isa PT_HLPNG
-        ex = Bag(NamedSortRef(:dot), DotConstant(), 1)
-    elseif pntd isa AbstractContinuousNet
-        ex = NumberEx(NamedSortRef(:real), one(Float64))
+    ex = if pntd isa PT_HLPNG
+         if isnothing(placetype)
+            @assert placetype == NamedSortRef(:dot)
+         end
+        Bag(NamedSortRef(:dot), DotConstant(), 1)
     elseif pntd isa AbstractHLCore
         isnothing(placetype) &&
             throw(ArgumentError("placetype needed for $pntd"))
         basis = sortref(placetype)::SortRef
-        ex = Bag(basis, def_sort_element(placetype), 1)
-    else pntd isa AbstractPnmlNet
-        ex = NumberEx(NamedSortRef(:positive), one(Int))
+        Bag(basis, def_sort_element(placetype), 1)
+    elseif pntd isa AbstractContinuousNet
+        NumberEx(NamedSortRef(:real), one(Float64))
+    else
+        NumberEx(NamedSortRef(:positive), one(Int))
     end
     Inscription(nothing, ex, nothing, nothing, REFID[], net)
 end
