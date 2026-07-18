@@ -122,7 +122,7 @@ end
 #out = vectorfield(sir_rxn)(du, concentrations(sir_rxn), rates(sir_rxn), 0.01)
 valueat(f::Function, u, t) = try f(u,t) catch e f(t) end
 
-function vectorfield(net::PnmlNet) #! MY version
+function vectorfield(net::AbstractPnmlNet) #! MY version
     outmatrix = PNML.output_matrix(net)
     inmatrix = PNML.input_matrix(net)
     dt = outmatrix - inmatrix # incidence_matrix, but here we want input also
