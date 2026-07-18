@@ -32,7 +32,7 @@ interior nodes values are `Union{XmlDictType, Vector{XmlDictType}}`
 
 See [`XmlDictType`](@ref).
 """
-@auto_hash_equals struct AnyElement{T}
+@struct_hash_equal struct AnyElement{T}
     # Tag of enclosing node (or any symbol-owning thing).
     tag::Symbol
     # LittleDict{Union{Symbol,String}, Any}  returned by `xmldict`.

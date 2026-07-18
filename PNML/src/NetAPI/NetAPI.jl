@@ -7,6 +7,7 @@ import Graphs
 import Multisets: Multiset, Multisets
 import OrderedCollections
 import PNML: varsubs
+import StructEquality: @struct_hash_equal
 
 using Base: Fix2, length
 using DocStringExtensions

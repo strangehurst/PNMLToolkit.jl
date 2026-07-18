@@ -142,7 +142,7 @@ These are all `Declaration` subtypes in the UML2/RelaxNG parts of ISO 15909-2:20
 a strong _Java_ bias. The text on the standard states they are also sort-like.
 We use a different type system.
 """
-@auto_hash_equals struct NamedSort{N <: AbstractPnmlNet, S <: AbstractSort} <: SortDeclaration
+@struct_hash_equal struct NamedSort{N <: AbstractPnmlNet, S <: AbstractSort} <: SortDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     def::S  #! This remains where the concrete sort lives.

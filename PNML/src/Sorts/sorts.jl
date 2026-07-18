@@ -21,7 +21,7 @@ is_builtinsort(tag::Symbol) = (tag in builtin_sorts())
 # Returns true if sorts are semantically  #! should be the same sort, even in two different objects.
 # Ex: two FiniteEnumerations F1 = {1,4,6} and F2 = {1,4,6} or two Integers I1 and I2.
 # Unless they have content, just the types are sufficent.
-# Use @auto_hash_equals on all sorts so that these compare item, by, item. Could use hashes.
+# Use @struct_hash_equal on all sorts so that these compare item, by, item. Could use hashes.
 # Called when both a and b are the same concrete type.
 equalSorts(::AbstractPnmlNet, a::AbstractSort, b::AbstractSort) = a == b
 
@@ -35,7 +35,7 @@ Operators: and, or, not, imply
 
 Functions: equality, inequality
 """
-@auto_hash_equals struct BoolSort <: AbstractSort end
+@struct_hash_equal struct BoolSort <: AbstractSort end
 Base.eltype(::Type{<:BoolSort}) = Bool
 "Elements of boolean sort"
 sortelements(::BoolSort, ::AbstractPnmlNet) = tuple(true, false)
@@ -47,7 +47,7 @@ $(TYPEDEF)
 
 Wrap a SortRef. Warning: do not cause recursive multiset Sorts.
 """
-@auto_hash_equals struct MultisetSort <: AbstractSort
+@struct_hash_equal struct MultisetSort <: AbstractSort
     basis::SortRef
 
     function MultisetSort(b::SortRef, net::AbstractPnmlNet)
@@ -76,7 +76,7 @@ An ordered collection of sorts. The elements of the sort are tuples of elements 
 ISO 15909-1:2019 Concept 14 (color domain) finite cartesian product of color classes.
 Where sorts are the syntax for color classes and ProductSort is the color domain.
 """
-@auto_hash_equals struct ProductSort{PN <:AbstractPnmlNet, N} <: AbstractSort
+@struct_hash_equal struct ProductSort{PN <:AbstractPnmlNet, N} <: AbstractSort
     ae::NTuple{N, SortRef}
     net::PN
 end

@@ -1,7 +1,7 @@
 """
 $(TYPEDEF)
 """
-@auto_hash_equals struct ListSort{T<:SortRef} <: AbstractSort
+@struct_hash_equal struct ListSort{T<:SortRef} <: AbstractSort
     basis::T
 end
 

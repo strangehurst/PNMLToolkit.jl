@@ -2,6 +2,7 @@ module Declarations
 import AutoHashEquals: @auto_hash_equals
 import Base: eltype
 import PNML: name, pid, sortdefinition, sortelements, sortref, verify!
+import StructEquality: @struct_hash_equal
 
 using ..IDRegistrys
 using ..Sorts

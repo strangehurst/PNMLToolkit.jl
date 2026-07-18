@@ -6,6 +6,7 @@ module PnmlGraphics
 
 import AutoHashEquals: @auto_hash_equals
 import Base: eltype
+import StructEquality: @struct_hash_equal
 
 using DocStringExtensions
 using PNML: Coordinate

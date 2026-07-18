@@ -8,10 +8,11 @@ import AutoHashEquals: @auto_hash_equals
 import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import PNML
-import PNML: PnmlMultiset,
+import PNML: AbstractPnmlMultiset, PnmlMultiset,
     initial_marking, initial_markings, inscription, metagraph, nettype, pid,
     pnmlmodel, pntd_of, rates
 import PNML.NetAPI: inscriptions, conditions
+import StructEquality: @struct_hash_equal
 import XMLDict
 
 using DocStringExtensions

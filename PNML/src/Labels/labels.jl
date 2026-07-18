@@ -91,7 +91,7 @@ of the structure defined by the pntd schema.
 See also [`AnyElement`](@ref) which allows any well-formed XML,
 while `PnmlLabel` is restricted to PNML Labels.
 """
-@auto_hash_equals struct PnmlLabel{N <: AbstractPnmlNet, T} <: Annotation
+@struct_hash_equal struct PnmlLabel{N <: AbstractPnmlNet, T} <: Annotation
     # XMLDict uses symbols for attribute keys and string for elements/children keys.
     tag::Union{Symbol, String, SubString{String}}
     elements::T

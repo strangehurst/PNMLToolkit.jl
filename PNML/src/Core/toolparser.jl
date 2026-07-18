@@ -10,7 +10,7 @@ Holds a parser callable for a `<toolspecific>` tag's well-formed contents invoke
 Will be in an iteratable collection that maps tool name & version to a parser callable.
 See `toolspecific_content_fallback`.
 """
-@auto_hash_equals struct ToolParser{T}
+@struct_hash_equal struct ToolParser{T}
     toolname::String
     version::String
     func::T # arguments (::XMLNODE, ::PnmlNet{T}) where {T}

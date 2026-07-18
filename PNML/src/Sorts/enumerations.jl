@@ -47,7 +47,7 @@ See ISO/IEC 15909-2:2011/Cor.1:2013(E) defect 11 power or nth successor/predeces
 
 MCC2023/SharedMemory-COL-100000 has cyclic enumeration with 100000 <feconstant> elements.
 """
-@auto_hash_equals struct CyclicEnumerationSort <: EnumerationSort
+@struct_hash_equal struct CyclicEnumerationSort <: EnumerationSort
     # Difference of Cyclic from Finite EnumerationSort is successor/predecessor operators.
     fec_refs::Vector{REFID} # ordered collection of FEConstant REFIDs
 end
@@ -58,7 +58,7 @@ end
     FiniteEnumerationSort(ntuple) -> FiniteEnumerationSort{M}
 Wraps a collection of `FEConstant` REFIDs. Usage: `feconstant(net)[refid]`.
 """
-@auto_hash_equals struct FiniteEnumerationSort <: EnumerationSort
+@struct_hash_equal struct FiniteEnumerationSort <: EnumerationSort
     fec_refs::Vector{REFID} # ordered collection of FEConstant REFIDs
     #TODO! Constructor version with start,end attributes. See ISO/IEC 15909-2:2011/Cor.1:2013(E) defect 10
 end
@@ -67,7 +67,7 @@ end
     $(TYPEDEF)
     FiniteIntRangeSort(start::T, stop::T) where {T<:Integer}
 """
-@auto_hash_equals struct FiniteIntRangeSort{T<:Integer} <: AbstractSort
+@struct_hash_equal struct FiniteIntRangeSort{T<:Integer} <: AbstractSort
     start::T
     stop::T # XML Schema calls this 'end'.
 end

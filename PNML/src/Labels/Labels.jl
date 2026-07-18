@@ -7,6 +7,7 @@ import Multisets
 import PNML: Coordinate, arctype, basis, elements, graphics, has_graphics, name,
     number_value, refid, sortdefinition, sortelements, sortref, tag, term, toolinfos, value,
     value_type, verify!, version
+import StructEquality: @struct_hash_equal
 
 using ..Expressions
 using ..PnmlTypes
