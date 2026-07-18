@@ -11,7 +11,7 @@ A "multiset sort over a basis sort is interpreted as
 """
 @kwdef mutable struct Place{N <: AbstractPnmlNet, S <: SortRef, T <: PnmlExpr}  <: AbstractPnmlNode
     id::Symbol
-    initialMarking::Marking{N, T} # Expression as value. Used to create marking vector.
+    initialMarking::Marking{N, T} # Expression used to create marking vector.
 
     # For each place, a sort defines the type of the marking tokens of the place (sorttype).
     # The inscription of an arc to or from a place defines which tokens are added or removed
@@ -24,6 +24,7 @@ A "multiset sort over a basis sort is interpreted as
     net::N
 end
 
+# Evaluate expression
 initial_marking(place::Place) = (place.initialMarking)()
 net(place::Place) = place.net
 sortref(place::Place) = sortref(place.sorttype)::SortRef

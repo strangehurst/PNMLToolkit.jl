@@ -236,7 +236,7 @@ has_operator(net::PnmlNet, id::Symbol) = has_operator(decldict(net), id)
     has_key(net::PnmlNet, dict, key::Symbol) -> Bool
 Where `dict` is the access method for a dictionary in `DeclDict`.
 """
-has_key(net::PnmlNet, dict, key::Symbol) = haskey(dict(decldict(net)), key)
+has_key(net::PnmlNet, dict, key::Symbol) = haskey(dict(decldict(net)), key)::Bool
 
 has_variabledecl(net::PnmlNet, id::Symbol)   = has_key(net, variabledecls, id)
 has_namedsort(net::PnmlNet, id::Symbol)      = has_key(net, namedsorts, id)
