@@ -17,37 +17,39 @@ Return a [`Graphics`](@ref PnmlGraphics.Graphics) holding the union of possibili
 """
 function parse_graphics(node, pntd)
     check_nodename(node, "graphics")
-    args = Dict()
+    args = Pair{Symbol}[] #) # Dict()
     _positions = Coordinate[]
     #TODO Add these to labelparsers (though these are not "Labels")
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "dimension"
-            args[:dimension] = parse_graphics_coordinate(child, pntd)
+            push!(args, :dimension => parse_graphics_coordinate(child, pntd))
         elseif tag == "fill"
-            args[:fill] = parse_graphics_fill(child, pntd)
+            push!(args, :fill => parse_graphics_fill(child, pntd))
         elseif tag == "font"
-            args[:font] = parse_graphics_font(child, pntd)
+            push!(args, :font => parse_graphics_font(child, pntd))
         elseif tag == "line"
-            args[:line] = parse_graphics_line(child, pntd)
+            push!(args, :line => parse_graphics_line(child, pntd))
         elseif tag == "offset"
-            args[:offset] = parse_graphics_coordinate(child, pntd)
+            push!(args, :offset => parse_graphics_coordinate(child, pntd))
         elseif tag == "position"
             push!(_positions, parse_graphics_coordinate(child, pntd))
         else
             @warn "ignoring unexpected child of <graphics>: '$tag'"
         end
     end
-    args[:positions] = _positions
-    Graphics(; pairs(args)...)
+    push!(args, :positions => _positions)
+    Graphics(; args...)
 end
 
 "Add XMLNode attribute, value pair to dictionary."
 function kw!(args::AbstractDict, node::XMLNode, key::AbstractString)
     if EzXML.haskey(node, key)
-        sym = Symbol(replace(key, "-" => "_")) # make proper identifier for readibility
-        args[sym] = node[key]
+        # make proper identifier for readibility
+        sym = Symbol(replace(key, "-" => "_")::String)
+        args[sym] = convert(String,node[key])
     end
+    nothing
 end
 
 """
@@ -57,11 +59,11 @@ Return [`Line`](@ref PnmlGraphics.Line).
 """
 function parse_graphics_line(node, _pntd)
     check_nodename(node, "line")
-    args = Dict()
-    for key in ["color", "shape", "style", "width"]
+    args = Dict{Symbol,String}()
+    for key in String["color", "shape", "style", "width"]
         kw!(args, node, key)
     end
-    PnmlGraphics.Line(; pairs(args)...)
+    PnmlGraphics.Line(; args...)
 end
 
 
@@ -92,8 +94,8 @@ Return [`Fill`](@ref PnmlGraphics.Fill)
 """
 function parse_graphics_fill(node, _pntd)
     check_nodename(node, "fill")
-    args = Dict{Symbol, Union{String, SubString{String}}}()
-    for key in ["color", "image", "gradient-color", "gradient-rotation"]
+    args = Dict{Symbol, String}()
+    for key in String["color", "image", "gradient-color", "gradient-rotation"]
         kw!(args, node, key)
     end
     PnmlGraphics.Fill(; args...)
@@ -106,9 +108,9 @@ Return [`Font`](@ref PnmlGraphics.Font).
 """
 function parse_graphics_font(node, _pntd)
     check_nodename(node, "font")
-    args = Dict()
+    args = Dict{Symbol, String}()
     for key in ["weight", "style", "align", "decoration", "family", "rotation", "size"]
          kw!(args, node, key)
     end
-    PnmlGraphics.Font(; pairs(args)...)
+    PnmlGraphics.Font(; args...)
 end
