@@ -44,6 +44,7 @@ import Moshi.Match: @match
 import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import SciMLPublic: @public
+import StructEquality: @struct_hash_equal
 import XMLDict
 
 using Accessors
@@ -62,7 +63,7 @@ using NamedTupleTools
 using Preferences: load_preference, set_preferences!
 using TermInterface
 
-export @xml_str, APN, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
+export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
     MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place,
     PnmlExpr, PnmlModel, PnmlNet,
     ProductSortRef, REFID, RefPlace, RefTransition, SortRef, SortRefImpl,
@@ -108,8 +109,8 @@ using .Sorts
 include("Declarations/Declarations.jl")
 using .Declarations
 include("Core/parse_context.jl") # parse context has id registry and DeclDict
-include("Core/multisets.jl")
 include("Core/variables.jl")
+include("Core/multisets.jl")
 include("Core/expressions.jl")
 using .Expressions
 include("Core/operators.jl")

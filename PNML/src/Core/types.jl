@@ -259,3 +259,10 @@ Return `Expr` constructed from `ex`. Calls `toexpr` on any contained terms.
 $(METHODLIST)
 """
 function toexpr end
+
+"""
+TermInterface expression types.
+"""
+abstract type PnmlExpr end
+
+abstract type AbstractPnmlMultiset end

@@ -10,8 +10,8 @@ import PNML: PNML, basis, sortref, toexpr
 using Base: Fix2
 using Metatheory: @matchable
 using PNML
-using PNML: BooleanConstant, DotConstant, FEConstant, FiniteIntRangeConstant,
-    NumberConstant, PnmlMultiset, ProductSort, feconstant, mcontains, multiset, operator,
+using PNML: AbstractPnmlMultiset, BooleanConstant, DotConstant, FEConstant, FiniteIntRangeConstant,
+    NumberConstant, PnmlExpr, PnmlMultiset, ProductSort, feconstant, mcontains, multiset, operator,
     partitionsort, pnmlmultiset, value, variabledecl
 using TermInterface
 
@@ -28,12 +28,6 @@ export GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual, Modulo
 export Append, Concatenation, StringLength, SubstringEx
 export StringGreaterThan, StringGreaterThanOrEqual, StringLessThan, StringLessThanOrEqual
 export ListAppend, ListConcatenation, ListEx, ListLength, MemberAtIndex, Sublist
-
-
-"""
-TermInterface expression types.
-"""
-abstract type PnmlExpr end
 
 """
 TermInterface boolean expression types.
@@ -226,7 +220,7 @@ Bag # Need to avoid @matchable to have docstring
     # end h
 end
 Bag(b::SortRef, x) = Bag(b::SortRef, x, 1) # singleton multiset
-Bag(ms::PnmlMultiset) = Bag(basis(ms), multiset(ms))
+Bag(ms::AbstractPnmlMultiset) = Bag(basis(ms), multiset(ms))
 Bag(b::SortRef, x::Multiset) = Bag(b::SortRef, x, nothing) # x is a Multiset
 Bag(b::SortRef) = Bag(b::SortRef, nothing, nothing) # multiset: one of each element of the basis sort.
 
@@ -372,6 +366,7 @@ sortref(a::ScalarProduct) = sortref(a.bag)
 expr_sortref(a::ScalarProduct, net) = expr_sortref(a.bag, net)::SortRef
 
 function toexpr(op::ScalarProduct, var::NamedTuple, net)
+    # TODO can type parameters be inferred?
     Expr(:call, PnmlMultiset, basis(op.bag)::SortRef,
         Expr(:call, :(*), toexpr(op.n, var, net), toexpr(op.bag, var, net)))
 end
