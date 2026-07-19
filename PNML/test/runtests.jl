@@ -120,7 +120,6 @@ select(y::AbstractString) = select(tuple(y))
      if select(("ALL", "NET3"), ("!NET3",))
         println("# NET3 #")
         @safetestset "rate"         begin include("rate.jl") end
-        @safetestset "netapi"       begin include("netapi.jl") end
     end
 
     if select(("ALL", "DOC"), ("!DOC",))

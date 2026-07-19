@@ -48,6 +48,7 @@ const FAILFAST = parse(Bool, get(ENV, "JULIA_TEST_FAILFAST", "true"))
         println("# NET3 #")
         #! @safetestset "rate"         begin include("rate.jl") end
         @safetestset "simplenet"    begin include("simplenet.jl") end
+        @safetestset "netapi"       begin include("netapi.jl") end
     end
 
     # if select(("ALL", "DOC"), ("!DOC",))
