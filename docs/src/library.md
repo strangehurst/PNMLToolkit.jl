@@ -38,13 +38,10 @@ Modules = [PNML.Parser]
 ```@autodocs
 Modules = [PNML.Expressions]
 ```
-## PNML.NetAPI
-```@autodocs
-Modules = [PNML.NetAPI]
-```
+
 ## Index
 ```@index
 Modules = [PNML, PNML.PnmlTypes, PNML.IDRegistrys, PNML.Sorts,
     PNML.Declarations, PNML.PnmlGraphics, PNML.Labels, PNML.Parser,
-    PNML.Expressions, PNML.NetAPI]
+    PNML.Expressions]
 ```
