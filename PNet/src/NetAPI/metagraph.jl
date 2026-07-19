@@ -4,8 +4,6 @@
 Create a graph.
 Note that when `is_collective_token` is true the graph `weight_function` becomes complex.
 """
-function metagraph end
-metagraph(model::PnmlModel) = metagraph(first(nets(model)))
 function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
     #! println("\nmetagraph $(pntd_of(net)) $(pid(net))")
 
@@ -24,7 +22,7 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
     @assert length(vlabel) == length(vcode)
 
     # Create a directed graph from every arc in the petri net graph.
-    graph = SimpleDiGraphFromIterator(Edge(vcode[source(a)] => vcode[target(a)]) for a in arcs(net))
+    graph = SimpleDiGraphFromIterator(Edge(vcode[PNML.source(a)] => vcode[PNML.target(a)]) for a in PNML.arcs(net))
     @assert length(vcode) == Graphs.nv(graph)
 
     # Map place/pransition pid to (vertex code, label).
@@ -33,7 +31,7 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
     @assert length(vdata) == Graphs.nv(graph)
 
     # Map from (src,dst) to arc. Uses pid, not vertex codes of graph.
-    edge_data = Dict((source(a), target(a)) => a for a in arcs(net))
+    edge_data = Dict((PNML.source(a), PNML.target(a)) => a for a in PNML.arcs(net))
     @assert length(edge_data) == Graphs.ne(graph)
 
     #todo weight function for MetaGraph
@@ -41,7 +39,7 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
     if is_collective_token(pntd_of(net))
         # No variable substitutions here.
         tuple(a -> inscription(a)(NamedTuple()),
-              PNML.Parser.default(Inscription, net))
+              PNML.Parser.default(PNML.Inscription, net))
     else
         #!@error "graph edge weight function of multiset in $(pntd_of(net)) $(pid(net))"
         tuple(a -> 1, 1)
@@ -55,12 +53,18 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
 end
 
 "pnml id symbol mapped to graph vertex code integer."
-vertex_codes(n::PnmlNet) = Dict(s=>i for (i,s) in enumerate(union(place_idset(n),
-                                                                  transition_idset(n))))
+function vertex_codes(n::PnmlNet)
+    Dict(s=>i for (i,s) in
+        enumerate(union(PNML.place_idset(n),
+                        PNML.transition_idset(n))))
+end
 
 "graph vertex code integer mapped to pnml id symbol."
-vertex_labels(n::PnmlNet) = Dict(i=>s for (i,s) in enumerate(union(place_idset(n),
-                                                                   transition_idset(n))))
+function vertex_labels(n::PnmlNet)
+    Dict(i=>s for (i,s) in
+        enumerate(union(PNML.place_idset(n),
+                        PNML.transition_idset(n))))
+end
 
 """
 Fill `vdata` dictionary where keys are pnml ids,
@@ -70,11 +74,13 @@ values are tuples of vertex code, place or transition.
 function vertex_data!(vdata::Dict{Symbol, Tuple{Int, Union{Place, Transition}}},
                      net::PnmlNet,
                      vcode::AbstractDict)
-    for p in places(net)
-        vdata[pid(p)] = (vcode[pid(p)], p)
+    for p::Place in PNML.places(net)
+        place_id = pid(p)
+        vdata[place_id] = tuple(vcode[place_id], p)
     end
-    for t in transitions(net)
-        vdata[pid(t)] = (vcode[pid(t)], t)
+    for t::Transition in PNML.transitions(net)
+        trans_id = pid(t)
+        vdata[trans_id] = tuple(vcode[trans_id], t)
     end
     return vdata
 end
