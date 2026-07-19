@@ -25,7 +25,7 @@ PrecompileTools.@setup_workload begin
 
             let pntds = ["hlcore", "hlnet", "pt_hlpng", "symmetricnet"]
                 for pntd in pntds
-                    PNML.NetAPI.metagraph(pnmlmodel(xmlnode("""<?xml version="1.0"?>
+                    pnmlmodel(xmlnode("""<?xml version="1.0"?>
                         <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
                         <net id="smallnet_$pntd" type="$pntd">
                         <name> <text>Some Net</text> </name>
@@ -74,13 +74,13 @@ PrecompileTools.@setup_workload begin
                             </arc>
                         </page>
                         </net>
-                        </pnml>""")))
+                        </pnml>"""))
                 end
-            end
+           end
 
             let pntds = ["continuous"]
                 for pntd in pntds
-                    PNML.NetAPI.metagraph(pnmlmodel(xmlnode("""<?xml version="1.0"?>
+                    pnmlmodel(xmlnode("""<?xml version="1.0"?>
                         <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
                         <net id="smallnet_$pntd" type="$pntd">
                         <name> <text>Some Net</text> </name>
@@ -96,7 +96,7 @@ PrecompileTools.@setup_workload begin
                             </arc>
                         </page>
                         </net>
-                        </pnml>""")))
+                        </pnml>"""))
                 end
             end
         end # redirect_stdio
