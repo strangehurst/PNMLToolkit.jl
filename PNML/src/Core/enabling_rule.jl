@@ -68,7 +68,8 @@ function enabled(net::AbstractPnmlNet, marking)
     ER()&& println("#-- enabled $(pid(net)) ", marking)
     # Start by assuming all transitions are enabled.
     # dictionary with key of transaction id, value of enabled state boolean
-    enabled_dict = OrderedDict{Symbol, Bool}(id=>true for (id,_) in pairs(transitiondict(net)))
+    #!enabled_dict = OrderedDict{Symbol, Bool}(id=>true for (id,_) in pairs(transitiondict(net)))
+    enabled_dict = OrderedDict{Symbol, Bool}(id=>true for id in PNML.transitionids(net))
 
     # dictionary with key of place id, value of its marking value (from marking vector)
     mark_dict = OrderedDict{Symbol, value_type(Marking, net)}(labeled_places(net, marking))
@@ -224,7 +225,7 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
                             _, _, _) where {T <: AbstractPNTD}
     # evaluate condition expression
     eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-    inscription_val = inscription_value(net, a, NamedTuple()) # Number:: value_type(Inscription)
+    inscription_val = inscription_value(a, NamedTuple()) # Number:: value_type(Inscription)
     return mark >= inscription_val
  end
 
@@ -234,7 +235,7 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
     if isempty(tr_vars) # 0-ary operators or constants
         # PT_HLPNG will have no vars
         eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-        inscription_val = inscription_value(net, a, NamedTuple())
+        inscription_val = inscription_value(a, NamedTuple())
         mark = unwrap_pmset(mark)
         return issubset(inscription_val, mark)
    else
@@ -251,7 +252,7 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
             # Check guard condition expression that may contain variables.
             # Must be evaluated for each candidate_parms.
             eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
-            inscription_val = inscription_value(net, a, tr_vsub) # bag
+            inscription_val = inscription_value(a, tr_vsub) # bag
             mark = unwrap_pmset(mark)
             issubset(inscription_val, mark) || continue # not a valid substitution
             push!(tr_varsubs, tr_vsub)
