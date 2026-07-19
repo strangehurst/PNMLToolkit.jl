@@ -947,5 +947,4 @@ function substitute(expr::PnmlExpr, var::NamedTuple)
         expr #~ not a call, leave it alone
     end
 end
-# maketerm(typeof(expr), operation(expr), map(x->recurse_expr(x, dict), arguments(expr)), metadata(expr))
 end # module Expressons

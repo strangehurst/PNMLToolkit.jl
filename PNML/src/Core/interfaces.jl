@@ -246,7 +246,7 @@ function target end
 """
 $(TYPEDSIGNATURES)
 
-Return arcs that have a source of transition `id`.
+Return ids of arcs that have a source of transition `id`.
 
 See also [`all_arcs`](@ref), [`tgt_arcs`](@ref).
 
@@ -257,7 +257,7 @@ function src_arcs end
 """
 $(TYPEDSIGNATURES)
 
-Return arcs that have a target of transition `id`.
+Return ids of arcs that have a target of transition `id`.
 
 See also [`all_arcs`](@ref), [`src_arcs`](@ref).
 
