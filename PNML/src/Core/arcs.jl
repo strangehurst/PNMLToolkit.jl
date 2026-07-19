@@ -26,6 +26,34 @@ function inscription(arc::Arc)
     arc.inscription # label
 end
 
+
+"""
+    inscription_value(a::Arc, varsub) -> T
+
+Evaluate inscription expression of `a` with  `varsub`, a possibly empty variable substitution.
+"""
+function inscription_value end
+
+#@memoize Dict
+function inscription_value(a::Arc, varsub)
+    inscription_value(pntd_of(a.net), a, varsub)
+end
+
+function inscription_value(::AbstractPNTD, a::Arc, varsub)
+    return eval(toexpr(term(inscription(a)), varsub, a.net))
+end
+
+function inscription_value(::PT_HLPNG, a::Arc, varsub)
+    #! @show a inscription(a) term(inscription(a))
+    val = eval(toexpr(term(inscription(a)), varsub, a.net))
+    return cardinality(val)
+end
+function inscription_value(::AbstractHLCore, a::Arc, varsub)
+    val = eval(toexpr(term(inscription(a)), varsub, a.net))
+    return cardinality(val)
+end
+
+
 #TODO ====================================================================
 #TODO Move extensions/enhancements to ISO 150909-1:2004 (1st ED.) to own file.
 
