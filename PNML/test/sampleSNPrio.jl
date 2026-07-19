@@ -1,4 +1,4 @@
-using PNML, JET, OrderedCollections
+using PNML, JET, OrderedCollections, Test
 #
 include("TestUtils.jl")
 using .TestUtils
@@ -15,16 +15,16 @@ println("-----------------------------------------"); flush(stdout)
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #first(PNML.nets(model)))
     n = first(PNML.nets(model))::PnmlNet
-    @test vertex_codes(n) isa AbstractDict
-    @test vertex_labels(n) isa AbstractDict
-    PNML.show_sorts(n)
+    # @test vertex_codes(n) isa AbstractDict
+    # @test vertex_labels(n) isa AbstractDict
+    # PNML.show_sorts(n)
 
-    if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
-        @test_throws ArgumentError PNML.metagraph(n)
-    else
-        @test contains(sprint(show, PNML.metagraph(n)),
-            "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
-    end
+    # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
+    #     @test_throws ArgumentError PNML.metagraph(n)
+    # else
+    #     @test contains(sprint(show, PNML.metagraph(n)),
+    #         "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
+    # end
     #TODO more tests
     #@test PNML.verify(net, true)
 end
@@ -37,13 +37,13 @@ println("-----------------------------------------")
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #first(PNML.nets(model)))
     n = first(PNML.nets(model))::PnmlNet
-    @test vertex_codes(n) isa AbstractDict
-    @test vertex_labels(n) isa AbstractDict
-    if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
-        @test_throws ArgumentError PNML.metagraph(n)
-    else
-        @test contains(sprint(show, PNML.metagraph(n)),
-            "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
-    end
+    # @test vertex_codes(n) isa AbstractDict
+    # @test vertex_labels(n) isa AbstractDict
+    # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
+    #     @test_throws ArgumentError PNML.metagraph(n)
+    # else
+    #     @test contains(sprint(show, PNML.metagraph(n)),
+    #         "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
+    # end
     #TODO more tests
 end

@@ -38,8 +38,8 @@ Multisets.set_key_value_show()
 @reexport using PNML.PnmlGraphics
 @reexport using PNML.SortRefImpl
 @reexport using PNML.Expressions
-@reexport using PNML.NetAPI
-@reexport using PNML.NetAPI: metagraph, vertex_codes, vertex_labels
+#!@reexport using PNML.NetAPI
+#!@reexport using PNML.NetAPI: metagraph, vertex_codes, vertex_labels
 
 "Run @test_opt, expect many dynamic dispatch reports."
 const runopt::Bool = false

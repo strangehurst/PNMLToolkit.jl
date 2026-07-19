@@ -33,9 +33,7 @@ import DataStructures
 import ExproniconLite
 import EzXML
 import FunctionWrappers
-import Graphs
 import MacroTools
-import MetaGraphsNext
 import Metatheory
 import Moshi
 import Moshi.Data: @data, is_data_type, isa_variant, variant_type
@@ -54,25 +52,27 @@ using EnumX: @enumx
 using ExproniconLite: JLCall, JLExpr, JLField, JLFor, JLFunction, JLIfElse, JLKwField,
     JLKwStruct, JLStruct, xcall, xfirst, xgetindex, xiterate, xlast, xmap, xmapreduce,
     xnamedtuple, xprint, xprintln, xpush, xtuple
-using Graphs: Edge, SimpleDiGraphFromIterator
 using Logging
 using LoggingExtras
 using Memoization
-using MetaGraphsNext: MetaGraph
 using NamedTupleTools
 using Preferences: load_preference, set_preferences!
 using TermInterface
 
-export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef, Arc, ArcTypeEnum, D,
+export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef,
+    Arc, ArcTypeEnum, D, enabled,
     MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place,
     PnmlExpr, PnmlModel, PnmlNet,
     ProductSortRef, REFID, RefPlace, RefTransition, SortRef, SortRefImpl,
-    Transition, UserSortRef, pnmlmodel, xmlnode
+    Transition, UserSortRef, narcs, npages, nplaces, ntransitions,
+    arc, place, transition, pnmlmodel, xmlnode,
+    initial_marking, inscription, condition
 
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
 @public namedsort, productsort, Coordinate
-@public basis, name, rates, mcontains, to_sort
+@public basis, conditions, inscriptions, name, rates, mcontains, nrefplaces, nreftransitions, to_sort, inscription_value
 @public is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
+@public src_arcs, tgt_arcs, source, target
 
 Multisets.set_key_value_show()
 
@@ -126,10 +126,13 @@ include("Core/transitions.jl")
 include("Core/arcs.jl")
 include("Core/page.jl")
 include("Core/net.jl") # PnmlNet holds pages
+include("Core/netutils.jl")
 include("Core/model.jl") # Holds multiple PnmlNets.
 include("Core/flatten.jl") # Flatten pages of PnmlNet
-include("NetAPI/NetAPI.jl") # API for Petri nets, graphs, et al.
-using .NetAPI
+#! Move to PNet package
+#include("NetAPI/NetAPI.jl") # API for Petri nets, graphs, et al.
+#using .NetAPI
+include("Core/enabling_rule.jl")
 include("Core/enable_filters.jl")
 include("Parser/Parser.jl")
 using .Parser

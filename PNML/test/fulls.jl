@@ -16,20 +16,20 @@ println("-----------------------------------------")
     summary(stdout, model) #first(nets(model)))
     n = first(nets(model))::PnmlNet
     n = flatten_pages!(n; verbose=true)::PnmlNet
-    vc = vertex_codes(n)::AbstractDict
-    vl = vertex_labels(n)::AbstractDict
+    # vc = vertex_codes(n)::AbstractDict
+    # vl = vertex_labels(n)::AbstractDict
     # for a in arcs(n)
     #     println("Edge ",
     #             vc[source(a)], " -> ",  vc[target(a)], " or ",
     #             vl[vc[source(a)]], " -> ",  vl[vc[target(a)]]
     #             )
     # end
-    if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
-        @test_throws ArgumentError metagraph(n)
-    else
-        @test contains(sprint(show, metagraph(n)),
-            "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
-    end
+    # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
+    #     @test_throws ArgumentError metagraph(n)
+    # else
+    #     @test contains(sprint(show, metagraph(n)),
+    #         "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
+    # end
 end
 
 println("\n-----------------------------------------")
@@ -40,14 +40,14 @@ println("-----------------------------------------")
     summary(stdout, model) #first(nets(model)))
     n = first(nets(model))::PnmlNet
     n = flatten_pages!(n)::PnmlNet
-    vc = vertex_codes(n)::AbstractDict
-    vl = vertex_labels(n)::AbstractDict
-     if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
-        @test_throws ArgumentError metagraph(n)
-    else
-        @test contains(sprint(show, metagraph(n)),
-            "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
-    end
+    # vc = vertex_codes(n)::AbstractDict
+    # vl = vertex_labels(n)::AbstractDict
+    #  if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
+    #     @test_throws ArgumentError metagraph(n)
+    # else
+    #     @test contains(sprint(show, metagraph(n)),
+    #         "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
+    # end
 end
 
 println("\n-----------------------------------------")
@@ -62,14 +62,14 @@ println("-----------------------------------------")
     summary(stdout, model)
     n = first(nets(model))::PnmlNet
     n = flatten_pages!(n)::PnmlNet
-    @test vertex_codes(n) isa AbstractDict
-    @test vertex_labels(n) isa AbstractDict
-    if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
-        @test_throws ArgumentError metagraph(n)
-    else
-        @test contains(sprint(show, metagraph(n)),
-           "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
-    end
+    # @test vertex_codes(n) isa AbstractDict
+    # @test vertex_labels(n) isa AbstractDict
+    # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
+    #     @test_throws ArgumentError metagraph(n)
+    # else
+    #     @test contains(sprint(show, metagraph(n)),
+    #        "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
+    # end
 end
 
 println("\n-----------------------------------------")
@@ -83,12 +83,12 @@ println("-----------------------------------------")
     summary(stdout, model)
     n = first(nets(model))::PnmlNet
     n = flatten_pages!(n)::PnmlNet
-    @test vertex_codes(n) isa AbstractDict
-    @test vertex_labels(n) isa AbstractDict
-    if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
-        @test_throws ArgumentError metagraph(n)
-    else
-        @test contains(sprint(show, metagraph(n)),
-            "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
-    end
+    # @test vertex_codes(n) isa AbstractDict
+    # @test vertex_labels(n) isa AbstractDict
+    # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
+    #     @test_throws ArgumentError metagraph(n)
+    # else
+    #     @test contains(sprint(show, metagraph(n)),
+    #         "Meta graph based on a Graphs.SimpleGraphs.SimpleDiGraph{Int64}")
+    # end
 end

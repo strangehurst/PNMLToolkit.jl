@@ -1,12 +1,18 @@
-using Graphs, JET, Logging, MetaGraphsNext, PNet, Test
-import PNML
-using PNML: @xml_str, Arc, Page, Place, PnmlModel, PnmlNet, Transition, arc, arcs, condition,
-    enabled, firstpage, has_arc, has_place, has_transition, initial_marking,
-    initial_markings, inscription, narcs, nets, nplaces, ntransitions, pages, pid, place,
-    places, pnmlmodel, pntd_of, rates, transition, transitions, xmlnode
-using PNML.Parser
-:xmlnode
-using PNML.NetAPI
+using Graphs
+using JET
+using Logging
+using MetaGraphsNext
+using PNML
+using PNML.Parser: xmlnode
+using PNML: @xml_str, Arc, Page, Place, PnmlModel, PnmlNet, Transition, arc, arcs,
+    condition, enabled, firstpage, has_arc, has_place, has_transition, initial_marking,
+    initial_markings, input_matrix, inscription, narcs, nets, nplaces, ntransitions,
+    output_matrix, pages, pid, place, places, pnmlmodel, pntd_of, rates, transition,
+    transitions, xmlnode
+using PNet
+using PNet: metagraph, fire2
+using Test
+#using PNML.NetAPI
 
 const t_modules = (PNML,PNet)
 
@@ -120,7 +126,7 @@ const str1 = """
 
     # PetriNet-only methods.
     @testset "initialMarking" begin
-        u1 = @inferred Vector initial_markings(simp)
+        u1 = @inferred Vector initial_markings(simp.net)
     end
 end
 
@@ -201,7 +207,7 @@ end
     #@show t = collect(PNML.counted_transitions(net1))
 
 
-    @show PNML.enabled(simp.net, m₀)
+    @show enabled(simp.net, m₀)
 
     println("all arcs :wolves = ", collect(PNML.all_arcs(simp.net, :wolves)))
     println("src arcs :wolves = ", collect(PNML.src_arcs(simp.net, :wolves)))
@@ -340,8 +346,7 @@ const ex_types = ("continuous",)
     """
     println(pntd)
     anet = SimpleNet(PNML.Parser.xmlnode(str3))::AbstractPetriNet
-    PNML.metagraph(pnmlnet(anet))
-    #! mg2 = PNML.metagraph(anet)
+    metagraph(pnmlnet(anet))
 
     m₀ = initial_markings(anet.net)
     C  = PNML.incidence_matrix(anet.net) # Matrix of PnmlMultiset
@@ -352,21 +357,21 @@ const ex_types = ("continuous",)
     @test e == [true,false,false,false] # 3 representations of the enabled vector.
     @test e == [1,0,0,0]
 
-    m₁ = PNML.fire2(C, anet.net, m₀)
+    m₁ = fire2(C, anet.net, m₀)
     @test PNML.enabled(anet.net, m₁) == [false,true,false,false]
 
-    m₂ = PNML.fire2(C, anet.net, m₁)
+    m₂ = fire2(C, anet.net, m₁)
     @test PNML.enabled(anet.net, m₂) == [false,false,true,false]
 
-    m₃ = PNML.fire2(C, anet.net, m₂)
+    m₃ = fire2(C, anet.net, m₂)
     @test PNML.enabled(anet.net, m₃) == [false,false,false,true]
 
-    m₄ = PNML.fire2(C, anet.net, m₃)
+    m₄ = fire2(C, anet.net, m₃)
     @test PNML.enabled(anet.net, m₄) == [true,false,false,false]
 
     let mx = m₀
         for n in 1:10
-            mx = PNML.fire2(C, anet.net, mx)
+            mx = fire2(C, anet.net, mx)
         end
         @test PNML.enabled(anet.net, mx) == [false,false,true,false]
     end
