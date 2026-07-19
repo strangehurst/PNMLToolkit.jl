@@ -20,8 +20,6 @@ $(FIELDS)
     place_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     transition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    #! inhibit_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    #! read_arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     refplace_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     reftransition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     # Keys of pages in `pagedict` owned by this net.
@@ -150,11 +148,18 @@ arcs(net::PnmlNet)           = values(arcdict(net))
 refplaces(net::PnmlNet)      = values(refplacedict(net))
 reftransitions(net::PnmlNet) = values(reftransitiondict(net))
 
+placeids(net::PnmlNet)         = keys(placedict(net))
+transitionids(net::PnmlNet)    = keys(transitiondict(net))
+arcids(net::PnmlNet)           = keys(arcdict(net))
+refplaceids(net::PnmlNet)      = keys(refplacedict(net))
+reftransitionids(net::PnmlNet) = keys(reftransitiondict(net))
+
 place(net::PnmlNet, id::Symbol)         = placedict(net)[id]
 transition(net::PnmlNet, id::Symbol)    = transitiondict(net)[id]
 arc(net::PnmlNet, id::Symbol)           = arcdict(net)[id]
 refplace(net::PnmlNet, id::Symbol)      = refplacedict(net)[id]
 reftransition(net::PnmlNet, id::Symbol) = reftransitiondict(net)[id]
+
 """
 Return `Arc` from 'src' to 'tgt' or `nothing`.
 Useful for graphs where arcs are represented by a tuple or pair (source,target).
@@ -182,6 +187,42 @@ inscription(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
 inhibitor(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
 reader(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
 condition(net::PnmlNet, trans_id::Symbol) = condition(transition(net, trans_id))
+
+
+"""
+    inscriptions(net::PnmlNet) -> Iterator
+
+Return iterator over REFID => inscription(arc) pairs of `net`. This is the same order as `arcs`.
+"""
+function inscriptions end
+function inscriptions(net::AbstractPnmlNet)
+    Iterators.map((arc_id, a)->arc_id => inscription(a)(NamedTuple()), pairs(arcdict(net)))
+end
+
+function inscriptions(net::AbstractHLCore) #TODO! non-ground terms for HL
+    @error "high level net $(pid(net)) needs variable substitution"
+end
+
+"""
+    conditions(net::PnmlNet) -> Iterator
+
+Return iterator  over REFID => condition(transaction) pairs of `net`.
+This is the same order as `transactions`.
+"""
+function conditions end
+function conditions(net::AbstractPnmlNet)
+    Iterators.map((tr_id, t)->tr_id => condition(t)(NamedTuple()), pairs(transitiondict(net)))
+end
+
+function conditions(net::AbstractHLCore) #TODO! non-ground terms for HL
+    @error "high level net $(pid(net)) needs variable substitution"
+end
+
+function rates(net::AbstractPnmlNet)
+    #[tid => rate_value(t) for (tid, t) in pairs(transitiondict(net))]
+    Iterators.map((tr_id, t)->tr_id => rate_value(t), pairs(transitiondict(net)))
+end
+
 
 #------------------------------------------------------------------------------
 # DeclDict access
@@ -372,13 +413,19 @@ function Base.show(io::IO, net::PnmlNet)
 
     println(io, "Arcs:")
     map(arcs(net)) do a
-        show(io, a); println(io)
+        println(io, a)
+    end
+    foreach(arcids(net)) do id
+        println(io, id)
     end
     println(io, "Places:")
     map(places(net)) do p
         show(io, p); println(io)
     end
-    println(io, "Transitions:")
+    foreach(placeids(net)) do p
+        show(io, p); println(io)
+    end
+   println(io, "Transitions:")
     map(transitions(net)) do t
         show(io, t); println(io)
     end
