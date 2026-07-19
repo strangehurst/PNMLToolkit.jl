@@ -15,7 +15,7 @@ Iterate ids of input (arc's source) for output transition or place `id`.
 See `PNet.in_inscriptions` and `PNet.transition_function`.
 """
 preset(net::AbstractPnmlNet, id::Symbol) = begin
-    Iterators.map(arcid -> source(arcdict(net)[arcid]), tgt_arcs(net, id))
+    Iterators.map(arcid -> PNML.source(PNML.arc(net, arcid)::Arc), PNML.tgt_arcs(net, id))
 end
 
 # ISO 15909-1:2019 Concept 5 postcondition of a transition, postset or t•
@@ -27,64 +27,9 @@ Iterate ids of output (arc's target) for source transition or place `id`.
 See `PNet.out_inscriptions` and `PNet.transition_function``).
 """
 postset(net::AbstractPnmlNet , id::Symbol) = begin
-    Iterators.map(arcid -> target(arcdict(net)[arcid]), src_arcs(net, id))
+    Iterators.map(arcid -> PNML.target(PNML.arc(net, arcid)::Arc), PNML.src_arcs(net, id))
 end
 
-
-"""
-    inscriptions(net::PnmlNet) -> Iterator
-
-Return iterator over REFID => inscription(arc) pairs of `net`. This is the same order as `arcs`.
-"""
-function inscriptions end
-function inscriptions(net::AbstractPnmlNet)
-    Iterators.map((arc_id, a)->arc_id => inscription(a)(NamedTuple()), pairs(arcdict(net)))
-end
-
-function inscriptions(net::AbstractHLCore) #TODO! non-ground terms for HL
-    @error "high level net $(pid(net)) needs variable substitution"
-end
-
-"""
-    conditions(net::PnmlNet) -> Iterator
-
-Return iterator  over REFID => condition(transaction) pairs of `net`.
-This is the same order as `transactions`.
-"""
-function conditions end
-function conditions(net::AbstractPnmlNet)
-    Iterators.map((tr_id, t)->tr_id => condition(t)(NamedTuple()), pairs(transitiondict(net)))
-end
-
-function conditions(net::AbstractHLCore) #TODO! non-ground terms for HL
-    @error "high level net $(pid(net)) needs variable substitution"
-end
-
-function rates(net::AbstractPnmlNet)
-    #[tid => rate_value(t) for (tid, t) in pairs(transitiondict(net))]
-    Iterators.map((tr_id, t)->tr_id => rate_value(t), pairs(transitiondict(net)))
-end
-
-"""
-    inscription_value(a::Arc, varsub) -> T
-
-Evaluate inscription expression of `a` with  `varsub`, a possibly empty variable substitution.
-"""
-function inscription_value end
-
-@memoize Dict function inscription_value(net::PnmlNet{T}, a::Arc, varsub) where {T <: AbstractPNTD}
-    return eval(toexpr(term(inscription(a)), varsub, net))
-end
-@memoize Dict function inscription_value(net::PnmlNet{PT_HLPNG}, a::Arc, varsub)
-    #! @show a inscription(a) term(inscription(a))
-    val = eval(toexpr(term(inscription(a)), varsub, net))
-    return cardinality(val)
-end
-@memoize Dict function inscription_value(net::APN, a::Arc, varsub)
-    pntd = pntd_of(net)
-    val = eval(toexpr(term(inscription(a)), varsub, net))
-    return cardinality(val)
-end
 
 #==========================================================================
 Notes based on ISO/IEC 15909-1:2019 (Part 1, 2nd Edition).
@@ -170,7 +115,7 @@ function input_matrix!(imatrix, net::AbstractPnmlNet)
             val = if isnothing(a)
                 zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
             else
-                inscription_value(net, a, varsub)
+                inscription_value(a, varsub)
             end
             imatrix[t, p] = dot2int(pntd_of(net), val)
         end
@@ -213,7 +158,7 @@ function output_matrix!(omatrix, net::AbstractPnmlNet)
                 end
                 z
             else
-                inscription_value(net, a, varsub)
+                inscription_value(a, varsub)
             end
             #@show typeof(omatrix) typeof(val)
             omatrix[t, p] = dot2int(pntd_of(net), val)
@@ -233,7 +178,7 @@ function pre(net::AbstractPnmlNet, p::Symbol, t::Symbol, varsubs=NamedTuple())
     iv = if isnothing(a)
         zero_marking(place(net, p))
     else
-        inscription_value(net, a, varsubs)
+        inscription_value(a, varsubs)
     end
     println("pre(net, $p, $t) = ", iv)
     return iv
@@ -247,7 +192,7 @@ function post(net::AbstractPnmlNet, t::Symbol, p::Symbol, varsubs=NamedTuple())
     iv = if isnothing(a)
         zero_marking(place(net, p))
     else
-        inscription_value(net, a, varsubs)
+        inscription_value(a, varsubs)
     end
     println("post(net, $t, $p) = ", iv)
     return iv
@@ -269,9 +214,6 @@ function incidence_matrix end
 function incidence_matrix(net::AbstractPnmlNet)
     return output_matrix(net) - input_matrix(net)
 end
-
-# Vector{NamedTuple} cached in transition field.
-varsubs(net::AbstractPnmlNet, transition_id::Symbol) = varsubs(transition(net, transition_id))
 
 """
     initial_markings(petrinet) -> Tuple{Pair{id(place),value_type(marking(place))}
