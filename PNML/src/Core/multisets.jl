@@ -101,7 +101,7 @@ end
 function Base.zero(pms::PnmlMultiset{T}) where {T}
     b = basis(pms)
     ms = Multiset{T}() #^ empty multiset
-    z = PnmlMultiset{T}(b, ms, pms.net[])
+    z = PnmlMultiset{T, typeof(pms.net)}(b, ms, pms.net)
     is_emptymultiset(z) ||
         @error "not a empty multiset!: $z"
     return z
@@ -110,8 +110,8 @@ end
 # Choose an arbitrary value `f` of `pms` to have multiplicity of 1.
 function Base.one(pms::PnmlMultiset{T}) where {T}
     b = basis(pms)
-    f = first(sortelements(b, pms.net[]))
-    o = PnmlMultiset{T}(b, Multiset(f), pms.net)
+    f = first(sortelements(b, pms.net))
+    o = PnmlMultiset{T, typeof(pms.net)}(b, Multiset(f), pms.net)
     is_singletonmultiset(o) ||
         @error "expected a singleton with one element, found: $o"
     return o
