@@ -27,19 +27,22 @@ It is also where other Net constructs can be defined over `PnmlNet`s. Perhaps as
 module PNML
 __precompile__(true)
 
-import AutoHashEquals: @auto_hash_equals
+import PrecompileTools
+#import AutoHashEquals: @auto_hash_equals
 import Base: *, +, -, <, <=, >, >=, eltype, iterate, keys, length, zero
 import DataStructures
 import ExproniconLite
-import EzXML
 import FunctionWrappers
 import MacroTools
-import Metatheory
-import Moshi
-import Moshi.Data: @data, is_data_type, isa_variant, variant_type
-import Moshi.Derive: @derive
-import Moshi.Match: @match
-import Multisets: Multisets, Multiset
+PrecompileTools.@recompile_invalidations begin
+    import EzXML
+    import Metatheory
+    import Moshi
+    import Moshi.Data: @data, is_data_type, isa_variant, variant_type
+    import Moshi.Derive: @derive
+    import Moshi.Match: @match
+    import Multisets: Multisets, Multiset
+end
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import SciMLPublic: @public
 import StructEquality: @struct_hash_equal
