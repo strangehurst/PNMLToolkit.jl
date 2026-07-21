@@ -4,7 +4,7 @@
 """
 module PnmlGraphics
 
-import AutoHashEquals: @auto_hash_equals
+#import AutoHashEquals: @auto_hash_equals
 import Base: eltype
 import StructEquality: @struct_hash_equal
 
@@ -25,6 +25,9 @@ $(TYPEDFIELDS)
     image::String = ""
     gradient_color::String = ""
     gradient_rotation::String = ""
+   function Fill(color::String, image::String, gradient_color::String, gradient_rotation::String)
+        new(color, image, gradient_color, gradient_rotation)
+    end
 end
 
 function Base.show(io::IO, fill::Fill)
@@ -52,6 +55,9 @@ $(TYPEDFIELDS)
     align     ::String = ""
     rotation  ::String = ""
     decoration::String = ""
+    function Font(family::String, style::String, weight::String, size::String, align::String, rotation::String, decoration::String)
+        new(family, style, weight, size, align, rotation, decoration)
+    end
 end
 
 function Base.show(io::IO, font::Font)
@@ -77,6 +83,9 @@ $(TYPEDFIELDS)
     shape::String = ""
     style::String = ""
     width::String = ""
+    function Line(color::String, shape::String, style::String, width::String)
+        new(color, shape, style, width)
+    end
 end
 
 function Base.show(io::IO, line::Line)
@@ -99,9 +108,9 @@ $(TYPEDFIELDS)
 """
 @kwdef struct Graphics
     dimension::Coordinate = Coordinate(one(eltype(Coordinate)), one(eltype(Coordinate)))
-    fill::Fill = Fill(; color = "black")
-    font::Font = Font(; weight = "black")
-    line::Line = Line(; color = "black")
+    fill::Fill = Fill()
+    font::Font = Font()
+    line::Line = Line()
     offset::Coordinate = Coordinate(zero(eltype(Coordinate)), zero(eltype(Coordinate)))
     positions::Vector{Coordinate} = Vector{Coordinate}[] # ordered collection
 end
@@ -119,21 +128,21 @@ end
 
 
 @kwdef struct ArcGraphics
-    line::Line = Line(; color = "black")
+    line::Line = Line()
     positions::Vector{Coordinate} = Vector{Coordinate}[] # ordered collection
 end
 
 @kwdef struct NodeGraphics
     postion::Coordinate = Coordinate(zero(eltype(Coordinate)), zero(eltype(Coordinate)))
     dimension::Coordinate = Coordinate(one(eltype(Coordinate)), one(eltype(Coordinate)))
-    line::Line = Line(; color = "black")
-    fill::Fill = Fill(; color = "black")
+    line::Line = Line()
+    fill::Fill = Fill()
 end
 
 @kwdef struct AnnotationGraphics
-    fill::Fill = Fill(; color = "black")
+    fill::Fill = Fill()
     offset::Coordinate = Coordinate(zero(eltype(Coordinate)), zero(eltype(Coordinate)))
-    line::Line = Line(; color = "black")
-    font::Font = Font(; weight = "black")
+    line::Line = Line()
+    font::Font = Font()
 end
 end # module PnmlGraphics
