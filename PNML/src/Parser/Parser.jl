@@ -6,7 +6,7 @@ Exports: [`@xml_str`(@ref)], [`XMLNode`](@ref), [`pnmlmodel`](@ref), [`xmlnode`]
 See [`LabelParser`](@ref), [`ToolParser`](@ref).
 """
 module Parser
-import AutoHashEquals: @auto_hash_equals
+#import AutoHashEquals: @auto_hash_equals
 import Base: eltype
 import EzXML
 import Multisets: Multisets, Multiset

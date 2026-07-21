@@ -1,7 +1,7 @@
 module Labels
 
 import ..Expressions: PnmlExpr, expr_sortref, toexpr
-import AutoHashEquals: @auto_hash_equals
+#import AutoHashEquals: @auto_hash_equals
 import Base: eltype
 import Multisets
 import PNML: Coordinate, arctype, basis, elements, graphics, has_graphics, name,

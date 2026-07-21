@@ -32,7 +32,7 @@ Notes:
 """
 module Sorts
 
-import AutoHashEquals: @auto_hash_equals
+#import AutoHashEquals: @auto_hash_equals
 import Base: eltype
 import PNML: basis, inc_indent, indent, refid, sortdefinition, sortelements,
     sortref, unwrap_namedsort

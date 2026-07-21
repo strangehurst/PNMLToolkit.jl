@@ -2,7 +2,7 @@
     NetAPI
 """
 module NetAPI
-import AutoHashEquals: @auto_hash_equals
+#import AutoHashEquals: @auto_hash_equals
 import Graphs
 import Multisets: Multiset, Multisets
 import OrderedCollections
