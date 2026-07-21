@@ -15,7 +15,7 @@ find a transition with all input place marking >= arc inscription
 #output_matrix(petrinet::AbstractPetriNet) = output_matrix(pnmlnet(petrinet))
 #incidence_matrix(petrinet::AbstractPetriNet) = incidence_matrix(pnmlnet(petrinet))
 
-is_enabled(petrinet::AbstractPetriNet, marking) = PNML.NetAPI.enabled(pnmlnet(petrinet), marking)
+is_enabled(petrinet::AbstractPetriNet, marking) = enabled(pnmlnet(petrinet), marking)
 
 
 #^+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
