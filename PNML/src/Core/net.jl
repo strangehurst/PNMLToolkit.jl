@@ -227,17 +227,17 @@ end
 #------------------------------------------------------------------------------
 # DeclDict access
 #------------------------------------------------------------------------------
-useroperators(net::PnmlNet)  = useroperators(decldict(net))
-variabledecls(net::PnmlNet)  = variabledecls(decldict(net))
-namedsorts(net::PnmlNet)     = namedsorts(decldict(net))
-arbitrarysorts(net::PnmlNet) = arbitrarysorts(decldict(net))
-partitionsorts(net::PnmlNet) = partitionsorts(decldict(net))
-namedoperators(net::PnmlNet) = namedoperators(decldict(net))
-arbitraryops(net::PnmlNet)   = arbitraryops(decldict(net))
-partitionops(net::PnmlNet)   = partitionops(decldict(net))
-feconstants(net::PnmlNet)    = feconstants(decldict(net))
-multisetsorts(net::PnmlNet)  = multisetsorts(decldict(net))
-productsorts(net::PnmlNet)   = productsorts(decldict(net))
+useroperators(@nospecialize(net::PnmlNet))  = useroperators(decldict(net))
+variabledecls(@nospecialize(net::PnmlNet))  = variabledecls(decldict(net))
+namedsorts(@nospecialize(net::PnmlNet))     = namedsorts(decldict(net))
+arbitrarysorts(@nospecialize(net::PnmlNet)) = arbitrarysorts(decldict(net))
+partitionsorts(@nospecialize(net::PnmlNet)) = partitionsorts(decldict(net))
+namedoperators(@nospecialize(net::PnmlNet)) = namedoperators(decldict(net))
+arbitraryops(@nospecialize(net::PnmlNet))   = arbitraryops(decldict(net))
+partitionops(@nospecialize(net::PnmlNet))   = partitionops(decldict(net))
+feconstants(@nospecialize(net::PnmlNet))    = feconstants(decldict(net))
+multisetsorts(@nospecialize(net::PnmlNet))  = multisetsorts(decldict(net))
+productsorts(@nospecialize(net::PnmlNet))   = productsorts(decldict(net))
 
 variabledecl(net::PnmlNet, id::Symbol)  = variabledecls(net)[id]
 namedsort(net::PnmlNet, id::Symbol)     = namedsorts(net)[id]
