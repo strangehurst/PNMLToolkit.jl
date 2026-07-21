@@ -124,7 +124,7 @@ end
 """
     toolkit_options(node, net|pntd) -> Labels.ToolkitOptions
 
-Parse `ToolInfo` content. Example:
+Parse `ToolInfo` content for Pnml Toolkit options. Example:
 ```
 <toolspecific tool="PNMLToolkit.jl" version="1.1">
     <filters>
