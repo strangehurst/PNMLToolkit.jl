@@ -65,7 +65,7 @@ makedocs(sitename="PNML.jl",
                                 #edit_link=nothing,
                                 # CI means publish documentation on GitHub.
                                 prettyurls = (get(ENV, "CI", nothing) == "true"),
-                                canonical = "https://strangehurst.github.io/PNML.jl",
+                                canonical = "https://strangehurst.github.io/PNMLToolkit.jl",
                                 size_threshold_ignore = ["library.md"],
                                 mathengine,
                                 inventory_version = "",
@@ -80,7 +80,7 @@ makedocs(sitename="PNML.jl",
 if !isempty(get(ENV, "DOCUMENTER_KEY", ""))
     deploydocs(;
             # repo = Documenter.Remotes.GitHub("strangehurst","PNML.jl"),
-            repo = "github.com/strangehurst/PNML.jl",
+            repo = "github.com/strangehurst/PNMLToolkit.jl",
                devbranch = "main",
                push_preview = false,
                )
