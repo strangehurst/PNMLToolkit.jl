@@ -1,7 +1,7 @@
 # High level Petri net enamling rule filters.
 
 "Fallback enabled filter always returns `true`."
-function enable_filter_true(::AbstractPnmlNet, t::Symbol, marks)
+function enable_filter_true(::AbstractPnmlNet, ::Symbol, _marks)
     #println("enable_filter_true $t")
     return true
 end
@@ -12,12 +12,11 @@ Return `true` iff ∀p ∈ preset(t): is_inhibitor(arc(p,t)) && inscription != 0
 function enable_filter_inhibit(net::AbstractPnmlNet, t::Symbol, marks)
     for p in preset(net, t)
         iarc = arc(net, p, t)::Arc
-        #! WHY Union{PNML.Parser.ParseInscriptionTerm, PNML.Arc}
         isnothing(iarc) && continue
         is_inhibitor(iarc) || continue
         inhibit = inscription(iarc)
-        z = zero
-        if inhibited(inhibit, 0, marks[p])
+        z = 0 #! TODO make zero of proper type
+        if inhibited(inhibit, z, marks[p])
             return false
         end
     end
