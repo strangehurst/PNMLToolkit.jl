@@ -13,7 +13,7 @@ using LoggingExtras
 using Memoization
 using PNML
 using PNML: AnyElement, DotConstant, REFID, inc_indent, indent, namedsort,
-    partitionsort, toexpr
+    partitionsort, toexpr, is_namedsort
 
 export AbstractDeclaration, ArbitraryOperator, ArbitrarySort, NamedOperator, NamedSort,
     OperatorDeclaration, PartitionElement, PartitionSort, SortDeclaration,
