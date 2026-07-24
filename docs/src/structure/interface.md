@@ -6,10 +6,6 @@ CurrentModule = PNML
 using PNML, InteractiveUtils, Markdown
 ```
 
-```@setup methods
-using PNML, InteractiveUtils, Markdown
-```
-
 ```@setup types
 using  PNML, InteractiveUtils, Markdown
 list_type(f) = for pntd in values(PNML.PnmlTypes.pnmltype_map)
