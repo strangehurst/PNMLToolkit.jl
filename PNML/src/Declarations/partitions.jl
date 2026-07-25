@@ -72,6 +72,59 @@ struct PartitionElement <: OperatorDeclaration
     partition::REFID
 end
 
+"Return Bool true if partition contains the FEConstant"
+function contains end
+contains(pe::PartitionElement, fec::Symbol) = fec in pe.terms
+
+"Return PartitionSort of which this is an equivalence class"
+function partition_of(net::APN, e::PartitionElement)
+    partitionsort(net, e.partition)
+end
+
+"PartitionElement greater than implementation"
+function pe_gt end
+"PartitionElement less than implementation"
+function pe_lt end
+"PartitionElement equal implementation"
+function pe_eq end
+
+function partitionelement_gt(net::APN, lhs::PartitionElement, rhs::PartitionElement)
+    ps_lhs = partition_of(net, lhs)
+    ps_rhs = partition_of(net, rhs)
+    if ps_lhs.id !=  ps_rhs.id
+        throw(ArgumentError(string("element sorts not the same: ", ps_lhs,
+                                    " and ", ps_rhs)))
+    end
+    pe_gt(ps_lhs, lhs.id, rhs.id)
+end
+
+function partitionelement_lt(net::APN, lhs::PartitionElement, rhs::PartitionElement)
+    ps_lhs = partition_of(net, lhs)
+    ps_rhs = partition_of(net, rhs)
+    if ps_lhs.id !=  ps_rhs.id
+        throw(ArgumentError(string("element sorts not the same: ", ps_lhs,
+                                    " and ", ps_rhs)))
+    end
+    pe_lt(ps_lhs, lhs.id, rhs.id)
+end
+
+
+function partitionelement_eq(net::APN, lhs::PartitionElement, rhs::PartitionElement)
+    ps_lhs = partition_of(net, lhs)
+    ps_rhs = partition_of(net, rhs)
+    if ps_lhs.id !=  ps_rhs.id
+        throw(ArgumentError(string("element sorts not the same: ", ps_lhs,
+                                    " and ", ps_rhs)))
+    end
+    pe_eq(ps_lhs, lhs.id, rhs.id)
+end
+
+function Base.show(io::IO, pe::PartitionElement)
+    print(io, nameof(typeof(pe)), "(", pid(pe), ", ", repr(name(pe)), ", ")
+    show(io,  pe.terms)
+    print(io, ", ",  repr(pe.partition), ")")
+ end
+
 # verify terms are in parent partitions's referenced sort elements.
 function verify!(errors::Vector{String}, pe::PartitionElement,
                  verbose::Bool, net::AbstractPnmlNet)
@@ -84,16 +137,6 @@ function verify!(errors::Vector{String}, pe::PartitionElement,
         push!(errors, msg)
     end
 end
-
-"Return Bool true if partition contains the FEConstant"
-function contains end
-contains(pe::PartitionElement, fec::Symbol) = fec in pe.terms
-
-function Base.show(io::IO, pe::PartitionElement)
-    print(io, nameof(typeof(pe)), "(", pid(pe), ", ", repr(name(pe)), ", ")
-    show(io,  pe.terms)
-    print(io, ", ",  repr(pe.partition), ")")
- end
 
 """
 $(TYPEDEF)
@@ -109,15 +152,22 @@ struct PartitionSort{N <: AbstractPnmlNet} <: SortDeclaration
     id::Symbol
     name::Union{String, SubString{String}}
     def::SortRef # Like a NamedSort, refers to a sort (EnumerationSort)
-    elements::Vector{PartitionElement} # 1 or more PartitionElements that index into `def` #TODO a set?
+    elements::Vector{PartitionElement} # 1 or more PartitionElements that index into `def`
+    elid2index::Dict{Symbol,Int} # Support for less than, greater than operations.
     net::N
 
-    # function PartitionSort(i, n, d, e, dd)
-    #     # has_namedsort(d) || throw(ArgumentError("REFID $(repr(d)) is not a NamedSort"))
-    #     # # Look at what is wrapped.
-    #     # @assert tag(sortdefinition(namedsort(d))) in (:finiteenumeration, :cyclicenumeration, :finiteintenumeration)
-    #     new(i, n, d, e, dd)
-    # end
+    function PartitionSort(id::Symbol, n::Union{String, SubString{String}},
+                           d::SortRef, e::Vector{PartitionElement}, net::APN)
+        is_namedsort(d) ||
+            throw(ArgumentError("Partitioned Sort must be a NamedSort, found $d"))
+        # Defined over an enumeration sort.
+        any(s -> sortdefinition(namedsort(net, d)) isa s,
+            (FiniteEnumerationSort, CyclicEnumerationSort, FiniteIntRangeSort)) ||
+            throw(ArgumentError("Partitioned Sort can only be over an enumeration, found $d"))
+
+        e2i = Dict{Symbol, Int}(e.id=>i for (i,e) in enumerate(e))
+        new{typeof(net)}(id, n, d, e, e2i, net)
+    end
 end
 
 #TODO also do AbstractSort, another SortDeclaration
@@ -125,8 +175,6 @@ sortdefinition(p::PartitionSort) = sortdefinition(namedsort(p.net, p.def))
 sortelements(p::PartitionSort, ::AbstractPnmlNet) = p.elements
 
 # TODO Add Partition/PartitionElement methods here
-# list PartitionElement ids & names
-# list PartitionElement terms
 # access by partition id, element id
 
 "Iterator over partition element REFIDs of a `PartitionSort"
@@ -137,6 +185,19 @@ end
 "Iterator over partition element names"
 function element_names(ps::PartitionSort)
     Iterators.map(name, sortelements(ps, ps.net))
+end
+
+function pe_gt(ps::PartitionSort, lhs::Symbol, rhs::Symbol)
+    ps.elid2index[lhs] >
+    ps.elid2index[rhs]
+end
+function pe_lt(ps::PartitionSort, lhs::Symbol, rhs::Symbol)
+    ps.elid2index[lhs] <
+    ps.elid2index[rhs]
+end
+function pe_eq(ps::PartitionSort, lhs::Symbol, rhs::Symbol)
+    ps.elid2index[lhs] ==
+    ps.elid2index[rhs]
 end
 
 function verify!(errors::Vector{String}, psort::PartitionSort, verbose::Bool, net::AbstractPnmlNet)
