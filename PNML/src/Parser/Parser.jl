@@ -7,13 +7,20 @@ See [`LabelParser`](@ref), [`ToolParser`](@ref).
 """
 module Parser
 #import AutoHashEquals: @auto_hash_equals
+import PrecompileTools
 import Base: eltype
-import EzXML
-import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import PNML: adjacent_place, elements, refid, source, target,
     sortdefinition, sortelements, sortref, tag, verify!
 import XMLDict
+PrecompileTools.@recompile_invalidations begin
+    import EzXML
+    import Metatheory
+    import Moshi
+    import Multisets
+    using Moshi.Data: @data, is_data_type, isa_variant
+    using Moshi.Match: @match
+end
 
 using ..Declarations
 using ..Expressions
@@ -28,8 +35,6 @@ using Base: isempty, length
 using DocStringExtensions
 using Logging
 using LoggingExtras
-using Moshi.Data: @data, is_data_type, isa_variant
-using Moshi.Match: @match
 using NamedTupleTools
 using PNML
 using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, DotConstant, FEConstant,
