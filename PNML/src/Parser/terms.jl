@@ -44,11 +44,13 @@ function parse_term(node::XMLNode, net::AbstractPnmlNet; vars)
 end
 
 """
-    subterms(node, net; vars) -> Vector{PnmlExpr}
+    subterms(node, net; vars) -> Tuple{Vector{PnmlExpr}, NamedTuple}
 
-Unwrap each `<subterm>` and parse into a [`PnmlExpr`](@ref) term in a vector.
+Parse each `<subterm>` child of `node` into a vector of [`PnmlExpr`](@ref),
+collecting variable ids in `vars`.
+Return tuple of vector and `vars`.
 """
-function subterms(node, net::AbstractPnmlNet; vars)
+function subterms(node, net::AbstractPnmlNet; vars::NTuple{N,Symbol}) where {N}
     sts = Vector{PnmlExpr}()
     for subterm in EzXML.eachelement(node)
         if EzXML.nodename(subterm) == "subterm"
@@ -475,6 +477,7 @@ function parse_term(::Val{:division}, node::XMLNode, net::AbstractPnmlNet; vars)
     return TermJunk(Division(sts[1], sts[2]), NamedSortRef(:bool), vars) #! wrong sort
 end
 
+# FiniteIntRangeSort
 function parse_term(::Val{:greaterthan}, node::XMLNode, net::AbstractPnmlNet; vars)
     sts, vars = subterms(node, net; vars)
     @assert length(sts) == 2
@@ -616,9 +619,16 @@ function parse_term(::Val{:partitionelementof}, node::XMLNode, net::AbstractPnml
     return TermJunk(peo, PartitionSortRef(ref_partition), vars)
 end
 
-"""
-    `<gtp>` Partition element greater than.
-"""
+# `<ltp>` Partition element less than.
+function parse_term(::Val{:ltp}, node::XMLNode, net::AbstractPnmlNet; vars)
+    sts, vars = subterms(node, net; vars)
+    @assert length(sts) == 2
+    @assert sts[1].refpartition == sts[2].refpartition "all partitions must be of the same sort"
+    plt = PartitionLessThan(sts...)
+    return TermJunk(plt, PartitionSortRef(sts[1].refpartition), vars)
+end
+
+# `<gtp>` Partition element greater than.
 function parse_term(::Val{:gtp}, node::XMLNode, net::AbstractPnmlNet; vars)
     sts, vars = subterms(node, net; vars)
     @assert length(sts) == 2
