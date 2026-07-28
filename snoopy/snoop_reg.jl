@@ -3,6 +3,7 @@ using SnoopCompileCore
 invs = @snoop_invalidations using PNML;
 using SnoopCompile, AbstractTrees
 trees = invalidation_trees(invs)
+
 tree = trees[1]
 sig, victim = tree.mt_backedges[end];
 sig
