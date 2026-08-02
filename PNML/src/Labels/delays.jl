@@ -55,9 +55,9 @@ function delay_content_parser(label, value_type)
             (isnothing(cn) || isempty(cn)) &&
                 throw(ArgumentError("<interval> <cn> element is $(repr(cn))"))
             if cn isa Vector
-                value_type[number_value(value_type, x) for x in cn]
+                value_type[parse(value_type, x) for x in cn]
             else
-                value_type[number_value(value_type, cn)]
+                value_type[parse(value_type, cn)]
             end
         end
     else

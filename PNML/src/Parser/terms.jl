@@ -198,7 +198,7 @@ function parse_term(::Val{:numberconstant}, node::XMLNode, net::AbstractPnmlNet;
         throw(MalformedException("sort not supported for :numberconstant: $sorttag"))
 
     sortref = NamedSortRef(sorttag)
-    nv = number_value(eltype(to_sort(sortref, net)), value)
+    nv = parse(eltype(to_sort(sortref, net)), value)
     # Bounds check not needed for IntegerSort, RealSort.
     if sorttag === :natural
         nv >= 0 || throw(ArgumentError("not a Natural Number: $nv"))
@@ -503,7 +503,7 @@ function parse_term(::Val{:greaterthanorequal}, node::XMLNode, net::AbstractPnml
 end
 
 function parse_term(::Val{:modulo}, node::XMLNode, net::AbstractPnmlNet; vars)
-    sts, vars = subterms(node, net; vars, net)
+    sts, vars = subterms(node, net; vars)
     @assert length(sts) == 2
     return TermJunk(Modulo(sts[1], sts[2]), NamedSortRef(:bool), vars )#! wrong sort
 end

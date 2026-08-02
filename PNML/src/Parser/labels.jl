@@ -115,7 +115,7 @@ Each having a `termparser`.
 Returns vars, a tuple of PNML variable REFIDs.
 Used in the muti-sorted algebra of High-level nets.
 """
-function parse_label_content(node::XMLNode, termparser::F, net::AbstractPnmlNet) where {F}
+function parse_label_content(node::XMLNode, @nospecialize(termparser), net::AbstractPnmlNet)
     EzXML.haselement(node) || error("xml node is empty")
 
     text::Maybe{Union{String,SubString{String}}} = nothing
@@ -201,7 +201,7 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::AbstractP
     mvt = value_type(Marking, pntd_of(net))::Type
     pt <: mvt ||
         @error("initial marking value type of $(pntd_of(net)) must be $mvt, found: $pt")
-    value = isnothing(l.text) ? zero(pt) : number_value(pt, l.text)
+    value = isnothing(l.text) ? zero(pt) : parse(pt, l.text)
     # We ate the text to make the expression.
     Marking(; term = NumberEx(sortref(placetype), value),
               text=nothing, l.graphics,
@@ -222,7 +222,7 @@ function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net:
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = number_value(value_type(Inscription, pntd_of(net)), parse_text(child, pntd_of(net)))
+            value = parse(value_type(Inscription, pntd_of(net)), parse_text(child, pntd_of(net)))
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -546,15 +546,16 @@ function parse_sorttype(node::XMLNode, net::AbstractPnmlNet; parentid)
 end
 
 """
+$(TYPEDSIGNATURES)
     parse_sorttype_term(::XMLNode, net::AbstractPnmlNet) -> TermJunk
 
-The PNML `<type>` of a `<place>` is a "sort" of the high-level many-sorted algebra.
-Because we are using the HL implementation with the other meta-models,
-we support it in all nets.
+Used as `termparser` by [`parse_label_content`](@ref) for the PNML `<type>`
+of a `<place>`.
 
-The term here is a concrete sort.
+The term here is a concrete sort expression.
 It is possible to have an inlined concrete sort that is anonymous.
-We place all these concrete sorts in the `decldict(net)`` and pass around a SortRef.
+And de-duplication is attempted due to the `equalSorts` being structural.
+We place all these concrete sorts in the `decldict(net)`` and pass around a `SortRef`.
 
 See [`parse_sorttype`](@ref) for the rest of the `AnnotationLabel` structure.
 """
@@ -564,7 +565,7 @@ function parse_sorttype_term(typenode::XMLNode, net::AbstractPnmlNet)
         throw(ArgumentError("missing <type> element in <structure>"))
     # Expect only child element to be a sort.
     sort_node = EzXML.firstelement(typenode)::XMLNode
-    sort_type = parse_sort(sort_node, net, nothing, "")::SortRef
+    sort_type = parse_sort(sort_node, net, nothing, "")#::SortRef
     is_multisetsort(sort_type) &&
         error("multiset sort not allowed for place <type>")
     return TermJunk(SortRefEx(sort_type), sort_type, ()) # Not a term; has no variables.
@@ -582,6 +583,21 @@ function parse_structure(node::XMLNode, net::AbstractPnmlNet)
     return TermJunk(SortRefEx(UserSortRef(:int)), UserSortRef(:int), ())
 end
 
+"""
+$(TYPEDSIGNATURES)
+
+Return `Rate` wraping a `NumberEx`, with optional `graphics` and `toolspec`.
+
+The rate label:
+```
+<rate>
+    <text> number_string </text>
+    <graphics/> <-- optional -->
+    <toolspecific/> <-- optional -->
+</rate>
+```
+The string contained in `<text>` is parsed as a `value_type(Rate)`.
+"""
 function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)
     check_nodename(node, "rate")
     D()&& println("## parse_rate of $(repr(parentid))")
@@ -592,7 +608,8 @@ function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = number_value(value_type(Rate, pntd_of(net)), parse_text(child, pntd_of(net)))
+            value = parse(value_type(Rate),
+                          parse_text(child, pntd_of(net)))
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -602,7 +619,6 @@ function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)
         end
     end
 
-    # Treat missing value as if the <rate> element was absent.
     if isnothing(value)
         value = one(value_type(Rate, pntd_of(net)))
     end
@@ -612,6 +628,19 @@ function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)
 end
 
 
+"""
+$(TYPEDSIGNATURES)
+
+The priority label:
+```
+<priority>
+    <text> number_string </text>
+    <graphics/> <-- optional -->
+    <toolspecific/> <-- optional -->
+</priority>
+```
+The string contained in `<text>` is parsed as a `value_type(Priority)`.
+"""
 function parse_priority(node::XMLNode, net::AbstractPnmlNet, parentid)
     check_nodename(node, "priority")
     #@warn "parse_priority of $(repr(parentid))"
@@ -622,7 +651,7 @@ function parse_priority(node::XMLNode, net::AbstractPnmlNet, parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = number_value(value_type(Priority, pntd_of(net)), parse_text(child, pntd_of(net)))
+            value = parse(value_type(Priority, pntd_of(net)), parse_text(child, pntd_of(net)))
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
