@@ -104,7 +104,7 @@ include("Core/types.jl") # Abstract Types with docstrings.
 include("Core/sortref.jl")
 include("Core/toolparser.jl")
 include("Core/labelparser.jl")
-include("Core/decldictcore.jl") # define structure filled by Sorts, Declarations
+include("Core/decldictcore.jl") # Declaration dictionaries  filled by Sorts, Declarations
 include("Core/constterm.jl")
 
 include("Sorts/Sorts.jl") # used in Variables, Operators, Places
@@ -120,17 +120,17 @@ include("Core/operators.jl")
 include("Core/rewrite.jl")
 include("Core/pnmlnetkeys.jl") # Used by page, net; who owns what.
 
-#^ Above here are things that appear in  DeclDict contents.
+#^ Above here are things that appear in declaration dictionaries content.
 include("Core/decldict.jl") # Just contains show(). See decldictcore.jl.
 include("Labels/Labels.jl")
 using .Labels
-include("Core/places.jl")
-include("Core/transitions.jl")
-include("Core/arcs.jl")
-include("Core/page.jl")
-include("Core/net.jl") # PnmlNet holds pages
+include("Core/places.jl") # Has labels
+include("Core/transitions.jl") # Has labels
+include("Core/arcs.jl") # Has labels
+include("Core/page.jl") # `Page` holds places, transitions, arcs
+include("Core/net.jl") # `PnmlNet` holds pages
 include("Core/netutils.jl")
-include("Core/model.jl") # Holds multiple PnmlNets.
+include("Core/model.jl") # Holds multiple `PnmlNet`.
 include("Core/flatten.jl") # Flatten pages of PnmlNet
 #! Move to PNet package
 #include("NetAPI/NetAPI.jl") # API for Petri nets, graphs, et al.
