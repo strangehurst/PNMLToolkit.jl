@@ -4,7 +4,7 @@ $(TYPEDFIELDS)
 
 One or more Petri Nets.
 """
-struct PnmlModel{T <: AbstractDict}
+struct PnmlModel{T <: NamedTuple}
     nets::T
     namespace::String
 end
@@ -24,7 +24,11 @@ Return iterator of nets matching Petri net type definition given as string, symb
 function find_nets end
 find_nets(model, str::AbstractString) = find_nets(model, PnmlTypes.pntd_symbol(str))
 find_nets(model, sym::Symbol) = find_nets(model, pnmltype(sym))
-find_nets(model, pntd::AbstractPNTD) = Iterators.filter(n -> Fix1(isa, pntd)(typeof(pntd_of(n))), nets(model))
+function find_nets(model, @nospecialize(pntd::AbstractPNTD))
+    P = typeof(pntd)
+    Iterators.filter(n -> Fix2(isa, P)(pntd_of(n)),
+        nets(model))
+end
 
 firstnet(model::PnmlModel) = first(nets(model))::PnmlNet
 

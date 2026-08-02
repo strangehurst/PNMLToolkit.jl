@@ -49,7 +49,7 @@ function pnmlmodel(node::XMLNode; kwargs...)
         end
     end
     length(nets) > 0 || throw(MalformedException("<pnml> does not have any <net> elements"))
-    return PnmlModel(freeze(nets), namespace)
+    return PnmlModel(namedtuple(nets), namespace)
 end
 
 """

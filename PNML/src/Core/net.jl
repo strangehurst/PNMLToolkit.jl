@@ -117,7 +117,6 @@ ntransitions(net::PnmlNet)    = length(transitiondict(net))
 narcs(net::PnmlNet)           = length(arcdict(net))
 nrefplaces(net::PnmlNet)      = length(refplacedict(net))
 nreftransitions(net::PnmlNet) = length(reftransitiondict(net))
-ndeclarations(net::PnmlNet)   = length(decldict(net))
 
 """
     allpages(net::PnmlNet|dict::OrderedDict) -> Iterator
@@ -388,7 +387,6 @@ function Base.summary(net::PnmlNet)
             " name ", repr(name(net)), ", ",
             " type ", nettype(net), ", ",
             npages(net), " pages, ",
-            ndeclarations(net), " declarations, ",
             has_tools(net) ? length(toolinfos(net)) : 0, " toolinfos, ")::String
 end
 
