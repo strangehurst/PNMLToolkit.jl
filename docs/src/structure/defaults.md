@@ -10,7 +10,7 @@ Varies by PNTD. Possibilitie include:
 
 The _ISO/IEC 15909-2_ standard and the RelaxNG Schemas state 'natural numbers' and 'non-zero natural numbers'. I choose to also allow continuous values to support nonstandard continuous and hybrid valued Petri Nets. Makes generating default values more interesting.
 
-Determine type of `Number` to parse with [`number_value`](@ref) by using [`value_type`](@ref).
+Determine type of `Number` to `parse` by using [`value_type`](@ref).
 
 There are many items in the XML that are permitted to be missing and a defaut value is assumed.
 Examples are place _initial marking_, arc _inscription_, transition _condition_, graphics data.

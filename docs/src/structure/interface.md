@@ -106,8 +106,7 @@ The pnml schemas and primer only try to cover the discrete case as Place-Transit
 
 ### Continuous Values
 
-Continous support is present where possible. For instance, when a number appers in the XML
-[`number_value`](@ref) is used to parse the string to `Int` or `Float64`.
+Continous support is present where possible. We allow `value_type` to be `Float64` for some PNTDs.
 This is currently (2022) "non-standard" so such pnml files will not be generally
 interchangable with other tools.
 
