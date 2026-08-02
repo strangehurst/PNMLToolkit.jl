@@ -8,26 +8,27 @@ import Multisets: Multiset
 import PNML: PNML, basis, sortref, toexpr
 
 using Base: Fix2
+using DocStringExtensions
 using Metatheory: @matchable
 using PNML
 using PNML: AbstractPnmlMultiset, BooleanConstant, DotConstant, FEConstant, FiniteIntRangeConstant,
     NumberConstant, PnmlExpr, PnmlMultiset, ProductSort, feconstant, mcontains, multiset, operator,
-    partitionsort, pnmlmultiset, value, variabledecl
+    partitionsort, pnmlmultiset, value, variabledecl, VariableDeclaration
+
 using TermInterface
 
 export expr_sortref, toexpr
 # abstract types
 export AbstractBoolExpr, AbstractOpExpr, PnmlExpr
 # concrete types
-export BooleanEx, DotConstantEx, NumberEx, SortRefEx, PnmlTupleEx, UserOperatorEx, VariableEx
-export Add, Bag, Cardinality, CardinalityOf, Contains, ScalarProduct, Subtract
-export And, Equality, Imply, Inequality, Not, Or, Predecessor, Successor
-export PartitionElementOf, PartitionGreaterThan, PartitionLessThan
-export Addition, Division, Multiplication, Subtraction
-export GreaterThan, GreaterThanOrEqual, LessThan, LessThanOrEqual, Modulo
-export Append, Concatenation, StringLength, SubstringEx
-export StringGreaterThan, StringGreaterThanOrEqual, StringLessThan, StringLessThanOrEqual
-export ListAppend, ListConcatenation, ListEx, ListLength, MemberAtIndex, Sublist
+export Add, Addition, And, Append, Bag, BooleanEx, Cardinality, CardinalityOf, Concatenation,
+    Contains, Division, DotConstantEx, Equality, GreaterThan, GreaterThanOrEqual, Imply,
+    Inequality, LessThan, LessThanOrEqual, ListAppend, ListConcatenation, ListEx,
+    ListLength, MemberAtIndex, Modulo, Multiplication, Not, NumberEx, Or,
+    PartitionElementOf, PartitionGreaterThan, PartitionLessThan, PnmlTupleEx,
+    Predecessor, ScalarProduct, SortRefEx, StringGreaterThan, StringGreaterThanOrEqual,
+    StringLength, StringLessThan, StringLessThanOrEqual, Sublist, SubstringEx, Subtract,
+    Subtraction, Successor, UserOperatorEx, VariableEx
 
 """
 TermInterface boolean expression types.
@@ -125,15 +126,64 @@ end
 
 # We also need to define equality for our matchables expression. Ignore any metadata.
 # function Base.:(==)(a::PnmlExpr, b::PnmlExpr)
-#     a.head == b.head && a.args == b.args && a.foo == b.foo #! is this corrct XXX
+#     a.head == b.head && a.args == b.args && a.foo == b.foo #! is this correct XXX
 # end
 
+
+#= 2026-07-27 from SymbolicUtils code.jl
+
+#! We have not made PnmlExpr into a Moshi adt YET.
+
+"code-related combinators,
+
+Namely `Assignment`, `Let`, `Func`, `SetArray`, `MakeArray`, `MakeSparseArray` and
+`MakeTuple`."
+
+function manual_dispatch_toexpr(@nospecialize(x), st)
+    if x isa BasicSymbolic{SymReal}
+        toexpr(x, st)
+    elseif x isa Vector{BasicSymbolic{SymReal}}
+        toexpr(x, st)
+    elseif x isa Matrix{BasicSymbolic{SymReal}}
+        toexpr(x, st)
+    elseif x isa Symbol
+        toexpr(x, st)
+    elseif x isa Expr
+        toexpr(x, st)
+    elseif x isa Let
+        toexpr(x, st)
+    elseif x isa Assignment
+        toexpr(x, st)
+    elseif x isa DestructuredArgs
+        toexpr(x, st)
+    elseif x isa MakeArray
+        toexpr(x, st)
+    elseif x isa SetArray
+        toexpr(x, st)
+    elseif x isa SetArray
+        toexpr(x, st)
+    else
+        toexpr(x, st)
+    end
+end
+
+=#
+
+
 ###################################################################################
-# Expression holdine a SortRef
+# Expression holding a SortRef
 @matchable struct SortRefEx <: PnmlExpr
     ref::SortRef
 end
-toexpr(sr::SortRefEx, _::NamedTuple, _) = QuoteNode{sr.ref}
+"""
+    SortRefEx(ref::SortRef)
+
+Wraps a SortRef.
+`toexpr` returns `ref` wrapped in a `QuoteNode`.
+"""
+SortRefEx
+
+toexpr(sr::SortRefEx, _::NamedTuple, _) = QuoteNode(sr.ref)
 expr_sortref(sr::SortRefEx, _) = sr.ref
 function Base.show(io::IO, x::SortRefEx)
     print(io, "SortRefEx(", x.ref, ")" )
@@ -144,15 +194,28 @@ end
 @matchable struct VariableEx <: PnmlExpr
     refid::Symbol
 end
+"""
+      VariableEx(refid::Symbol)
+
+Wraps a variable id.
+`toexpr` uses id to access value in `varsub`, returns Union{Expr, QuoteNode}.
+A Symbol value is interprted to be an operator id.
+"""
+VariableEx
 
 function toexpr(op::VariableEx, varsub::NamedTuple, net)
-    # `op` holds `refid`, an index into a `DeclDict` operator dictionary.
-    # `varsub`
+    # `op` holds `refid`,  a key into a `VariableDeclaration` dictionary.
+    vdecl = variabledecl(net, op.refid)::VariableDeclaration
     vsub = varsub[op.refid]
     if vsub isa Symbol
+        # `vsub` is id symbol of a place marking => value of marking
+        # vdecl.sort is return type of 0-arity operator
+        #TODO other operators
         Expr(:call, feconstant, QuoteNode(net), QuoteNode(vsub))
-    else
-        :($(vsub))
+    elseif vsub isa Union{Expr, QuoteNode}
+        vsub
+    else # literal
+        QuoteNode(vsub)
     end
 end
 
@@ -167,10 +230,18 @@ end
 @matchable struct UserOperatorEx <: AbstractOpExpr
     refid::Symbol # operator(net, REFID) returns operator callable.
 end
+"""
+    UserOperatorEx(refid:Symbol)
+
+Wraps a operator id.
+`toexpr` returns `Expr` that calls `operator`.
+"""
+UserOperatorEx
+
 
 function toexpr(op::UserOperatorEx, varsub::NamedTuple, net)
     #@warn "toexpr(op::UserOperatorEx, varsub::NamedTuple)" op varsub operator(net, op.refid)
-    Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #
+    Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #TODO! ass varsub
 end
 
 function expr_sortref(o::UserOperatorEx, net)
@@ -187,6 +258,13 @@ end
 @matchable struct NamedOperatorEx <: AbstractOpExpr
     refid::Symbol # operator(net, REFID) returns operator callable.
 end
+"""
+    NamedOperatorEx(refid:Symbol)
+
+Wraps a operator id.
+`toexpr` returns `Expr` that calls `operator`.
+"""
+NamedOperatorEx
 
 function toexpr(op::NamedOperatorEx, varsub::NamedTuple, net)
     Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #
@@ -203,11 +281,6 @@ end
 
 
 ###################################################################################
-"""
-Bag:
-Expression calling pnmlmultiset(basis, x, multi; net) to construct a [`PnmlMultiset`](@ref).
-"""
-Bag # Need to avoid @matchable to have docstring
 @matchable struct Bag{E <: Any, M <: Any} <: PnmlExpr
     basis::SortRef
     element::E # ground term expression or Multiset
@@ -219,6 +292,14 @@ Bag # Need to avoid @matchable to have docstring
     #     new(b, x, m)
     # end h
 end
+"""
+    Bag{E <: Any, M <: Any}
+
+Wraps a `basis`, `element` and `multi`.
+`toexpr` returns `Expr` that calls `pnmlmultiset(basis, x, multi; net)` to construct a [`PnmlMultiset`](@ref).
+"""
+Bag
+
 Bag(b::SortRef, x) = Bag(b::SortRef, x, 1) # singleton multiset
 Bag(ms::AbstractPnmlMultiset) = Bag(basis(ms), multiset(ms))
 Bag(b::SortRef, x::Multiset) = Bag(b::SortRef, x, nothing) # x is a Multiset
@@ -244,16 +325,17 @@ function Base.show(io::IO, x::Bag)
 end
 
 ###################################################################################
-"""
-    NumberEx
-
-    TermInterface expression for a `<numberconstant>`.
-"""
-NumberEx # Need to avoid @matchable to have docstring
 @matchable struct NumberEx{T<:Number} <: PnmlExpr
     basis::SortRef # Wraps a sort REFID.
     element::T #
 end
+"""
+    NumberEx
+
+Wraps `basis` and `element`.
+`toexpr` returns `element` of `basis` sort.
+"""
+NumberEx # Need to avoid @matchable to have docstring
 
 toexpr(b::NumberEx{T}, _var::NamedTuple, _net) where {T<:Number} = b.element
 
@@ -265,36 +347,34 @@ function Base.show(io::IO, x::NumberEx)
     print(io, "NumberEx(", x.basis, ", ", x.element,")")
 end
 
-"""
-    BooleanEx
-
-TermInterface expression for a BooleanConstant.
-"""
-BooleanEx # Need to avoid @matchable to have docstring
 @matchable struct BooleanEx <: AbstractBoolExpr
     element::BooleanConstant
 end
+"""
+    BooleanEx
+
+    wraps a boolean literal value.
+`toexpr` return QuoteNode.
+"""
+BooleanEx # Need to avoid @matchable to have docstring
 
 function toexpr(b::BooleanEx, var::NamedTuple, net)
-    if b.element isa BooleanConstant
-        QuoteNode(value(b.element))
-    else
-        toexpr(b.element, var::NamedTuple, net)
-    end
+    @assert b.element isa BooleanConstant
+    QuoteNode(value(b.element))
 end
 
 function Base.show(io::IO, x::BooleanEx)
     print(io, "BooleanEx(", x.element,")")
 end
 
+@matchable struct DotConstantEx <: PnmlExpr
+end
 """
     DotConstantEx
 
-TermInterface expression for a DotSort element.
+`toexpr` returns a DotConstant.
 """
-DotConstantEx # Need to avoid @matchable to have docstring
-@matchable struct DotConstantEx <: PnmlExpr
-end
+DotConstantEx
 
 basis(::DotConstantEx) = UserSortRef(:dot)
 sortref(::DotConstantEx) = UserSortRef(:dot)
@@ -321,6 +401,13 @@ end
 @matchable struct Add <: PnmlExpr #^ multiset add uses `+` operator.
     args::Vector{Bag} # >=2 =
 end
+"""
+    Add
+
+Multiset addition. Wraps `args::Vector{Bag}``
+`toexpr` returns `Expr` calling `sum`.
+"""
+Add
 
 basis(a::Add) = basis(first(a.args))
 sortref(a::Add) = sortref(first(a.args))
@@ -337,11 +424,17 @@ function Base.show(io::IO, x::Add)
     print(io, "Add(", join(x.args, ", "), ")" )
 end
 
-#"Multiset subtract: Bag × Bag -> PnmlMultiset"
 @matchable struct Subtract <: PnmlExpr #^ multiset subtract uses `-` operator.
     lhs::Bag
     rhs::Bag
 end
+"""
+    Subtract
+
+Multiset subtraction, Wraps `lhs::Bag`, `rhs::Bag`.
+`toexpr` returns `Expr` calling `-`
+"""
+Subtract
 
 basis(a::Subtract) = basis(a.lhs)
 sortref(a::Subtract) = sortref(a.lhs)
@@ -360,6 +453,13 @@ end
     n::Any #! Expression evaluating to integer, use Any to allow `Symbolic` someday.
     bag::Bag #! Expression
 end
+"""
+    ScalarProduct
+
+Wraps an integer and a `Bag`.
+`toexpr` returns `Expr` that constructs a `PnmlMultiset` from a scalar multiset product.
+"""
+ScalarProduct
 
 basis(a::ScalarProduct) = basis(a.bag)
 sortref(a::ScalarProduct) = sortref(a.bag)
@@ -378,6 +478,13 @@ end
 @matchable struct Cardinality <: PnmlExpr #^ multiset cardinality uses `length`.
     bag::Bag # multiset expression
 end
+"""
+    Cardinality
+
+Wraps a `Bag`.
+`toexpr` returns `Expr` caling `cardinality` on PnmlMultiset created fro `bag`.
+"""
+Cardinality
 
 basis(::Cardinality) = UserSortRef(:natural)
 sortref(::Cardinality) = UserSortRef(:natural)
@@ -393,8 +500,14 @@ end
 
 @matchable struct CardinalityOf <: PnmlExpr #^ cardinalityof accesses multiset.
     ms::Bag # multiset expression
-    refid::Symbol # element of basis sort
+    refid::Symbol # element of basis sort #! XXX feconstant ?
 end
+"""
+    CardinalityOf
+Wraps `ms::Bag` and `refid::Symbol`.
+`toexpr` calls `multiplicity(ms, refid)`
+"""
+CardinalityOf
 
 function toexpr(op::CardinalityOf, var::NamedTuple, net)
     Expr(:call, :multiplicity, toexpr(op.ms, var, net), op.refid)
@@ -404,11 +517,18 @@ function Base.show(io::IO, x::CardinalityOf)
     print(io, "(CardinalityOf", x.ms, ", ", repr(x.refid), ")" )
 end
 
-#"Bag -> Bool"
 @matchable struct Contains <: AbstractBoolExpr #^ multiset contains access multiset.
     lhs::Bag # multiset expression #TODO Union{Bag, VariableEx}
     rhs::Bag # multiset expression
 end
+"""
+    Contains
+
+Wraps `lhs::Bag`, `rhs::Bag`.
+Does multiset `lhs` contain `rhs`.
+`toexpr` returns `Expr` that calls `mcontains(lhs, rhs, net)`
+"""
+Contains
 
 function toexpr(op::Contains, var::NamedTuple, net)
     Expr(:call, :mcontains, toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
@@ -422,6 +542,13 @@ end
 @matchable struct Or <: AbstractBoolExpr #^ Uses `any`.
     args::Vector{AbstractBoolExpr} # >=2 in ISO 15909, but some =1 exist.
 end
+"""
+    Or
+
+Wraps vector of boolean expressions.
+`toexpr` returns `Expr` that calls `any` for arg in vector.
+"""
+Or
 
 function toexpr(op::Or, vars::NamedTuple, net)
     :(any(eval(toexpr(arg, $vars, $net)) for arg in $(op.args)))
@@ -434,6 +561,13 @@ end
 @matchable struct And <: AbstractBoolExpr #^ Uses `all`.
     args::Vector{AbstractBoolExpr} # >=2
 end
+"""
+    And
+
+Wraps vector of boolean expressions.
+`toexpr` returns `Expr` that calls `all` for arg in vector.
+"""
+And
 
 function toexpr(op::And, vars::NamedTuple, net)
     #@show [eval(toexpr(arg, vars, net)) for arg in op.args]
@@ -447,6 +581,13 @@ end
 @matchable struct Not <: AbstractBoolExpr #^ Uses `!` operator.
     args::Vector{AbstractBoolExpr}
 end
+"""
+    Not
+
+Wraps vector of boolean expressions.
+`toexpr` returns `Expr` that calls `!any` for arg in vector.
+"""
+Not
 
 # Return true if none of the args are true.
 function toexpr(op::Not, vars::NamedTuple, net)
@@ -462,6 +603,13 @@ end
     lhs::Any # AbstractBoolExpr
     rhs::Any # AbstractBoolExpr
 end
+"""
+    Imply
+
+Wraps lhs, rhs boolean expressions.
+`toexpr` returns `Expr` that calls `||(lhs, rhs)`.
+"""
+Imply
 
 function toexpr(op::Imply, var::NamedTuple, net)
     Expr(:call, :(||), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
@@ -475,7 +623,13 @@ end
     lhs::Any # expression evaluating to a T
     rhs::Any # expression evaluating to a T
 end
+"""
+    Equality
 
+Wraps lhs, rhs expressions.
+`toexpr` returns `Expr` that calls `==(lhs, rhs)`.
+"""
+Equality
 function toexpr(op::Equality, var::NamedTuple, net)
     Expr(:call, :(==), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
 end
@@ -488,6 +642,13 @@ end
     lhs::Any # expression evaluating to a T
     rhs::Any # expression evaluating to a T
 end
+"""
+    Inequality
+
+Wraps lhs, rhs expressions.
+`toexpr` returns `Expr` that calls `!=(lhs, rhs)`.
+"""
+Inequality
 
 function toexpr(op::Inequality, var::NamedTuple, net)
     Expr(:call, :(!=), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
@@ -502,6 +663,14 @@ end
 @matchable struct Successor <: PnmlExpr
     arg::Any
 end
+"""
+    Successor
+
+Wraps #!TBD
+
+#TODO `toexpr` returns `Expr` that calls `!=(lhs, rhs)`.
+"""
+Successor
 
 toexpr(op::Successor, var::NamedTuple, net) = error("implement me arg ", repr(op.arg))
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
@@ -514,6 +683,14 @@ end
 @matchable struct Predecessor <: PnmlExpr
     arg::Any
 end
+"""
+    Predecessor
+
+Wraps #!TBD
+
+#TODO `toexpr` returns `Expr` that calls `!=(lhs, rhs)`.
+"""
+Predecessor
 
 toexpr(op::Predecessor, var::NamedTuple, net) = error("implement me arg ", repr(op.arg))
 
@@ -524,18 +701,19 @@ end
 
 #& FiniteIntRange Operators work on integrs in spec, we extend to Number
 
-#! Use the Integer version. The difference is how the number is accessed!
-# struct LessThan{T <: Number} <: PnmlExpr #! Use the Integer version.
-# struct LessThanOrEqual{T} <: PnmlExpr #! Use the Integer version.
-# struct GreaterThan{T} <: PnmlExpr #! Use the Integer version.
-# struct GreaterThanOrEqual{T} <: PnmlExpr #! Use the Integer version.
-
-
 #& Integer in standard # we extend to `Number`, really anything that supports the + operator used:)
 @matchable struct Addition <: PnmlExpr #? Use `+` operator.
     lhs::Any
     rhs::Any
 end
+"""
+    Addition
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `+(lhs, rhs)`.
+"""
+Addition
 
 expr_sortref(a::Addition, net) = expr_sortref(a.lhs, net)::SortRef
 
@@ -551,6 +729,14 @@ end
     lhs::L
     rhs::R
 end
+"""
+    Subtraction
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `-(lhs, rhs)`.
+"""
+Subtraction
 
 expr_sortref(a::Subtraction, net) = expr_sortref(a.lhs, net)::SortRef
 
@@ -566,10 +752,19 @@ end
     lhs::L
     rhs::R
 end
+"""
+    Multiplication
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `*(lhs, rhs)`.
+"""
+Multiplication
 
 expr_sortref(a::Multiplication, net) = expr_sortref(a.lhs, net)::SortRef
 
-function toexpr(op::Multiplication, var::NamedTuple, net)
+function toexpr(op::Multiplication, var::NamedTuple, net)# <gtp>
+
     Expr(:call, :(*), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
 end
 
@@ -581,6 +776,14 @@ end
     lhs::L
     rhs::R
 end
+"""
+    Division
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `div(lhs, rhs)`.
+"""
+Division
 
 expr_sortref(a::Division, net) = expr_sortref(a.lhs, net)::SortRef
 
@@ -592,10 +795,19 @@ function Base.show(io::IO, x::Division)
     print(io, "Division(", x.lhs, ", ", x.rhs, ")" )
 end
 
+#^------------------------------------------------------------------
 @matchable struct GreaterThan{L,R} <: AbstractBoolExpr #? Use `>` operator.
     lhs::L
     rhs::R
 end
+"""
+    GreaterThan
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `>(lhs, rhs)`.
+"""
+GreaterThan
 
 function toexpr(op::GreaterThan, var::NamedTuple, net)
     Expr(:call, :(>), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
@@ -609,6 +821,14 @@ end
     lhs::L
     rhs::R
 end
+"""
+    GreaterThanOrEqual
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `>=(lhs, rhs)`.
+"""
+GreaterThanOrEqual
 
 function toexpr(op::GreaterThanOrEqual, var::NamedTuple, net)
     Expr(:call, :(>=), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
@@ -622,6 +842,14 @@ end
     lhs::L
     rhs::R
 end
+"""
+    LessThan
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `<(lhs, rhs)`.
+"""
+LessThan
 
 function toexpr(op::LessThan, var::NamedTuple, net)
     Expr(:call, :(<), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
@@ -635,6 +863,14 @@ end
     lhs::L
     rhs::R
 end
+"""
+    LessThanOrEqual
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `<=(lhs, rhs)`.
+"""
+LessThanOrEqual
 
 function toexpr(op::LessThanOrEqual, var::NamedTuple, net)
     Expr(:call, :(<=), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
@@ -648,6 +884,14 @@ end
     lhs::L
     rhs::R
 end
+"""
+    Modulo
+
+Wraps `lhs` , `rhs` expressions.
+
+`toexpr` returns `Expr` that calls `mod(lhs, rhs)`.
+"""
+Modulo
 
 expr_sortref(a::Modulo, net) = sortref(a.lhs)::SortRef
 
@@ -659,7 +903,6 @@ function Base.show(io::IO, x::Modulo)
     print(io, "Modulo(", x.lhs, ", ", x.rhs, ")" )
 end
 
-
 #& Partition
 # PartitionElement is an operator declaration. Is this a literal? See PartitionElementOf.
 @matchable struct PartitionElementOp <: AbstractOpExpr #! Same as PartitionElement, for term rerwite?
@@ -668,6 +911,14 @@ end
     refs::Vector{Symbol} # to FEConstant
     partition::Symbol
 end
+"""
+    PartitionElementOp
+
+Wraps `id::Symbol` , `name::String`, `refs` vector, `net`.
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+PartitionElementOp
 
 expr_sortref(a::PartitionElementOp, net) = sortref(partitionsort(net, a.partition))::SortRef
 
@@ -680,15 +931,25 @@ end
 
 #> comparison functions on the partition elements which is based on
 #> the order in which they occur in the declaration of the partition
+
+# <ltp>
 @matchable struct PartitionLessThan{L,R} <: AbstractBoolExpr
     lhs::L #PartitionElement
     rhs::R #PartitionElement
 end
+"""
+    PartitionLessThan
 
-function ltp_impl(lhs, rhs)
-    #@warn "ltp_impl" lhs  rhs
-    lhs < rhs
-end
+Wraps `lhs` , `rhs`.
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+PartitionLessThan
+
+# function ltp_impl(lhs, rhs)
+#     #@warn "ltp_impl" lhs  rhs
+#     return false #! lhs < rhs # ivalidation trigger
+# end
 
 toexpr(op::PartitionLessThan, var::NamedTuple, net) = error("implement me ", repr(op))
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
@@ -697,15 +958,24 @@ function Base.show(io::IO, x::PartitionLessThan)
     print(io, "PartitionLessThan(", x.lhs, ", ", x.rhs, ")" )
 end
 
+# <gtp>
 @matchable struct PartitionGreaterThan{L,R} <: AbstractBoolExpr
     lhs::L #PartitionElement
     rhs::R #PartitionElement
     # return AbstractBoolExpr
 end
+"""
+    PartitionGreaterThan
+
+Wraps `lhs` , `rhs`.
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+PartitionGreaterThan
 
 function gtp_impl(lhs, rhs)
     #@warn "gtp_impl" lhs  rhs
-    lhs > rhs
+    return false #! lhs > rhs invalidation trigger
 end
 
 function toexpr(op::PartitionGreaterThan, varsub::NamedTuple, net)
@@ -723,6 +993,14 @@ end
     arg::T # TODO variable that should be a feconstant
     refpartition::Symbol # TODO! wrap in PartitionSortRef
 end
+"""
+    PartitionElementOf
+
+Wraps `arg` , `rhrefpartitions`.
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+PartitionElementOf
 
 expr_sortref(a::PartitionElementOf, net) = sortref(partitionsort(net, a.refpartition))::SortRef
 
@@ -748,41 +1026,102 @@ end
     args::Vector{T} # =2
     # use ?
 end
+"""
+    Concatenation
+
+Wraps `args::Vector`.
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+Concatenation
 
 @matchable struct Append{T <: AbstractString} <: PnmlExpr
     lhs::T
     rhs::T
     # use ?
 end
+"""
+    Append
 
+Wraps `lhs`, `rhs`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+Append
+
+# <stringlength>
 @matchable struct StringLength{T <: AbstractString} <: PnmlExpr
     arg::T
     # use ?
 end
+"""
+    StringLength
 
+Wraps `lhs`, `rhs`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+StringLength
+
+# <lts>
 @matchable struct StringLessThan{T <: AbstractString} <: AbstractBoolExpr
     lhs::T
     rhs::T
     # use ?
 end
+"""
+    StringLessThan
 
+Wraps `lhs`, `rhs`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+StringLessThan
+
+# <leqs>
 @matchable struct StringLessThanOrEqual{T <: AbstractString} <: AbstractBoolExpr
     lhs::T
     rhs::T
     # use ?
 end
+"""
+    StringLessThanOrEqual
 
+Wraps `lhs`, `rhs`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+StringLessThanOrEqual
+
+# <gts>
 @matchable struct StringGreaterThan{T <: AbstractString} <: AbstractBoolExpr
     lhs::T
     rhs::T
     # use ?
 end
+"""
+    StringGreaterThan
 
+Wraps `lhs`, `rhs`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+StringGreaterThan
+
+# <geqs>
 @matchable struct StringGreaterThanOrEqual{T <: AbstractString} <: AbstractBoolExpr
     lhs::T
     rhs::T
     # use ?
 end
+"""
+    StringGreaterThanOrEqual
+
+Wraps `lhs`, `rhs`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+StringGreaterThanOrEqual
 
 @matchable struct SubstringEx{T <: AbstractString} <: PnmlExpr
     str::T
@@ -790,7 +1129,14 @@ end
     length::Int
     # use ?
 end
+"""
+    SubstringEx
 
+Wraps `lhs`, `rhs`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+SubstringEx
 
 #&=========================================================================================
 #& Lists
@@ -800,6 +1146,14 @@ end
     basis::SortRef
     els::Vector{T} #
 end
+"""
+    ListEx
+
+Wraps `basis::SortRef`, `els::Vector`.`
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+ListEx
 
 function toexpr(op::ListEx, varsub::NamedTuple, net)
     #@warn "toexpr ListEx" op varsub
@@ -812,23 +1166,68 @@ function Base.show(io::IO, x::ListEx)
 end
 
 
-
+# <listlength>
 @matchable struct ListLength <: PnmlExpr
 end
+"""
+    ListLength
 
+Wraps #! TBD
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+ListLength
+
+# <listconcatenation>
 @matchable struct ListConcatenation <: PnmlExpr
 end
+"""
+    ListConcatenation
+
+Wraps #! TBD
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+ListConcatenation
 
 @matchable struct Sublist <: PnmlExpr
 end
+"""
+    Sublist
 
+Wraps #! TBD
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+Sublist
+
+# <listappend>
 @matchable struct ListAppend <: PnmlExpr
 end
+"""
+    ListAppend
+
+Wraps #! TBD
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+ListAppend
 
 @matchable struct MemberAtIndex <: PnmlExpr
 end
+"""
+    MemberAtIndex
+
+Wraps #! TBD
+
+`toexpr` returns `Expr` that calls #! TBD
+"""
+MemberAtIndex
 
 #--------------------------------------------------------------
+@matchable struct PnmlTupleEx <: PnmlExpr #{N, T<:PnmlExpr}
+    args::Vector{Any} # >=2 subterms
+end
 """
     PnmlTupleEx(args::Vector)
 
@@ -837,12 +1236,10 @@ There is a related `ProductSort`: an ordered collection of sorts.
 Each tuple element will have the same sort as the corresponding product sort.
 
 NB: ISO 15909 Standard considers Tuple to be an Operator.
+
+`toexpr` returns `Expr` that calls #! TBD
 """
 PnmlTupleEx
-
-@matchable struct PnmlTupleEx <: PnmlExpr #{N, T<:PnmlExpr}
-    args::Vector{Any} # >=2 subterms
-end
 
 # <tuple> is an operator.
 # The sort of a tuple is a tuple of its element's sorts (a.k.a ProductSort).
