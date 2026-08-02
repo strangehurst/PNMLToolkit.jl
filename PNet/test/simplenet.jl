@@ -192,11 +192,11 @@ end
     </pnml>
     """
     model = @inferred PnmlModel PNML.pnmlmodel(PNML.Parser.xmlnode(str3))
-    net1 = first(nets(model));          #@show typeof(net1)
+    net1 = PNML.firstnet(model);          #@show typeof(net1)
     simp = @inferred SimpleNet(net1); #@show typeof(simp)
 
-    @show S = @inferred collect(PNML.place_idset(simp.net)) # [:rabbits, :wolves]
-    @show T = @inferred collect(PNML.transition_idset(simp.net))
+    @show @inferred collect(PNML.place_idset(simp.net)) # [:rabbits, :wolves]
+    @show @inferred collect(PNML.transition_idset(simp.net))
     @show m₀ = initial_markings(simp.net)
     @show input = input_matrix(pnmlnet(simp))
     @show output_matrix(pnmlnet(simp))

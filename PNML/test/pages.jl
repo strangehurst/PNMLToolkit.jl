@@ -91,7 +91,7 @@ model = @inferred PNML.PnmlModel pnmlmodel(xml"""<?xml version="1.0"?>
     </pnml>
 """)
 
-net = first(nets(model))
+net = firstnet(model)
 
 @test net isa PnmlNet  # Any concrete subtype.
 @test isconcretetype(typeof(net))

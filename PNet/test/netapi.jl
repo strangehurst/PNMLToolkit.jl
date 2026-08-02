@@ -88,7 +88,7 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
     """
 
     model = pnmlmodel(xmlnode(str3))
-    anet = PNML.firstnet(model)::PnmlNet
+    anet = PNML.firstnet(model)
     #@show summary(anet)
     #@show mg
 

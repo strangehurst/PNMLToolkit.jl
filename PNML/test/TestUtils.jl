@@ -12,7 +12,7 @@ Multisets.set_key_value_show()
     Transition, XmlDictType, allpages, arbitrarysort, arbitrarysorts, arc, arc_idset,
     arcdict, arcs, arity, cardinality, condition, decldict, elements, extralabels,
     fill_builtin_labelparsers!, fill_builtin_sorts!, fill_builtin_toolparsers!,
-    fill_sort_tag!, firstpage, flatten_pages!, graphics, has_arc, has_graphics, has_place,
+    fill_sort_tag!, firstnet, firstpage, flatten_pages!, graphics, has_arc, has_graphics, has_place,
     has_tools, has_transition, initial_marking, inputs, inscription, ispid, length,
     make_net, multiplicity, multiset, name, namedsort, namedsorts, narcs, nets,
     netsets, nettype, npages, nplaces, nrefplaces, nreftransitions, ntransitions,

@@ -6,16 +6,18 @@ using .TestUtils
 #
 # copied from pnmlframework-2.2.16/pnmlFw-Tests/XMLTestFilesRepository/Oracle
 #
-oracle = "data/XMLTestFilesRepository/Oracle"
+const oracle = "data/XMLTestFilesRepository/Oracle"
 
 println("\n-----------------------------------------")
 println("full_coremodel.xml")
 println("-----------------------------------------")
-@testset let fname=joinpath(@__DIR__, oracle, "full_coremodel.xml")
+@testset let fname=joinpath(@__DIR__, oracle, "full_coremodel.xml";)
     model = pnmlmodel(fname)::PnmlModel
-    summary(stdout, model) #first(nets(model)))
-    n = first(nets(model))::PnmlNet
+    summary(stdout, model) #firstnet(model)))
+    n = firstnet(model)
     n = flatten_pages!(n; verbose=true)::PnmlNet
+    @test narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0
+
     # vc = vertex_codes(n)::AbstractDict
     # vl = vertex_labels(n)::AbstractDict
     # for a in arcs(n)
@@ -37,10 +39,10 @@ println("full_ptnet.xml")
 println("-----------------------------------------")
 @testset let fname=joinpath(@__DIR__, oracle, "full_ptnet.xml")
     model = pnmlmodel(fname)::PnmlModel
-    summary(stdout, model) #first(nets(model)))
-    n = first(nets(model))::PnmlNet
+    summary(stdout, model) #firstnet(model)))
+    n = firstnet(model)
     n = flatten_pages!(n)::PnmlNet
-    # vc = vertex_codes(n)::AbstractDict
+    @test narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0    # vc = vertex_codes(n)::AbstractDict
     # vl = vertex_labels(n)::AbstractDict
     #  if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
     #     @test_throws ArgumentError metagraph(n)
@@ -60,9 +62,9 @@ println("-----------------------------------------")
                        match_mode=:any,
         pnmlmodel(fname)::PnmlModel)
     summary(stdout, model)
-    n = first(nets(model))::PnmlNet
+    n = firstnet(model)
     n = flatten_pages!(n)::PnmlNet
-    # @test vertex_codes(n) isa AbstractDict
+    @test narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0    # @test vertex_codes(n) isa AbstractDict
     # @test vertex_labels(n) isa AbstractDict
     # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
     #     @test_throws ArgumentError metagraph(n)
@@ -81,9 +83,9 @@ println("-----------------------------------------")
                        match_mode=:any,
         pnmlmodel(fname)::PnmlModel)
     summary(stdout, model)
-    n = first(nets(model))::PnmlNet
+    n = firstnet(model)
     n = flatten_pages!(n)::PnmlNet
-    # @test vertex_codes(n) isa AbstractDict
+    @test narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0    # @test vertex_codes(n) isa AbstractDict
     # @test vertex_labels(n) isa AbstractDict
     # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
     #     @test_throws ArgumentError metagraph(n)
