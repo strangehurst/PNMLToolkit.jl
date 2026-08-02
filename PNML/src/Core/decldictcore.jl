@@ -24,6 +24,7 @@ Each keyed by REFID symbols.
 
     # OperatorDecls
     # namedoperators are also used to access built-in operators.
+
     namedoperators::Dict{Symbol, NO}
     arbitraryoperators::Dict{Symbol, AO}
     # PartitionElement is an operator, there are other built-in operators
@@ -200,10 +201,8 @@ With output sort to match `OperatorDeclaration` .
 #TODO built-in operators
 """
 function operator(dd::ADDicts, opid::Symbol)
-    #println("operator($id)")
     for dict in _ops(dd) # Look through all the dictionaries.
         if haskey(dict, opid)
-            #@show dict[opid]
             return dict[opid] #! not type stable because each dict holds different type.
         end
     end
