@@ -50,7 +50,7 @@ const str1 = """
                        (:info, "add PnmlLabel :structure to :p3"),
                        (:info, "add PnmlLabel :frog to :p3"),
                 pnmlmodel(xmlnode(str1))::PnmlModel) #
-    net0 = @inferred PnmlNet first(PNML.nets(model))
+    net0 = @inferred PnmlNet PNML.firstnet(model)
 
     simp1 = @inferred SimpleNet SimpleNet(model)
     simp  = @inferred SimpleNet SimpleNet(net0)
@@ -76,13 +76,9 @@ const str1 = """
         #@inferred transitions(first(pages(net.net)))
         #@inferred arcs(first(pages(net.net)))
 
-        #@inferred places(net.net)
-        #@inferred transitions(net.net)
-        #@inferred arcs(net.net)
-
-        @inferred Base.ValueIterator places(simp.net)
-        @inferred Base.ValueIterator transitions(simp.net)
-        @inferred Base.ValueIterator arcs(simp.net)
+        @inferred places(net0)
+        @inferred transitions(net0)
+        @inferred arcs(net0)
     end
 
     # page, pnmlnet, petrinet, the 3 top=levels

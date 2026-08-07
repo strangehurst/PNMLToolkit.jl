@@ -18,7 +18,7 @@ println("-----------------------------------------\n")
 #     #!@show model
 #     #~ repr tests everybody's show() methods. #! Errors exposed warrent test BEFORE HERE!
 #     #!@test startswith(repr(model), "PnmlModel")
-    for net in PNML.nets(model)
+    for net in @inferred PNML.nets(model)
         @test pid(net) in Set([:net1,:net2,:net3,:net4,:net5,:net6,
                                :net7,:net8,:net9,:net10,:net11])
         #println("-----------------------------------------")

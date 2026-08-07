@@ -185,7 +185,7 @@ end
         </net>
         </pnml>
         """
-    for net in nets(pnmlmodel(pnmldoc)::PnmlModel)
+    for net in @inferred nets(pnmlmodel(pnmldoc)::PnmlModel)
         @test net isa PnmlNet
         # we harvest all declarations as one thing
 
@@ -229,13 +229,14 @@ end
             @test page isa Page
             @test @inferred(pid(page)) isa Symbol
             @test get_label(page, :XYZ) === nothing
-            for p in places(page)
+            for p in @inferred places(page)
                 @test p isa Place
                 @test get_label(p, :XYZ) === nothing
                 placeid = pid(p)::Symbol
                 @test has_place(page, placeid)
                 @test pid(place(page, placeid)) === placeid
                 @test initial_marking(net, pid(p)) == initial_marking(p)
+                #@test @inferred(initial_marking(net, pid(p))) == @inferred(initial_marking(p))
             end
             for transition in transitions(page)
                 @test transition isa Transition
