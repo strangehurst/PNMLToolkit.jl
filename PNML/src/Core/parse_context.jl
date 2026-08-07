@@ -122,8 +122,13 @@ function fill_builtin_toolparsers!(toolparsers::AbstractDict)
     for plugin in (
             ("org.pnml.tool", "1.0", Parser.tokengraphics_content),
             ("PNMLToolkit.jl", "1.1", Parser.toolkit_options),
+            ("PNMLToolkit.jl", "1.2", Parser.toolkit_options),
         )
-        toolparsers[plugin[1]] = LittleDict(plugin[2] => last(plugin))
+        if haskey(toolparsers, plugin[1])
+            toolparsers[plugin[1]][plugin[2]] = last(plugin)
+        else
+            toolparsers[plugin[1]] = LittleDict(plugin[2] => last(plugin))
+        end
     end
     return nothing
 end
