@@ -26,7 +26,7 @@ julia> typeof(PNML.first_net(m))
 The net is incompletely specified. Not inferrable.
 
 ```julia
-julia> @code_warntype parse_pnml(xmlroot(pnmlxml); reg = PnmlIDRegistry())
+julia> @code_warntype parse_pnml(xmlnode(pnmlxml); reg = PnmlIDRegistry())
 ```
 
 ```julia

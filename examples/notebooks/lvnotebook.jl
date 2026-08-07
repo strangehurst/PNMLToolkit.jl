@@ -57,9 +57,9 @@ let
 	d = PNML.PnmlLabel[]
 	reg = registry()
 	pntd = PnmlCoreNet()
-	PNML.add_label!(d, PNML.xmlroot("<test1> 1 </test1>"), pntd)
-	PNML.add_label!(d, PNML.xmlroot("<test2> 2.0 </test2>"), pntd)
-	PNML.add_label!(d, PNML.xmlroot("<test3> true </test3>"), pntd)
+	PNML.add_label!(d, PNML.xmlnode("<test1> 1 </test1>"), pntd)
+	PNML.add_label!(d, PNML.xmlnode("<test2> 2.0 </test2>"), pntd)
+	PNML.add_label!(d, PNML.xmlnode("<test3> true </test3>"), pntd)
 end
 
 # ╔═╡ ddacb450-31cb-4f7d-b62f-c81d0c2df858

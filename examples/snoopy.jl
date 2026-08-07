@@ -27,7 +27,7 @@ str = """<?xml version="1.0"?>
 </net>
 </pnml>
 """
-const pnmlroot = PNML.xmlroot(str)
+const pnmlroot = PNML.xmlnode(str)
 
 #tinf = @snoopi_deep begin end
 function test1(proot, n=10)

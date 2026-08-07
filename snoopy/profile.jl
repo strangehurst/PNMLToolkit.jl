@@ -87,7 +87,7 @@ node = EzXML.root(EzXML.readxml("/home/jeff/PetriNet/PNML/MCC2023/StigmergyCommi
 
 # #-----------------------------------------------------
 # using EzXML, PNML
-# arcnode = xmlroot("""<arc source="transition1" target="place1" id="arc1">
+# arcnode = xmlnode("""<arc source="transition1" target="place1" id="arc1">
 # </arc>""")
 # placenode = xml"""<place id="place1">
 # </place>"""

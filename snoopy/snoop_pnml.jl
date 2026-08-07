@@ -8,7 +8,7 @@ invalidations = @snoop_invalidations begin
     using PNML
 
     tinf = @snoop_inference begin
-        m = PNML.pnmlmodel(xmlroot("""<?xml version="1.0"?>
+        m = PNML.pnmlmodel(xmlnode("""<?xml version="1.0"?>
             <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
                 <net id="net0" type="pnmlcore">
                     <page id="page1">
