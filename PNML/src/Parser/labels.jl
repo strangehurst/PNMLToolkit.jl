@@ -147,16 +147,14 @@ end
 
 
 ############################################################################
-# Marking
+#
 ############################################################################
 
-# Sorts are sets in Part 1 of the ISO 15909 standard that defines the semantics.
+# Sorts are sets in Part 1 of the ISO 15909 standard that defines the semantics of PNML.
 # Very much mathy, so thinking of sorts as collections is natural.
 # Some of the sets are finite: boolean, enumerations, ranges.
 # Others include integers, natural, and positive numbers (Also floats/reals).
 # Some High-levl Petri nets, in particular Symmetric nets, are restricted to finite sets.
-# We support the possibility of full-fat High-level nets with
-# arbitrary sort and arbitrary operation definitions.
 
 # Part 2 of the standard that defines the syntax of the xml markup language
 # maps these sets to sorts (similar to Type). And adds things.
@@ -174,8 +172,6 @@ end
 # `eltype(x) @ Base abstractarray.jl:241` to return Int64.
 
 # Base.eltype is for collections: what an iterator would return.
-
-# Parse <text> as a `Number` of appropriate type or use apropriate default.
 
 """
 $(TYPEDSIGNATURES)
@@ -206,38 +202,6 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::AbstractP
     Marking(; term = NumberEx(sortref(placetype), value),
               text=nothing, l.graphics,
               l.toolspecinfos, net, place=parentid)
-end
-
-"""
-$(TYPEDSIGNATURES)
-Ignore the source & target symbols.
-"""
-function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net::AbstractPnmlNet; parentid::Symbol)
-    @assert !(pntd_of(net) isa AbstractHLCore) "inscription unexpected on pntd $(pntd_of(net)): $parentid"
-    check_nodename(node, "inscription")
-    value = nothing
-    graphics::Maybe{Graphics} = nothing
-    toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
-
-    for child in EzXML.eachelement(node)
-        tag = EzXML.nodename(child)
-        if tag == "text"
-            value = parse(value_type(Inscription, pntd_of(net)), parse_text(child, pntd_of(net)))
-        elseif tag == "graphics"
-            graphics = parse_graphics(child, pntd_of(net))
-        elseif tag == "toolspecific"
-            toolspecinfos = add_toolinfo(toolspecinfos, child, net) # inscription label
-        else
-            @warn("ignoring unexpected child of <inscription>: '$tag'")
-        end
-    end
-
-    # Treat missing value as if the <inscription> element was absent.
-    if isnothing(value)
-        value = one(value_type(Inscription, pntd_of(net)))
-    end
-    term = NumberEx(sortref(value), value)
-    Inscription(nothing, term, graphics, toolspecinfos, REFID[], net)
 end
 
 """
@@ -386,6 +350,39 @@ function (pmt::ParseMarkingTerm)(marknode::XMLNode, net::AbstractPnmlNet)
     throw(ArgumentError("missing marking term in <structure>"))
 end
 
+#^-----------------------------------------------------------------------------------------
+"""
+$(TYPEDSIGNATURES)
+Ignore the source & target symbols.
+"""
+function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net::AbstractPnmlNet; parentid::Symbol)
+    @assert !(pntd_of(net) isa AbstractHLPNTD) "inscription unexpected on pntd $(pntd_of(net)): $parentid"
+    check_nodename(node, "inscription")
+    value = nothing
+    graphics::Maybe{Graphics} = nothing
+    toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
+
+    for child in EzXML.eachelement(node)
+        tag = EzXML.nodename(child)
+        if tag == "text"
+            value = parse(value_type(Inscription, pntd_of(net)), parse_text(child, pntd_of(net)))
+        elseif tag == "graphics"
+            graphics = parse_graphics(child, pntd_of(net))
+        elseif tag == "toolspecific"
+            toolspecinfos = add_toolinfo(toolspecinfos, child, net) # inscription label
+        else
+            @warn("ignoring unexpected child of <inscription>: '$tag'")
+        end
+    end
+
+    # Treat missing value as if the <inscription> element was absent.
+    if isnothing(value)
+        value = one(value_type(Inscription, pntd_of(net)))
+    end
+    term = NumberEx(sortref(value), value)
+    Inscription(nothing, term, graphics, toolspecinfos, REFID[], net)
+end
+
 """
 $(TYPEDSIGNATURES)
 
@@ -483,7 +480,9 @@ function def_insc(source,::REFID, target::REFID, net::AbstractPnmlNet)
     return pnmlmultiset(sortref(place_type), sort_element, 1; net)::PnmlMultiset
 end
 
+#^-----------------------------------------------------------------------------------------
 """
+$(TYPEDSIGNATURES)
     parse_condition(::XMLNode, ::AbstractPNTD; net::AbstractPnmlNet) -> Condition
 
 Label of transition node. Used in the enabling function.
@@ -513,6 +512,7 @@ function parse_condition(node::XMLNode, net::AbstractPnmlNet; parentid)
 end
 
 """
+$(TYPEDSIGNATURES)
     parse_condition_term(::XMLNode, net::AbstractPnmlNet) -> PnmlExpr, SortRef, Tuple
 
 Used as `termparser` by [`parse_label_content`](@ref) for `Condition` label of a `Transition`;
@@ -547,7 +547,6 @@ end
 
 """
 $(TYPEDSIGNATURES)
-    parse_sorttype_term(::XMLNode, net::AbstractPnmlNet) -> TermJunk
 
 Used as `termparser` by [`parse_label_content`](@ref) for the PNML `<type>`
 of a `<place>`.
@@ -588,7 +587,7 @@ $(TYPEDSIGNATURES)
 
 Return `Rate` wraping a `NumberEx`, with optional `graphics` and `toolspec`.
 
-The rate label:
+The rate label format:
 ```
 <rate>
     <text> number_string </text>
@@ -631,7 +630,7 @@ end
 """
 $(TYPEDSIGNATURES)
 
-The priority label:
+The priority label format:
 ```
 <priority>
     <text> number_string </text>
