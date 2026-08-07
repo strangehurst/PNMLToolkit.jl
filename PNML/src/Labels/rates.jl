@@ -3,7 +3,9 @@ $(TYPEDEF)
 $(TYPEDFIELDS)
 
 Real valued label. An expected use is as a transition rate.
-Expected XML: `<rate> <text>0.3</text> </rate>`.
+Expected XML: `<rate>
+    <text>0.3</text>
+</rate>`.
 """
 @kwdef struct Rate{N <: AbstractPnmlNet, T <: PnmlExpr} <: Annotation
     text::Maybe{String} = nothing

@@ -159,7 +159,7 @@ $(TYPEDEF)
 
 $(TYPEDFIELDS)
 
-**TODO: Rename SimpleNet to TBD**
+** TODO: Rename SimpleNet to TBD **
 
 SimpleNet is a concrete `AbstractPetriNet` wrapping a single `PnmlNet`.
 
@@ -175,7 +175,7 @@ end
 
 # Method Cascade.
 # First two run the parser and can have addded tool and label plugins as context.
-# toolinfos => (tool1, [tool2,]...), labels =< (label1, [label2,]...)
+# toolinfos => (tool1, [tool2,]...), labels => (label1, [label2,]...)
 SimpleNet(str::AbstractString)  = SimpleNet(PNML.xmlnode(str))
 SimpleNet(node::PNML.XMLNode) = SimpleNet(PNML.Parser.pnmlmodel(node)) #TODO lp, tp, ef
 

@@ -114,12 +114,10 @@ function get_toolinfos(infos::Vector, namerex::Regex, versionrex::Regex)
     Iterators.filter(ti -> _match(ti, namerex, versionrex), infos)
 end
 
-
 """
     _match(tx, namerex::Regex, versionrex::Regex) -> Bool
 
-Return `true` if both toolname and version match. Default is any version.
-Applies to ToolInfo, ToolParser, and other objects with a `name` and `version` method.
+Return `true` if both tool `namerex` and `versionrex` match. Default is any version.
 """
 function _match(tx::Union{ToolInfo,ToolParser}, namerex::Regex, versionrex::Regex = r"^.*$")
     match_name = match(namerex, name(tx))

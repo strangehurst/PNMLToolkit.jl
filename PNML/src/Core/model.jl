@@ -2,7 +2,7 @@
 $(TYPEDEF)
 $(TYPEDFIELDS)
 
-One or more Petri Nets.
+Holds one or more `PnmlNet`s and a `namespace` string.
 """
 struct PnmlModel{T <: NamedTuple}
     nets::T
@@ -12,7 +12,7 @@ end
 """
 $(TYPEDSIGNATURES)
 
-Return all `nets` of `model`.
+Return iterator over `nets` of `model`.
 """
 nets(model::PnmlModel) = values(model.nets)
 namespace(model::PnmlModel) = model.namespace
@@ -37,11 +37,10 @@ $(TYPEDSIGNATURES)
 
 Return `PnmlNet` having `id` or `nothing`.
 """
-function find_net(model, id::Symbol)
-    haskey(model.nets, id) ? model.nets[id] : nothing
+function find_net(model::PnmlModel, id::Symbol)
+    haskey(model.nets, id) ? model.nets[id]::APN : nothing
 end
 
-# No indent done here.
 function Base.show(io::IO, model::PnmlModel)
     print(io, "PnmlModel(", namespace(model), ", ",)
     println(io, length(nets(model)), " nets:" )
@@ -53,7 +52,6 @@ function Base.show(io::IO, model::PnmlModel)
     end
 end
 
-#Base.summary(io::IO, pns::PnmlModel) = print(io, summary(pns))
 function Base.summary(io::IO, m::PnmlModel)
     println("model, namespace = ", namespace(m), ", has ", length(nets(m)), " net(s)")
     for (i, net) in enumerate(nets(m))
