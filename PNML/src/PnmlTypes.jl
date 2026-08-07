@@ -7,7 +7,7 @@ using DocStringExtensions
 using SciMLLogging: @SciMLMessage
 
 # Abstract Types
-export APNTD, AbstractContinuousNet, AbstractHLCore, AbstractPnmlCore, AbstractPNTD
+export APNTD, AbstractContinuousPNTD, AbstractHLPNTD, AbstractDiscretePNTD, AbstractPNTD
 # Concrete Types
 export ContinuousNet, HLCoreNet, HLPNG, PTNet, PT_HLPNG, PnmlCoreNet, SymmetricNet
 # Functions
@@ -39,7 +39,7 @@ Base of token/integer-based Petri Net pntds.
 
 See [`PnmlCoreNet`](@ref), [`PTNet`](@ref) and others.
 """
-abstract type AbstractPnmlCore <: AbstractPNTD end
+abstract type AbstractDiscretePNTD <: AbstractPNTD end
 
 """
 $(TYPEDEF)
@@ -48,7 +48,7 @@ The most minimal concrete Petri Net.
 Used to implement and test the core PNML support.
 Covers the complete graph infrastructure including labels attached to nodes and arcs.
 """
-struct PnmlCoreNet <: AbstractPnmlCore end
+struct PnmlCoreNet <: AbstractDiscretePNTD end
 
 """
 $(TYPEDEF)
@@ -58,7 +58,7 @@ Integer-valued initialMarking and inscription.
 The grammer file is ptnet.pnml so we name it PTNet.
 Note that 'PT' is often the prefix for XML tags specialized for this net type.
 """
-struct PTNet <: AbstractPnmlCore end
+struct PTNet <: AbstractDiscretePNTD end
 
 """
 $(TYPEDEF)
@@ -68,7 +68,7 @@ hlinitialMarking, hlinscription, and defined label structures.
 See [`PnmlTypes.HLCoreNet`](@ref), [`PnmlTypes.SymmetricNet`](@ref),
 [`PnmlTypes.PT_HLPNG`](@ref) and others.
 """
-abstract type AbstractHLCore <: AbstractPNTD end
+abstract type AbstractHLPNTD <: AbstractPNTD end
 
 """
 $(TYPEDEF)
@@ -76,7 +76,7 @@ $(TYPEDEF)
 We try to implement and test all function at `PnmlCoreNet level, but
 expect to find use for a concrete type at this level for testing high-level extensions.
 """
-struct HLCoreNet <: AbstractHLCore end
+struct HLCoreNet <: AbstractHLPNTD end
 
 """
 
@@ -86,34 +86,34 @@ It extends [`SymmetricNet`](@ref), including with
    - declarations for sorts and functions (ArbitraryDeclarations)
    - sorts for Integer, String, and List
 """
-struct HLPNG <: AbstractHLCore end
+struct HLPNG <: AbstractHLPNTD end
 
 """
 $(TYPEDEF)
 Place-Transition Net in HLCoreNet notation.
 """
-struct PT_HLPNG <: AbstractHLCore end
+struct PT_HLPNG <: AbstractHLPNTD end
 
 """
 $(TYPEDEF)
 Symmetric Petri Net is the best-worked use case in the `primer`
 and ISO 15909 standard part 2.
 """
-struct SymmetricNet <: AbstractHLCore end
+struct SymmetricNet <: AbstractHLPNTD end
 
 """
 $(TYPEDEF)
 Uses floating point numbers for markings, inscriptions.
-Most of the functionality is shared with [`AbstractPnmlCore`](@ref).
+Most of the functionality is shared with [`AbstractDiscretePNTD`](@ref).
 This seperates the
 """
-abstract type AbstractContinuousNet <: AbstractPNTD end
+abstract type AbstractContinuousPNTD <: AbstractPNTD end
 
 """
 $(TYPEDEF)
 TODO: Continuous Petri Net
 """
-struct ContinuousNet <: AbstractContinuousNet end
+struct ContinuousNet <: AbstractContinuousPNTD end
 
 #----------------------------------------------------------------------------------------
 
@@ -193,7 +193,7 @@ all_nettypes() = values(pnmltype_map)
 all_nettypes(p) = Iterators.filter(p, values(pnmltype_map))
 
 """
-    core_nettypes() -> Tuple{AbstractPNTD}
+    core_nettypes() -> Tuple{<:AbstractPNTD}
 
 Useful for testing the 3 kinds of tokens corresponding to
 abstract subclasses of `AbstractPNTD` (or `AbstractPNTD`) .
@@ -262,26 +262,27 @@ else
     throw(DomainError("Unknown PNTD symbol $s"))
 end
 
+
 "Tokens represented by integers."
 function is_discrete end
 is_discrete(::AbstractPNTD) = false
-is_discrete(::AbstractPnmlCore) = true
+is_discrete(::AbstractDiscretePNTD) = true
 is_discrete(::Type{<:AbstractPNTD}) = false
-is_discrete(::Type{<:AbstractPnmlCore}) = true
+is_discrete(::Type{<:AbstractDiscretePNTD}) = true
 
 "Tokens represented by floating point."
 function is_continuous end
 is_continuous(::AbstractPNTD) = false
-is_continuous(::AbstractContinuousNet) = true
+is_continuous(::AbstractContinuousPNTD) = true
 is_continuous(::Type{<:AbstractPNTD}) = false
-is_continuous(::Type{<:AbstractContinuousNet}) = true
+is_continuous(::Type{<:AbstractContinuousPNTD}) = true
 
 "Tokens represented by multiset (aka bag)."
 function is_highlevel end
 is_highlevel(::AbstractPNTD) = false
-is_highlevel(::AbstractHLCore) = true
+is_highlevel(::AbstractHLPNTD) = true
 is_highlevel(::Type{<:AbstractPNTD}) = false
-is_highlevel(::Type{<:AbstractHLCore}) = true
+is_highlevel(::Type{<:AbstractHLPNTD}) = true
 
 "Token identity is collective."
 function is_collective_token end
@@ -291,5 +292,11 @@ is_collective_token(pntd::AbstractPNTD) = is_discrete(pntd) || is_continuous(pnt
 function is_individual_token end
 is_individual_token(pntd::AbstractPNTD) = is_highlevel(pntd)
 
-
+#=
+Traits multiset, dot, number
+- AbstractHLPNTD: marking, inscriptions are `multiset`s includes SymmetricNet and HLPNG
+- PT_HLPNG: HL restricted to multiset over dot constant and dot2int
+- AbstractPNTD: marking, inscriptions are `Number`s,
+  includes AbstractDiscretePNTD, AbstractContinuousPNTD
+=#
 end # module PnmlTypes

@@ -21,7 +21,7 @@ using Moshi.Match: @match
 using NamedTupleTools
 using OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 using PNML
-using PNML: APNTD, AbstractHLCore, AbstractPnmlNet, AbstractPNTD, Arc, Inscription,
+using PNML: APNTD, AbstractHLPNTD, AbstractPnmlNet, AbstractPNTD, Arc, Inscription,
     Marking, Maybe, PT_HLPNG, Place, PnmlMultiset, arc, arcdict, arcs, cardinality,
     condition, filters, initial_marking, inscription,
     is_collective_token, is_productsort, multiset, narcs, nets, nplaces, ntransitions,

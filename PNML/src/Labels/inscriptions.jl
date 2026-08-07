@@ -67,10 +67,10 @@ end
 #!============================================================================
 
 value_type(::Type{Inscription}, ::AbstractPNTD) = eltype(PositiveSort) #::Int
-value_type(::Type{Inscription}, ::AbstractContinuousNet) = eltype(RealSort) #::Float64
+value_type(::Type{Inscription}, ::AbstractContinuousPNTD) = eltype(RealSort) #::Float64
 value_type(::Type{Inscription}, ::PT_HLPNG) = eltype(DotSort)
 
-function value_type(::Type{Inscription}, pntd::AbstractHLCore)
+function value_type(::Type{Inscription}, pntd::AbstractHLPNTD)
     @outline(pntd, @error("value_type(::Type{Inscription}, $pntd) undefined. Using DotSort.")) #! XXX TODO XXX
     eltype(DotSort) #! XXX TODO XXX
 end

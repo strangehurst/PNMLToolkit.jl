@@ -53,7 +53,7 @@ term(marking::Marking) = marking.term
 # $(TYPEDFIELDS)
 
 # Multiset of a sort labeling of a `Place` in a High-level Petri Net Graph.
-# See [`AbstractHLCore`](@ref), [`AbstractTerm`](@ref), [`Marking`](@ref).
+# See [`AbstractHLPNTD`](@ref), [`AbstractTerm`](@ref), [`Marking`](@ref).
 
 # Is a functor that returns the evaluated `value`.
 
@@ -131,17 +131,17 @@ end
 value_type(::Type{Marking}, net::AbstractPnmlNet) = value_type(Marking, pntd_of(net))
 
 # These are networks where the tokens have a collective identities.
-value_type(::Type{Marking}, ::AbstractPNTD) = eltype(NaturalSort) #::Int
-value_type(::Type{Marking}, ::AbstractContinuousNet) = eltype(RealSort) #::Float64
+value_type(::Type{Marking}, ::AbstractPNTD) = Int #eltype(NaturalSort) #::Int
+value_type(::Type{Marking}, ::AbstractContinuousPNTD) = Float64 #eltype(RealSort) #::Float64
 
 # These are networks were the tokens have individual identities.
 # Each place may have a different sort type.
-function value_type(::Type{Marking}, pntd::AbstractHLCore)
+function value_type(::Type{Marking}, pntd::AbstractHLPNTD)
      #@outline(pntd,
         @error("value_type(::Type{Marking}, $pntd undefined. Using DotSort.",
                 stacktrace())
             #))
-    eltype(DotSort)
+    Bool #eltype(DotSort)
 end
 
 # PT_HLPNG is restricted to DotSort, we treat its singleton multisets as  NaturalSort.

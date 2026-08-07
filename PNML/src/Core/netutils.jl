@@ -98,7 +98,7 @@ function input_matrix(net::PnmlNet{PT_HLPNG})
     imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return input_matrix!(imatrix, net)
 end
-function input_matrix(net::PnmlNet{T}) where {T <: AbstractHLCore}
+function input_matrix(net::PnmlNet{T}) where {T <: AbstractHLPNTD}
     ivt = value_type(Inscription, pntd_of(net))
     imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return input_matrix!(imatrix, net)
@@ -140,7 +140,7 @@ function output_matrix(net::PnmlNet{PT_HLPNG})
     omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return output_matrix!(omatrix, net)
 end
-function output_matrix(net::PnmlNet{T}) where {T <: AbstractHLCore}
+function output_matrix(net::PnmlNet{T}) where {T <: AbstractHLPNTD}
     ivt = value_type(Inscription, pntd_of(net))
     omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return output_matrix!(omatrix, net)
@@ -167,7 +167,7 @@ function output_matrix!(omatrix, net::AbstractPnmlNet)
     return omatrix
 end
 dot2int(::PT_HLPNG, v) = cardinality(v)
-dot2int(::AbstractHLCore, v) = v
+dot2int(::AbstractHLPNTD, v) = v
 dot2int(::AbstractPNTD, v) = v
 
 "backward (input) incidence matrix element"
@@ -216,7 +216,7 @@ function incidence_matrix(net::AbstractPnmlNet)
 end
 
 """
-    initial_markings(petrinet) -> Tuple{Pair{id(place),value_type(marking(place))}
+    $TYPEDSIGNATURES
 
 Tuple of Pair(place_id, initial_marking value).
 
@@ -228,6 +228,7 @@ Other HL Nets use multisets.
 function initial_markings end
 
 function initial_markings(net::AbstractPnmlNet)
+    value_type(Marking, pntd_of(net))
     [initial_marking(p)::Number for p in PNML.places(net)]
 end
 
@@ -237,7 +238,7 @@ function initial_markings(net::PnmlNet{PT_HLPNG})
 end
 
 #! XXX Other HL nets need it to be treated as multiset, not simple numbers! XXX
-function initial_markings(net::PnmlNet{<:AbstractHLCore})
+function initial_markings(net::PnmlNet{<:AbstractHLPNTD})
     # Evaluate the ground term expression into a multiset.
     [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
     #! FIFO places use queues, will co-exist with multisets from regular HL places.

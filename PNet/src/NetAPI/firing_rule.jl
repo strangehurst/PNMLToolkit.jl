@@ -2,7 +2,7 @@
 
 fire2(C, net::AbstractPnmlNet, marking) = fire(C, enabled(net, marking), marking)
 fire2(C, net::PnmlNet{PT_HLPNG}, marking) = fire(C, enabled(net, marking), marking)
-function fire2(C, net::PnmlNet{T}, marking) where {T <: AbstractHLCore}
+function fire2(C, net::PnmlNet{T}, marking) where {T <: AbstractHLPNTD}
     println("firing $(pntd_of(net)) not implemented here, good luck")
     fire(C, enabled(net, marking), marking)
 end

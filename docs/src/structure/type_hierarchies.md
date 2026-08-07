@@ -15,16 +15,16 @@ See [`PnmlTypes`](@ref) module page.
 
 There are levels:  Core (Place-Transition), Continuous and High-Level PNG (HLPNG).
 
-[`PnmlCoreNet`](@ref) is a concrete subtype of [`AbstractPNTD`](@ref).
+[`PnmlCoreNet`](@ref) is a concrete subtype of [`AbstractDiscretePNTD`](@ref).
 `PnmlCoreNet` is used by some `PNet.AbstractPetriNet` concrete types (`PNet.SimpleNet`).
 
-[`ContinuousNet`](@ref) is a concrete type of [`AbstractContinuousNet`](@ref).
+[`ContinuousNet`](@ref) is a concrete type of [`AbstractContinuousPNTD`](@ref).
 `ContinuousNet` uses floating point marking and inscriptions.
 It is a nonstandard extension to the ISO standard.
 
-[`HLCoreNet`](@ref) is a concrete subtype of [`AbstractHLCore`](@ref).
+[`HLCoreNet`](@ref) is a concrete subtype of [`AbstractHLPNTD`](@ref).
 `HLCoreNet` is used by some `PNet.AbstractPetriNet` concrete types (`PNet.HLPetriNet`).
-Think of it as a testable implementation of `AbstractHLCore`.
+Think of it as a testable implementation of `AbstractHLPNTD`.
 
 Tries to represent the model (all models) at a structural level.
 Tries to avoid imposing semantics. It is a toolkit with a wide range of behavior.

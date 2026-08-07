@@ -1,40 +1,40 @@
 """
-    pnmlmodel([filename::AbstractString|node::XMLNode]; kwargs...)
+    pnmlmodel([filename::AbstractString|node::XMLNode]; kwargs...) -> PnmlModel
 
-Build a [`PnmlModel`](@ref) holding one or more [`PnmlNet`](@ref) from either:
+Build a [`PnmlModel`](@ref) holding one or more [`PnmlNet`](@ref)s from either:
 
    - a file containing XML that is parsed into a XMLNode,
-   - a XMLNode,
-   - if no source, use an empty net.
+   - else from an XMLNode,
+   - otherwise if no source given, create model with one empty net.
 
 XMLNode is an alias for EzXML.Node.
 
-# Named Parameters
-  - pntd_override::Maybe{AbstractPNTD}
-  - lp: optional label parser plugins, a collection of (Symbol, callable) tuples
-  - tp: optional toolspecific parser plugins, a collection of(String, String, callable) tuples
-  - ef: optional enabled filter plugins, a collection of (Symbol, callable) tuples
-  - idregistry: model-level ID registry shared by all nets, defaults to IdRegistry().
-"""
-function pnmlmodel end
+Create a `PnmlModel` from a string using [`xmlnode`](@ref) or [`@xml_str`](@ref) string literal.
 
-function pnmlmodel(; kwargs...)
-    D()&& println("\n## pnmlmodel with 1 empty pnmlcore net")
-    empty_model = xml"""<?xml version="1.0"?>
+```julia
+xml'''<?xml version="1.0"?>
         <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
             <net id="empty_net" type="pnmlcore" />
         </pnml>
-    """
-    pnmlmodel(empty_model; kwargs...)
-end
+    '''
+```
+# Named Parameters
+  - pntd_override::Maybe{AbstractPNTD}
+  - lp: optional, label parser plugins, a collection of (Symbol, callable) tuples
+  - tp: optional, toolspecific parser plugins, a collection of(String, String, callable) tuples
+  - ef: optional, enabled filter plugins, a collection of (Symbol, callable) tuples
+  - idregistry: model-level ID registry shared by all nets, defaults to `IDRegistry()`.
+"""
+function pnmlmodel end
 
 function pnmlmodel(@nospecialize(filename::AbstractString); kwargs...)
-    D()&& println("\n## pnmlmodel filename $filename")
+    D()&& println("\n## pnmlmodel from filename $filename")
     isempty(filename) && throw(ArgumentError("must have a non-empty file name argument"))
     pnmlmodel(EzXML.root(EzXML.readxml(convert(String, filename)::String)); kwargs...)
 end
 
 function pnmlmodel(node::XMLNode; kwargs...)
+    # pnmlmodel from `XMLNode`
     check_nodename(node, "pnml")
     namespace = pnml_namespace(node)
     nets = LittleDict{Symbol,Any}()
@@ -48,14 +48,26 @@ function pnmlmodel(node::XMLNode; kwargs...)
             @error "<model> has unexpected child $tag"
         end
     end
-    length(nets) > 0 || throw(MalformedException("<pnml> does not have any <net> elements"))
+    isempty(nets) &&
+        throw(MalformedException("<pnml> does not have any <net> elements"))
     return PnmlModel(namedtuple(nets), namespace)
+end
+
+function pnmlmodel(; kwargs...)
+    D()&& println("\n## pnmlmodel with 1 empty pnmlcore net")
+    empty_model = xml"""<?xml version="1.0"?>
+        <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+            <net id="empty_net" type="pnmlcore" />
+        </pnml>
+    """
+    pnmlmodel(empty_model; kwargs...)
 end
 
 """
     plugins!(dict::AbstractDict, kwargs, plugintag)
 
-Fill `dict` if `kwargs[plugintag]` exists & has a collection of tuples.
+Fill `dict` if `kwargs[plugintag]` exists and has a collection of tuples.
+
 The first tuple element being a key of `dict` and the last entry the callable.
 Intermediate tupel elements are keys for nested dictionaries.
 """
@@ -74,6 +86,7 @@ function plugins!(dict::AbstractDict, kwargs, plugintag)
     end
 end #= function plugins! =#
 
+"If `i` < `n-1` recurse else callable found"
 function recurse_plugin(plugin, i, n)
     if i < n - 1
         return plugin[i] => LittleDict(plugin[i+1] => recurse_plugin(plugin, i+1, n))
@@ -115,7 +128,7 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
     # can be determined at runtime.
     #-------------------------------------------------------------------------------------
     net = PnmlNet(; type=pntd, id=netid, idregistry,
-                    pagedict = OrderedDict{Symbol, Page{PnmlNet{typeof(pntd)}}}(), #! abstract Page
+                    pagedict = OrderedDict{Symbol, Page{PnmlNet{typeof(pntd)}}}(),
                     )
     net.ddict[] = DeclDict(net) # Create with empty dictionaries of net specific values.
 
@@ -149,13 +162,11 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
         end
     end
 
+    #^ Net
     # Collect all the toolspecinfos at net level for use in later parsing.
     find_toolinfos!(net.toolspecinfos, net_node, net)
     validate_toolinfos(net.toolspecinfos)
 
-    #--------------------------------------------------------------------
-    # Fill `net`
-    #--------------------------------------------------------------------
     for child in EzXML.eachelement(net_node)
         tag = EzXML.nodename(child)
         if tag == "page"
@@ -177,14 +188,10 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
 
     #^ Ground terms used to set initial markings can be rewritten and evaluated here.
     #? Rewrite inscription and condition terms with variable substitution.
-    #? 0-arity operator means empty variable substitution, i.e. constant.
-    #TODO create API for using ToolInfo in expressions
 
-    # Create "color functions" that process variables using TermInterface expressions.
-    # Pre-caculate as much as is practical.
+    # TODO Create API for using ToolInfo in expressions.
+    # TODO Create "color functions" that process variables using TermInterface expressions.
 
-    #~ Evaluate expressions to create a mutable vector of markings.
-    #^ Marking vector is used in enabling and firing rules.
     return net
 end #= function parse_net =#
 
@@ -217,7 +224,7 @@ function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) wher
     #---------------------------------------------------------
     page = Page{typeof(net)}(; net, id = pageid,
                 netsets = PnmlNetKeys(),
-                toolspecinfos = find_toolinfos!(nothing, page_node, net)::Maybe{Vector{ToolInfo}})
+                toolspecinfos = find_toolinfos!(nothing, page_node, net))
 
     validate_toolinfos(toolinfos(page))
 

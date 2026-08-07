@@ -80,7 +80,7 @@ function parse_place(node::XMLNode, net::AbstractPnmlNet)
     # Get sorttype to use in parsing marking.
     sorttype::Maybe{SortType} = let typenode = firstchild(node, "type")
         if isnothing(typenode) # Deduce sort type of place if possible.
-            if isa(pntd_of(net), AbstractHLCore) && !isa(pntd_of(net), PT_HLPNG)
+            if isa(pntd_of(net), AbstractHLPNTD) && !isa(pntd_of(net), PT_HLPNG)
                 nothing # Deduce from initial marking.
             else
                 SortType("default", Labels.default_typesort(pntd_of(net)), net)
@@ -312,7 +312,7 @@ end
 
 function default(::Type{<:Marking}, net::AbstractPnmlNet, place::Symbol, placetype::Maybe{SortType}=nothing)
     pntd = pntd_of(net)
-    ex = if pntd isa AbstractHLCore
+    ex = if pntd isa AbstractHLPNTD
         isnothing(placetype) &&
              throw(ArgumentError("placetype needed for $pntd"))
         el = def_sort_element(placetype) # ::value_type(Marking, pntd_of(net))
@@ -320,7 +320,7 @@ function default(::Type{<:Marking}, net::AbstractPnmlNet, place::Symbol, placety
         # the value type of DotSort is Bool <: Number
         Bag(sortref(placetype), el, 0)
         # # el used for its type
-    elseif pntd isa AbstractContinuousNet
+    elseif pntd isa AbstractContinuousPNTD
         NumberEx(NamedSortRef(:real), zero(Float64))
     else
         NumberEx(NamedSortRef(:natural), zero(Int))
@@ -340,12 +340,12 @@ function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{S
             @assert placetype == NamedSortRef(:dot)
          end
         Bag(NamedSortRef(:dot), DotConstant(), 1)
-    elseif pntd isa AbstractHLCore
+    elseif pntd isa AbstractHLPNTD
         isnothing(placetype) &&
             throw(ArgumentError("placetype needed for $pntd"))
         basis = sortref(placetype)::SortRef
         Bag(basis, def_sort_element(placetype), 1)
-    elseif pntd isa AbstractContinuousNet
+    elseif pntd isa AbstractContinuousPNTD
         NumberEx(NamedSortRef(:real), one(Float64))
     else
         NumberEx(NamedSortRef(:positive), one(Int))

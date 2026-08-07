@@ -129,7 +129,7 @@ function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet{PT_HLPNG}, tra
 end
 
 function sufficient_tokens!(mark_dict::AbstractDict,
-                            net::PnmlNet{T}, transition_id) where (T <: AbstractHLCore)
+                            net::PnmlNet{T}, transition_id) where (T <: AbstractHLPNTD)
     ER()&& println("#-- sufficient_tokens! ",
                     "$(pntd_of(net)) $(pid(net)) $transition_id")
     tr_vars = haskey(net.vars, transition_id) ? net.vars[transition_id] : Set{Symbol}()
@@ -141,7 +141,7 @@ end
 
 function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{T}, transition_id,
                             tr_vars::Set{Symbol},
-                            tr_varsubs::Vector{NamedTuple}) where (T <: AbstractHLCore)
+                            tr_varsubs::Vector{NamedTuple}) where (T <: AbstractHLPNTD)
     # During enabling rule, tr_var_binding_set maps variable to a set of elements.
     tr_var_binding_set = OrderedDict{REFID, Any}()
     #~ marking = PnmlMultiset{B, T}(Multiset(T() => 1)) singleton
@@ -186,7 +186,7 @@ The firing rule will select from one transition's feasible substutions in its va
 """
 function comp_mark_inscription end
 # function comp_mark_inscription(net::PnmlNet{T}, mark_dict, transition_id, cond_term,
-#                                 tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractHLCore}
+#                                 tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractHLPNTD}
 #     for place_id in preset(net, transition_id)
 #         mark = mark_dict[place_id]
 #         z = zero_marking(place(net, place_idcomp_mark_inscription))
@@ -231,7 +231,7 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
 
 # Variables supported for High-level nets    s = comp_mark_inscription(net, mark_dict, transition_id,
 function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
-                           tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractHLCore}
+                           tr_var_binding_set, tr_vars, tr_varsubs) where {T <: AbstractHLPNTD}
     if isempty(tr_vars) # 0-ary operators or constants
         # PT_HLPNG will have no vars
         eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
@@ -319,7 +319,7 @@ function get_arc_var_binding_sets!(_arc_vars::Multiset, _placesort::SortRef, mar
     return true, OrderedDict{Symbol, Multiset{Symbol}}()
 end
 function get_arc_var_binding_sets!(arc_vars::Multiset, placesort::SortRef, mark::PnmlMultiset,
-                                    net::PnmlNet{T}) where {T <: AbstractHLCore}
+                                    net::PnmlNet{T}) where {T <: AbstractHLPNTD}
     ER()&& println("#-- get_arc_var_binding_sets! 3 $(pntd_of(net)) $(pid(net)) ", mark)
     get_arc_vbs_impl!(arc_vars, placesort, mark, net)
 end
@@ -327,7 +327,7 @@ end
 "Return tuple of boolean status and `arc_var_binding_set` dictionary."
 function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef,
                            mark::PnmlMultiset,
-                           net::PnmlNet{T}) where {T <: AbstractHLCore}
+                           net::PnmlNet{T}) where {T <: AbstractHLPNTD}
    # mark is a
     ER()&& println("#-- get_arc_vbs_impl! mark = ", mark)
     arc_binding_sets = OrderedDict{Symbol, Multiset{Symbol}}()

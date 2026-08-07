@@ -98,10 +98,10 @@ Return `SortRef` for default `SortType` of a `PNTD`.
 function default_typesort end
 
 default_typesort(::AbstractPNTD) = NamedSortRef(:natural)
-default_typesort(::AbstractContinuousNet) = NamedSortRef(:real)
+default_typesort(::AbstractContinuousPNTD) = NamedSortRef(:real)
 # High-level nets are expected to provide a useful value. PT_HLPNG uses the minimum: 'dot'.
 # We provide an implementation of 'dot', so this is a safe assumption.
 default_typesort(::PT_HLPNG) = NamedSortRef(:dot)
-function default_typesort(pntd::AbstractHLCore)
+function default_typesort(pntd::AbstractHLPNTD)
     error("default_typesort($pntd) is not defined, you should provide a place type in the XML")
 end

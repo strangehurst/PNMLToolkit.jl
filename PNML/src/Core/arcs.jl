@@ -48,7 +48,7 @@ function inscription_value(::PT_HLPNG, a::Arc, varsub)
     val = eval(toexpr(term(inscription(a)), varsub, a.net))
     return cardinality(val)
 end
-function inscription_value(::AbstractHLCore, a::Arc, varsub)
+function inscription_value(::AbstractHLPNTD, a::Arc, varsub)
     val = eval(toexpr(term(inscription(a)), varsub, a.net))
     return cardinality(val)
 end
