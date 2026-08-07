@@ -58,7 +58,7 @@ end
 """
 Reference Place node of a Petri Net Markup Language graph. For connections between pages.
 
-$(TYPEDEF)r
+$(TYPEDEF)
 $(TYPEDFIELDS)
 """
 struct RefPlace{N <: AbstractPnmlNet} <: ReferenceNode
