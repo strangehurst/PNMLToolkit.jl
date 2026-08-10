@@ -202,7 +202,7 @@ end
                     PNML.has_partitionop,
                     PNML.has_feconstant,
                     PNML.has_useroperator]
-            @test PNML.has_useroperator(net, :nosuch) == false
+            @test h(net, :nosuch) == false
         end
 
         for d in [PNML.variabledecl,
@@ -238,17 +238,19 @@ end
                 @test initial_marking(net, pid(p)) == initial_marking(p)
                 #@test @inferred(initial_marking(net, pid(p))) == @inferred(initial_marking(p))
             end
-            for transition in transitions(page)
+            for transition in @inferred transitions(page)
                 @test transition isa Transition
                 @test pid(transition) isa Symbol
                 @test get_label(transition, :XYZ) === nothing
                 @test condition(net, pid(transition)) == condition(transition)
+                #@test @inferred(condition(net, pid(transition))) == @inferred(condition(transition))
             end
-            for arc in arcs(page)
+            for arc in @inferred arcs(page)
                 @test arc isa Arc
                 @test pid(arc) isa Symbol
                 @test get_label(arc, :XYZ) === nothing
                 @test inscription(net, pid(arc)) == inscription(arc)
+                #@test @inferred(inscription(net, pid(arc))) == @inferred(inscription(arc))
             end
         end
     end
@@ -259,7 +261,7 @@ println("AirplaneLD-col-0010.pnml")
 println("-----------------------------------------")
 @testset let testfile=joinpath(@__DIR__, "data", "AirplaneLD-col-0010.pnml")
     #println(testfile); flush(stdout)
-    model = pnmlmodel(testfile)::PnmlModel
+    model = pnmlmodel(testfile)
     #model = @test_logs(match_mode=:all, pnmlmodel(testfile)
 
     netvec = nets(model) # iterator
