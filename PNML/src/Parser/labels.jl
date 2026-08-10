@@ -50,11 +50,6 @@ function parse_name(node::XMLNode, net::AbstractPnmlNet; parentid)
     return Name(text, graphics, toolspecinfos)
 end
 
-# function parse_name(node::XMLNode, _pntd::AbstractPNTD; net::AbstractPnmlNet, parentid)
-#     parse_name(node, net; parentid)
-# end
-
-
 """
 $(TYPEDSIGNATURES)
 
@@ -172,15 +167,14 @@ end
 # `eltype(x) @ Base abstractarray.jl:241` to return Int64.
 
 # Base.eltype is for collections: what an iterator would return.
-
 """
 $(TYPEDSIGNATURES)
 
 Non-high-level `AbstractPNTD` initial marking parser. Most things are assumed to be Numbers.
 See also [`parse_hlinitialMarking`](@ref), [`parse_fifoinitialMarking`](@ref).
 """
-function parse_initialMarking(node::XMLNode, placetype::SortType, net::AbstractPnmlNet;
-                                parentid::Symbol)
+function parse_initialMarking(node::XMLNode, placetype::SortType, net::PnmlNet{P}; #AbstractPnmlNet;
+                              parentid::Symbol) where {P <: Union{AbstractDiscretePNTD, AbstractContinuousPNTD}}
     nn = check_nodename(node, "initialMarking")
     # See if there is a <structure> attached to the label. This is non-standard.
     # Use of same mechanism used for high-level nets: if there is a <structure> attached
@@ -193,15 +187,19 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::AbstractP
         @warn "$nn place $parentid <text> element expected for $(pntd_of(net)) net"
     end
     @assert isempty(l.vars) # All markings are ground terms.
-    pt = eltype(to_sort(sortref(placetype), net))::Type
-    mvt = value_type(Marking, pntd_of(net))::Type
-    pt <: mvt ||
-        @error("initial marking value type of $(pntd_of(net)) must be $mvt, found: $pt")
-    value = isnothing(l.text) ? zero(pt) : parse(pt, l.text)
-    # We ate the text to make the expression.
-    Marking(; term = NumberEx(sortref(placetype), value),
-              text=nothing, l.graphics,
-              l.toolspecinfos, net, place=parentid)
+    ps = to_sort(sortref(placetype), net)
+    pT = eltype(ps)::Type{<:Number}
+    vT = value_type(Marking, pntd_of(net))::Type{<:Number}
+    # marking value type restricts net, place type restricts individual places.
+    pT <: vT ||
+        error("parse initial marking of $(pntd_of(net)) place type must be a $vT, found: $pT")
+
+    value = isnothing(l.text) ? zero(pT)::pT : parse(pT, l.text)::pT
+    value isa pT ||
+        error("initial marking value $value expected to be a $pT, found: $(typeof(value))")
+    # We ate the label's <text> to make the expression's value.
+    term = NumberEx(sortref(placetype), value)
+    Marking(; term, l.toolspecinfos, net, place=parentid)
 end
 
 """
@@ -327,27 +325,27 @@ placetype(pmt::ParseMarkingTerm) = pmt.defplacetype::Maybe{SortRef}
 function (pmt::ParseMarkingTerm)(marknode::XMLNode, net::AbstractPnmlNet)
     check_nodename(marknode, "structure")
 
-    if EzXML.haselement(marknode)
-        term = EzXML.firstelement(marknode) # ignore any others
+    EzXML.haselement(marknode) ||
+        throw(ArgumentError("missing marking term in <structure>"))
 
-        # Here we are parsing a term from XML to a ground term, which must be an operator.
-        mark_tj = parse_term(term, net; vars=()) # ParseMarkingTerm
-        isempty(mark_tj.vars) || error("unexpected variables in $mark_tj")
-        if isnothing(placetype(pmt))
-            @warn "$(pntd_of(net)) ParseMarkingTerm placetype(pmt) is nothing"
-        elseif !equalSorts(net, mark_tj.ref, placetype(pmt)::SortRef)
-            @warn "$(pntd_of(net)) ParseMarkingTerm sort mismatch" mark_tj.ref placetype(pmt) mark_tj
-        end
-        return mark_tj
+    term = EzXML.firstelement(marknode) # ignore any others
 
-        # PnmlMultiset (datastructure) vs UserOperator/NamedOperator (term/expression)
-        # Like with sorts, we have useroperator -> namedoperator -> operator.
-        # NamedOperators will be joined by ArbitraryOperators for HLPNGs.
-        # Operators include built-in operators, multiset operators, tuples
-        # Multiset operators must be evaluated to become PnmlMultiset objects.
-        # Markings are multisets (a.k.a. bags).
+    # Here we are parsing a term from XML to a ground term, which must be an operator.
+    mark_tj = parse_term(term, net; vars=()) # ParseMarkingTerm
+    isempty(mark_tj.vars) || error("unexpected variables in $mark_tj")
+    if isnothing(placetype(pmt))
+        @warn "$(pntd_of(net)) ParseMarkingTerm placetype(pmt) is nothing"
+    elseif !equalSorts(net, mark_tj.ref, placetype(pmt)::SortRef)
+        @warn "$(pntd_of(net)) ParseMarkingTerm sort mismatch" mark_tj.ref placetype(pmt) mark_tj
     end
-    throw(ArgumentError("missing marking term in <structure>"))
+    return mark_tj
+
+    # PnmlMultiset (datastructure) vs UserOperator/NamedOperator (term/expression)
+    # Like with sorts, we have useroperator -> namedoperator -> operator.
+    # NamedOperators will be joined by ArbitraryOperators for HLPNGs.
+    # Operators include built-in operators, multiset operators, tuples
+    # Multiset operators must be evaluated to become PnmlMultiset objects.
+    # Markings are multisets (a.k.a. bags).
 end
 
 #^-----------------------------------------------------------------------------------------
@@ -435,7 +433,7 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
 
     EzXML.haselement(node) ||
         error("missing inscription term of arc $(source(pit)) -> $(target(pit))")
-    tj = parse_term(EzXML.firstelement(node), net; vars=())::TermJunk
+    tj = parse_term(EzXML.firstelement(node), net; vars=()) # ParseInscriptionTerm
 
     if !equalSorts(net, tj.ref, placesort)
         @error("arc $(source(pit)) -> $(target(pit)) inscription term sort mismatch: $(tj.ref) != $placesort",
@@ -521,7 +519,7 @@ will have a structure element containing a term.
 function parse_condition_term(cnode::XMLNode, net::AbstractPnmlNet)
     check_nodename(cnode, "structure")
     if EzXML.haselement(cnode)
-        return parse_term(EzXML.firstelement(cnode), net; vars=())
+        return parse_term(EzXML.firstelement(cnode), net; vars=()) # parse_condition_term
     end
     throw(ArgumentError("missing condition term in <structure>"))
 end
