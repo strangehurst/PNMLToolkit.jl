@@ -199,14 +199,14 @@ function inscriptions(net::AbstractPnmlNet)
     Iterators.map((arc_id, a) -> arc_id => inscription(a)(NamedTuple()), pairs(arcdict(net)))
 end
 
-function inscriptions(net::AbstractHLPNTD) #TODO! non-ground terms for HL
+function inscriptions(net::PnmlNet{AbstractHLPNTD}) #TODO! non-ground terms for HL
     @error "high level net $(pid(net)) needs variable substitution"
     varsubs = NamedTuple()
     Iterators.map((arc_id, a) -> arc_id => inscription(a)(varsubs), pairs(arcdict(net)))
 end
 
 """
-    conditions(net::PnmlNet) -> Iterator
+$(TYPEDSIGNATURES)
 
 Return iterator  over REFID => condition(transaction) pairs of `net`.
 This is the same order as `transactions`.
@@ -216,13 +216,13 @@ function conditions(net::AbstractPnmlNet)
     Iterators.map((tr_id, t)->tr_id => condition(t)(NamedTuple()), pairs(transitiondict(net)))
 end
 
-function conditions(net::AbstractHLPNTD) #TODO! non-ground terms for HL
+function conditions(net::PnmlNet{AbstractHLPNTD}) #TODO! non-ground terms for HL
     @error "high level net $(pid(net)) needs variable substitution"
 end
 
 function rates(net::AbstractPnmlNet)
     #[tid => rate_value(t) for (tid, t) in pairs(transitiondict(net))]
-    Iterators.map((tr_id, t)->tr_id => rate_value(t), pairs(transitiondict(net)))
+    Iterators.map((tr_id::Symbol, t)->tr_id => rate_value(t), pairs(transitiondict(net)))
 end
 
 
