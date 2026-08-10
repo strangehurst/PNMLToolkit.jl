@@ -18,6 +18,7 @@ struct ArbitrarySort{N <: AbstractPnmlNet} <: SortDeclaration
 end
 
 name(a::ArbitrarySort) = a.name
+sortelements(::ArbitrarySort, ::AbstractPnmlNet) = tuple()
 
 function Base.show(io::IO, s::ArbitrarySort)
     print(io, nameof(typeof(s)), "(", repr(pid(s)), ", ", repr(name(s)), ")")
