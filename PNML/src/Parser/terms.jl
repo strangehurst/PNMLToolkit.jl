@@ -35,7 +35,7 @@ function parse_term(node::XMLNode, net::AbstractPnmlNet; vars)
     tag = Symbol(EzXML.nodename(node))
     tag === :namedoperator && error("namedoperator is a declaration, not a term!")
     tj = parse_term(Val(tag), node, net; vars)::TermJunk
-    # Collect varible REFIDs in `vars`. `length(vars) == 0` means is a ground term.
+    # Collects varible REFIDs in `vars`. `length(vars) == 0` means is a ground term.
     # Ensure that there is a `toexpr(::PnmlExpr, ::NamedTuple, ::AbstractPnmlNet)` method.
     if !isa(which(toexpr, (typeof(tj.exp), NamedTuple, AbstractPnmlNet)), Method)
         error("No `toexpr` method for expression in $tj")
@@ -44,25 +44,21 @@ function parse_term(node::XMLNode, net::AbstractPnmlNet; vars)
 end
 
 """
-    subterms(node, net; vars) -> Tuple{Vector{PnmlExpr}, NamedTuple}
+$(TYPEDSIGNATURES)
 
-Parse each `<subterm>` child of `node` into a vector of [`PnmlExpr`](@ref),
+Parse each `<subterm>` child of `node` into a vector of [expressions](@ref PnmlExpr),
 collecting variable ids in `vars`.
 Return tuple of vector and `vars`.
 """
 function subterms(node, net::AbstractPnmlNet; vars::NTuple{N,Symbol}) where {N}
     sts = Vector{PnmlExpr}()
     for subterm in EzXML.eachelement(node)
-        if EzXML.nodename(subterm) == "subterm"
-            tag, stnode = unwrap_subterm(subterm) # Used to dispatch on `Val(tag)`.
-            subterm_tj = parse_term(Val(tag), stnode, net; vars)::TermJunk
-            isnothing(subterm_tj) && throw(MalformedException("subterm_tj is nothing"))
-            vars = subterm_tj.vars
-            push!(sts, subterm_tj.exp::PnmlExpr)
-        else
-            println("not a subterm ", EzXML.nodename(node))
-            Base.show_backtrace(stdout, stacktrace())
-        end
+        check_nodename(subterm, "subterm")
+        tag, stnode = unwrap_subterm(subterm) # Used to dispatch on `Val(tag)`.
+        subterm_tj = parse_term(Val(tag), stnode, net; vars)::TermJunk
+        isnothing(subterm_tj) && throw(MalformedException("subterm_tj is nothing"))
+        vars = subterm_tj.vars
+        push!(sts, subterm_tj.exp::PnmlExpr)
     end
     return sts, vars
 end
@@ -198,7 +194,8 @@ function parse_term(::Val{:numberconstant}, node::XMLNode, net::AbstractPnmlNet;
         throw(MalformedException("sort not supported for :numberconstant: $sorttag"))
 
     sortref = NamedSortRef(sorttag)
-    nv = parse(eltype(to_sort(sortref, net)), value)
+    elT = eltype(to_sort(sortref, net))
+    nv = parse(elT, value)::elT
     # Bounds check not needed for IntegerSort, RealSort.
     if sorttag === :natural
         nv >= 0 || throw(ArgumentError("not a Natural Number: $nv"))
