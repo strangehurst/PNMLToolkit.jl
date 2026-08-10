@@ -143,7 +143,7 @@ end
 
 Return concrete sort of `net` using the `REFID` in `sr`,
 """
-function to_sort(sr::SortRef, net::AbstractPnmlNet)
+function to_sort(@nospecialize(sr::SortRef), @nospecialize(net::AbstractPnmlNet))
     if is_namedsort(sr)
         namedsort(net, sr.refid)
     elseif is_productsort(sr)
