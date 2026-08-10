@@ -99,7 +99,7 @@ function declarations(dd::ADDicts)
     ])
 end
 
-has_key(dd::ADDicts, dict, key::Symbol)   = haskey(dict(dd),key)
+has_key(dd::ADDicts, dict, key::Symbol)   = haskey(dict(dd), key)::Bool
 
 has_variabledecl(dd::ADDicts, id::Symbol)   = has_key(dd, variabledecls, id)
 has_namedsort(dd::ADDicts, id::Symbol)      = has_key(dd, namedsorts, id)
