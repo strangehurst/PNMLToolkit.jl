@@ -32,7 +32,7 @@ println("FLATTEN")
             </net>
         </pnml>
     """)
-    net = @inferred PnmlNet firstnet(model)
+    net = @inferred  firstnet(model)
     @test_call firstnet(model)
     @test length(allpages(net)) == length(allpages(net)) == 3
     flatten_pages!(net)
