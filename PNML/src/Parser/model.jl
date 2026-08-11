@@ -180,6 +180,8 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
             unexpected_label!(net.extralabels, child, Symbol(tag), net; parentid=netid)
         end
     end
+
+    # TODO make a CONFIG option to enable
     verify(net, false) # CONFIG.verbose)
 
     #~ --------------------------------------------------------------
