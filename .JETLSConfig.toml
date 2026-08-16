@@ -1,0 +1,3 @@
+[[full_analysis.concretization_patterns]]
+pattern = "net = x_"
+path = "PNML/test/idregistry.jl"
