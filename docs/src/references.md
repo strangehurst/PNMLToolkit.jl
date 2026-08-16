@@ -116,6 +116,8 @@ Julia things, small, random, stale, ...:
     C. Gutsche, S. Götz, V. Prokopets and U. Aßmann, "Context-Role Oriented Programming in Julia: Advancing Swarm Programming," 2025 IEEE/ACM 20th Symposium on Software Engineering for Adaptive and Self-Managing Systems (SEAMS), Ottawa, ON, Canada, 2025, pp. 85-95,
     doi: 10.1109/SEAMS66627.2025.00017. keywords: {Performance evaluation;Surveillance;Collaboration;Programming;Software;Hardware;Multi-robot systems;Drones;Software engineering;Software development management;Roles;Teams;Contexts;Swarms;Drones;SelfAdaptive Systems;Julia}. Does not use an input file.
 
+    [JuliaCon 2026: Introducing Contexts.jl: Context- and Role-Oriented Programming for Self-Adaptive Systems](https://pretalx.com/juliacon-2026/talk/HYN7DE/)
+
   * [DistributedWorkflows.jl](https://github.com/FiroozehDastur/DistributedWorkflows.jl)
     Does not use a Petri net input file. Constructs one internally?
     Uses [GPI-Space](https://www.gpi-space.de) where Petri nets are represented in a
