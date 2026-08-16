@@ -53,7 +53,7 @@ function Base.show(io::IO, model::PnmlModel)
 end
 
 function Base.summary(io::IO, m::PnmlModel)
-    println("model, namespace = ", namespace(m), ", has ", length(nets(m)), " net(s)")
+    println("PnmlModel namespace = ", namespace(m), ", has ", length(nets(m)), " net(s)")
     for (i, net) in enumerate(nets(m))
         println(io, "$i: ", summary(net))
     end
