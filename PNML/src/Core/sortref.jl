@@ -128,12 +128,12 @@ is_arbitrarysort(x::SortRef) = isa_variant(x, SortRefImpl.ArbitrarySortRef)
 
 function refid(s::SortRef)
     @match s begin
-        SortRefImpl.UserSortRef(; refid) => refid
-        SortRefImpl.NamedSortRef(; refid) => refid
-        SortRefImpl.PartitionSortRef(; refid) => refid
-        SortRefImpl.ProductSortRef(; refid) => refid
-        SortRefImpl.MultisetSortRef(; refid) => refid
-        SortRefImpl.ArbitrarySortRef(; refid) => refid
+        SortRefImpl.UserSortRef(; refid) => return refid
+        SortRefImpl.NamedSortRef(; refid) => return refid
+        SortRefImpl.PartitionSortRef(; refid) => return refid
+        SortRefImpl.ProductSortRef(; refid) => return refid
+        SortRefImpl.MultisetSortRef(; refid) => return refid
+        SortRefImpl.ArbitrarySortRef(; refid) => return refid
         _ => error("no refid match for: $s")
     end
 end
