@@ -19,13 +19,13 @@ struct Variable{N <: AbstractPnmlNet} <: AbstractVariable
     end
 end
 
-refid(v::Variable) = v.refvariable
+refid_of(v::Variable) = v.refvariable
 
 function (var::Variable)()
     value(var)
 end
 value(v::Variable) = error("not well defined: value($v)") #! XXX FIXME XXX
-sortref(v::Variable) = sortref(variabledecl(v.net, refid(v)))::SortRef
+sortref(v::Variable) = sortref(variabledecl(v.net, refid_of(v)))::SortRef
 
 function Base.show(io::IO, v::Variable)
     print(io, nameof(typeof(v)), "(", repr(v.refvariable), ")")

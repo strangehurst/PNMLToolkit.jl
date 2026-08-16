@@ -126,7 +126,7 @@ Check if a value is an `SortRef` vaTyperiant of `ArbitrarySortRef`.
 """
 is_arbitrarysort(x::SortRef) = isa_variant(x, SortRefImpl.ArbitrarySortRef)
 
-function refid(s::SortRef)
+function refid_of(s::SortRef)
     @match s begin
         SortRefImpl.UserSortRef(; refid) => return refid
         SortRefImpl.NamedSortRef(; refid) => return refid

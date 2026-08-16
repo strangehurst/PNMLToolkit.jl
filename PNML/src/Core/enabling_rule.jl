@@ -331,7 +331,7 @@ function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef,
         arc_binding_sets[v] = Multiset{Symbol}()
         v_decl = PNML.variabledecl(net, v)
         v_sortref = sortref(v_decl)
-        v_refid = PNML.refid(v_sortref)::Symbol
+        v_refid = PNML.refid_of(v_sortref)::Symbol
 
         # Verify variable sort matches placesort.
         if is_productsort(placesort)
@@ -355,10 +355,10 @@ function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef,
                     # Select the tuple member(s) matching variable sort.Return tuple of boolean status and `arc_var_binding_set` dictionary.
 
                     for expr in element
-                        if PNML.refid(expr) === v_refid
+                        if PNML.refid_of(expr) === v_refid
                             push!(arc_binding_sets[v], expr())
                         else
-                            @warn "refid(expr) !== v_refid"
+                            @warn "refid_of(expr) !== v_refid"
                         end
                     end
                 else #! element may be a PnmlMultiset

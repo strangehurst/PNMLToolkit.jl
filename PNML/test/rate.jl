@@ -19,7 +19,7 @@ println("RATE")
     @test occursin(r"^Rate", sprint(show, r))
     @test eltype(r) == Float64
     @test sortref(r) isa SortRef
-    @test refid(sortref(r)) === :real
+    @test refid_of(sortref(r)) === :real
     #!@test sortof(r) isa RealSort
 
     @test_call get_label(trans, :rate)

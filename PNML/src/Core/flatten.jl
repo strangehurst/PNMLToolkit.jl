@@ -171,7 +171,7 @@ function deref_place(net::AbstractPnmlNet, id::Symbol; trim::Bool = true)
     has_refplace(net, id) ||
         throw(ArgumentError("expected refplace $id to be found in net $netid"))
 
-    rid = refid(refplace(net, id))
+    rid = refid_of(refplace(net, id))
     isnothing(rid) && # Something is really, really wrong.
         throw(ArgumentError("failed to lookup reference place id $id in net $netid)"))
     has_place(net, rid) || has_refplace(net, rid) ||
@@ -196,12 +196,12 @@ function deref_transition(net::AbstractPnmlNet, id::Symbol; trim::Bool = true)
     rt = reftransition(net, id)
     isnothing(rt) && # Something is really, really wrong.
         throw(ArgumentError("failed to lookup reference transition id $id in net $netid"))
-    has_transition(net, refid(rt)) || has_reftransition(net, refid(rt)) ||
-        throw(ArgumentError("$(refid(rt)) is not a transition or reference transition in net $netid"))
+    has_transition(net, refid_of(rt)) || has_reftransition(net, refid_of(rt)) ||
+        throw(ArgumentError("$(refid_of(rt)) is not a transition or reference transition in net $netid"))
     if trim
         delete!(reftransitiondict(net), id)
         has_reftransition(net, id) &&
             error("did not expect reftransition $id in net $netid after delete")
     end
-    return refid(rt)
+    return refid_of(rt)
 end

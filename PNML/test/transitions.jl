@@ -91,7 +91,7 @@ end
 
     rtrans = parse_refTransition(node, net)::RefTransition
     @test pid(rtrans) === :rt1
-    @test PNML.refid(rtrans) === :t1
+    @test PNML.refid_of(rtrans) === :t1
     @test PNML.has_graphics(rtrans) && startswith(repr(PNML.graphics(rtrans)), "Graphics")
 end
 
@@ -109,7 +109,7 @@ end
     trans = @test_logs((:info, "add PnmlLabel :somelabel2 to :rt1"),
             parse_refTransition(node, net)::RefTransition)
     @test pid(trans) === :rt1
-    @test PNML.refid(trans) === :t1
+    @test PNML.refid_of(trans) === :t1
     @test PNML.has_graphics(trans) && startswith(repr(PNML.graphics(trans)), "Graphics")
     @test PNML.extralabels(trans)[:somelabel2] == get_label(trans, :somelabel2)
     @test elements(get_label(trans, :somelabel2))[:c] == "value"

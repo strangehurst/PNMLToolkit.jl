@@ -550,7 +550,7 @@ function parse_term(::Val{:tuple}, node::XMLNode, net::AbstractPnmlNet; vars)
         # Add `prod_sort` to the dictionary using an invented key.
         # Concatenate member sort ids to create a key for the product sort.
         sorttag = string("ProductSort_",
-            join(Iterators.map(refid, expr_sortref.(sts, Ref(net))), "_")) |> Symbol
+            join(Iterators.map(refid_of, expr_sortref.(sts, Ref(net))), "_")) |> Symbol
 
         fill_sort_tag!(net, sorttag, prod_sort)
         @assert productsorts(net)[sorttag] == prod_sort

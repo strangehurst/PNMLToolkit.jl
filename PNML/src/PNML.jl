@@ -67,7 +67,7 @@ export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef, A
     PnmlExpr, PnmlModel, PnmlNet, ProductSortRef, REFID, RefPlace, RefTransition,
     SortRef, SortRefImpl, Transition, UserSortRef, arc, condition, enabled,
     initial_marking, inscription, narcs, npages, nplaces, ntransitions, place, pnmlmodel,
-    pntdsym, transition, xmlnode
+    pntdsym, refid_of, transition, xmlnode
 
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
 @public namedsort, productsort, Coordinate

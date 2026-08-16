@@ -25,7 +25,7 @@ using PNML: APNTD, AbstractHLPNTD, AbstractPnmlNet, AbstractPNTD, Arc, Inscripti
     Marking, Maybe, PT_HLPNG, Place, PnmlMultiset, arc, arcdict, arcs, cardinality,
     condition, filters, initial_marking, inscription,
     is_collective_token, is_productsort, multiset, narcs, nets, nplaces, ntransitions,
-    pid, place, place_idset, places, pntd_of, rate_value, refid, sortref,
+    pid, place, place_idset, places, pntd_of, rate_value, refid_of, sortref,
     source, src_arcs, target, term,
     tgt_arcs, toexpr, transition, transition_idset, transitiondict, transitions,
     value_type, variabledecl, zero_marking

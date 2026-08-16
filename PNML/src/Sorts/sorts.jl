@@ -113,7 +113,7 @@ end
 function equalSorts(_net::PN, a::ProductSort{PN, N}, b::ProductSort{PN, N},
                     ) where {PN <: AbstractPnmlNet, N <: Integer}
     if length(a) == length(b) &&
-            all(refid(x) == refid(y) for (x,y) in zip(sorts(a), sorts(b)))
+            all(refid_of(x) == refid_of(y) for (x,y) in zip(sorts(a), sorts(b)))
         return true
     end
     return false
@@ -121,7 +121,7 @@ end
 
 #
 function equalSorts(net::AbstractPnmlNet, a::SortRef, b::SortRef)
-    if variant_type(a) == variant_type(b) && refid(a) == refid(b)
+    if variant_type(a) == variant_type(b) && refid_of(a) == refid_of(b)
         return true
     else
         # Compare concrete sort definitions for structural equality.

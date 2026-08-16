@@ -10,7 +10,7 @@ module Parser
 import PrecompileTools
 import Base: eltype
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
-import PNML: adjacent_place, elements, refid, source, target,
+import PNML: adjacent_place, elements, refid_of, source, target,
     sortdefinition, sortelements, sortref, tag, verify!
 import XMLDict
 PrecompileTools.@recompile_invalidations begin

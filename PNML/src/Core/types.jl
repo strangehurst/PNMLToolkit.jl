@@ -144,7 +144,7 @@ function Base.getproperty(rn::ReferenceNode, name::Symbol)
     return getfield(rn, name)
 end
 
-refid(r::ReferenceNode) = r.ref
+refid_of(r::ReferenceNode) = r.ref
 
 
 #--------------------------------------------

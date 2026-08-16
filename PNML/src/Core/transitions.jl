@@ -71,7 +71,7 @@ struct RefTransition{N <: AbstractPnmlNet} <: ReferenceNode
 end
 
 function Base.show(io::IO, r::ReferenceNode)
-    print(io, nameof(typeof(r)), "(", repr(pid(r)), ",  ", repr(refid(r)), ")")
+    print(io, nameof(typeof(r)), "(", repr(pid(r)), ",  ", repr(refid_of(r)), ")")
 end
 function verify!(errors, r::ReferenceNode, verbose::Bool , net::AbstractPnmlNet)
     verbose && println("## verify $(typeof(r)) $(pid(r))")

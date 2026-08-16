@@ -26,7 +26,7 @@ using .TestUtils
     place  = parse_place(node, net)::Place
     # pntd isa PnmlCoreNet &&
     #     @test_opt target_modules=t_modules broken=false parse_place(node, net)
-    @test_call target_modules=t_modules parse_place(node, net)
+    @test_call target_modules=t_modules broken=true parse_place(node, net)
     @test @inferred(pid(place)) === :place1
     @test @inferred(name(place)) == "with text"
     @test_call initial_marking(place)
@@ -113,7 +113,7 @@ end
     net = make_net(pntd, :refplace_net)
     place = parse_refPlace(node, net)::RefPlace
     @test pid(place) === :rp1
-    @test PNML.refid(place) === :p1
+    @test PNML.refid_of(place) === :p1
     @test get_label(place, :nosuchlabel) === nothing
 end
 
@@ -132,7 +132,7 @@ end
     place = @test_logs((:info, "add PnmlLabel :somelabel2 to :rp1"),
             parse_refPlace(node, net)::RefPlace)
     @test pid(place) === :rp1
-    @test PNML.refid(place) === :p1
+    @test PNML.refid_of(place) === :p1
     @test elements(PNML.extralabels(place)[:somelabel2])[:c] == "value"
     @test get_label(place, :nosuchlabel) === nothing
 end

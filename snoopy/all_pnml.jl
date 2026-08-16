@@ -162,14 +162,14 @@ end
 function exersize_netA(model)
     println(model)
     # Petri Net & Graph
-    @showtime anet = PNML.SimpleNet(model)
+    anet = PNML.SimpleNet(model)
     if !(PNML.narcs(pnmlnet(anet)) > 0 &&
          PNML.nplaces(pnmlnet(anet)) > 0 &&
          PNML.ntransitions(pnmlnet(anet)) > 0)
         println("incomplete graph $(PNML.pid(anet)) not compatible with `exersize_netA`")
         return
     end
-    @showtime mg = PNML.metagraph(anet)
+    mg = PNML.metagraph(anet)
     @show mg
     @show Graphs.is_bipartite(mg)
     @show ne = Graphs.ne(mg)
@@ -177,10 +177,10 @@ function exersize_netA(model)
     @show labels =  collect(MetaGraphsNext.labels(mg))
     @show elabels = collect(MetaGraphsNext.edge_labels(mg))
     println("-----")
-    if PNML.ishighlevel(PNML.nettype(pnmlnet(anet)))
+    if PNML.ishighlevel(typeof(PNML.pntd_of(pnmlnet(anet))))
         @warn "High-level enabling/firing not yet done!"
     else
-        @showtime m₀ = PNML.initial_markings(anet.net) #!
+        @showtime m₀ = PNML.initial_markings(anet.net)
         @showtime i  = PNML.incidence_matrix(anet.net, m₀)
         @showtime e  = PNML.enabled(anet.net, m₀)
     end

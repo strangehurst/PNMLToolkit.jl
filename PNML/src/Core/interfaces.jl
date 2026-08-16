@@ -23,7 +23,7 @@ function tag end
 
 
 """
-    refid(x) -> REFID
+    refid_of(x) -> REFID
 
 Return reference id symbol. Multiple objects may hold the same refid value.
 

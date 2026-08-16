@@ -38,7 +38,7 @@ struct FEConstant <: AbstractOperator
     ref::SortRef # of contining partition, enumeration, (or partitionelement?) sort.
 end
 
-refid(fec::FEConstant)    = refid(fec.ref)::Symbol
+refid_of(fec::FEConstant) = refid_of(fec.ref)::Symbol
 sortref(fec::FEConstant)  = fec.ref
 Base.eltype(::FEConstant) = Symbol # Use id symbol as the value. Alternative is name.
 

@@ -34,7 +34,7 @@ module Sorts
 
 #import AutoHashEquals: @auto_hash_equals
 import Base: eltype
-import PNML: basis, inc_indent, indent, refid, sortdefinition, sortelements,
+import PNML: basis, inc_indent, indent, refid_of, sortdefinition, sortelements,
     sortref, unwrap_namedsort
 import StructEquality: @struct_hash_equal
 

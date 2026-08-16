@@ -5,7 +5,7 @@ import ..Expressions: PnmlExpr, expr_sortref, toexpr
 import Base: eltype
 import Multisets
 import PNML: Coordinate, arctype, basis, elements, graphics, has_graphics, name,
-    parse, refid, sortdefinition, sortelements, sortref, tag, term, toolinfos, value,
+    parse, refid_of, sortdefinition, sortelements, sortref, tag, term, toolinfos, value,
     value_type, verify!, version
 import StructEquality: @struct_hash_equal
 
