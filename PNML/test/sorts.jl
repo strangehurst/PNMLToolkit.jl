@@ -7,7 +7,7 @@ using PNML: fill_sort_tag!, fill_builtin_sorts!, fill_builtin_labelparsers!
 
 @testset "parser_context" begin
     println("parser_context")
-    pntd = PnmlCoreNet()
+    pntd = :pnmlcore
     net = make_net(pntd, :parser_context_net)
 
     @test_call target_modules=t_modules NamedSort(:X, "X", PositiveSort(), net)

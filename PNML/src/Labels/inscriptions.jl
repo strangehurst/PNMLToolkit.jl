@@ -69,8 +69,29 @@ end
 value_type(::Type{Inscription}, ::AbstractPNTD) = eltype(PositiveSort) #::Int
 value_type(::Type{Inscription}, ::AbstractContinuousPNTD) = eltype(RealSort) #::Float64
 value_type(::Type{Inscription}, ::PT_HLPNG) = eltype(DotSort)
-
 function value_type(::Type{Inscription}, pntd::AbstractHLPNTD)
     @outline(pntd, @error("value_type(::Type{Inscription}, $pntd) undefined. Using DotSort.")) #! XXX TODO XXX
     eltype(DotSort) #! XXX TODO XXX
 end
+
+function value_type(::Type{Inscription}, s::Symbol)
+    if s === :pnmlcore || s === :ptnet
+        eltype(PositiveSort)
+    elseif s === :continuous
+        eltype(RealSort)
+    elseif s == :pt_hlpng
+        eltype(DotSort)
+    elseif is_highlevel(s)
+        @outline(s, @error("value_type(::Type{Inscription}, $s) undefined. Using DotSort.")) #! XXX TODO XXX
+        eltype(DotSort) #! XXX TODO XXX
+    else
+        error("not a valid PNTD symbol: $s")
+    end
+end
+value_type(::Type{Inscription}, ::Val{:pnmlcore}) = eltype(PositiveSort)
+value_type(::Type{Inscription}, ::Val{:ptnet}) = eltype(PositiveSort)
+value_type(::Type{Inscription}, ::Val{:pt_hlpng}) = eltype(DotSort)
+value_type(::Type{Inscription}, ::Val{:hlcore}) = eltype(DotSort)
+value_type(::Type{Inscription}, ::Val{:hlnet}) = eltype(DotSort)
+value_type(::Type{Inscription}, ::Val{:symmetric}) = eltype(DotSort)
+value_type(::Type{Inscription}, ::Val{:continuous}) = eltype(RealSort)

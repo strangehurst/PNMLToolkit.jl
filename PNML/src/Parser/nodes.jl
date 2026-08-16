@@ -334,18 +334,16 @@ end
 
 # placetype is needed for SymmetricNet and HLPNG
 function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{SortType}=nothing)
-    pntd = pntd_of(net)
-    ex = if pntd isa PT_HLPNG
-         if isnothing(placetype)
-            @assert placetype == NamedSortRef(:dot)
-         end
+    pntd = pntdsym(net) #pntd_of(net)
+    ex = if pntd === :pt_hlpng
+        isnothing(placetype) && @warn "expected placetype for PT_HLPNG, using NamedSortRef(:dot)"
         Bag(NamedSortRef(:dot), DotConstant(), 1)
-    elseif pntd isa AbstractHLPNTD
+    elseif is_highlevel(pntd)
         isnothing(placetype) &&
             throw(ArgumentError("placetype needed for $pntd"))
         basis = sortref(placetype)::SortRef
         Bag(basis, def_sort_element(placetype), 1)
-    elseif pntd isa AbstractContinuousPNTD
+    elseif pntd === :continuous
         NumberEx(NamedSortRef(:real), one(Float64))
     else
         NumberEx(NamedSortRef(:positive), one(Int))

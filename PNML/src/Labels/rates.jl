@@ -17,6 +17,7 @@ end
 
 value_type(::Type{Rate}) = Float64
 value_type(::Type{Rate}, ::AbstractPNTD) = Float64
+value_type(::Type{Rate}, ::Symbol) = Float64
 Base.eltype(::Rate) = value_type(Rate)
 Base.eltype(::Type{Rate}) = value_type(Rate)
 term(r::Rate) = r.term

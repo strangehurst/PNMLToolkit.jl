@@ -28,6 +28,7 @@ Condition(text::AbstractString, expr::BooleanEx, net::AbstractPnmlNet) =
 Base.eltype(::Condition) = Bool
 Base.eltype(::Type{<:Condition}) = Bool
 value_type(::Type{<:Condition}, ::AbstractPNTD) = eltype(BoolSort)
+value_type(::Type{<:Condition}, ::Symbol) = eltype(BoolSort)
 
 #! Term may be non-ground and need arguments:
 #! pnml variable expressions that reference a marking's value?

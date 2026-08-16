@@ -9,7 +9,7 @@ using .TestUtils
 using PNML: is_normal, is_inhibitor, is_read, is_reset
 
 @testset "arctypes $arct" for arct in ["normal", "inhibitor", "read", "reset"]
-    net = make_net(PnmlCoreNet(), :arctypes_net)
+    net = make_net(:pnmlcore, :arctypes_net)
 
     str = """<arc source="t1" target="p1" id="a1">
         <arctype>
@@ -38,8 +38,8 @@ using PNML: is_normal, is_inhibitor, is_read, is_reset
 end
 
 @testset "arctype is empty" begin
-    net = make_net(PnmlCoreNet(), :empty_arctype)
-    str = """<arc source="t1" target="p1" id="a1">
+    net = make_net(:pnmlcore, :empty_arctype)
+    str = """<arc source="t1:" target="p1" id="a1">
         <arctype>
             <!-- empty -->
         </arctype>

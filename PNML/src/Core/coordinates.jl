@@ -18,10 +18,12 @@ function Coordinate(x::T1, y::T2) where {T1 <: Number, T2 <: Number}
 end
 
 coordinate_type(::AbstractPNTD) = Coordinate
+coordinate_type(::Symbol) = Coordinate
 
 Base.eltype(::Coordinate) = Float32
 Base.eltype(::Type{Coordinate}) = Float32
 value_type(::Type{Coordinate}, ::AbstractPNTD) = eltype(Coordinate)
+value_type(::Type{Coordinate}, ::Symbol) = eltype(Coordinate)
 value_type(::Type{Coordinate}) = eltype(Coordinate)
 
 x(c::Coordinate) = c.x_

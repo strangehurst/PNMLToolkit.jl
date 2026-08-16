@@ -87,21 +87,22 @@ Return matrix of proper type and shape, fill using `input_matrix!`
 """
 function input_matrix end
 
-function input_matrix(net::PnmlNet{T}) where {T <: AbstractPNTD}
+function input_matrix(net::PnmlNet{T}) where {T <: PNMLVariant}
     ivt = value_type(Inscription, pntd_of(net))
     imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return input_matrix!(imatrix, net)
 end
-function input_matrix(net::PnmlNet{PT_HLPNG})
-    # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-    ivt = Int
-    imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-    return input_matrix!(imatrix, net)
-end
-function input_matrix(net::PnmlNet{T}) where {T <: AbstractHLPNTD}
-    ivt = value_type(Inscription, pntd_of(net))
-    imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-    return input_matrix!(imatrix, net)
+function input_matrix(net::PnmlNet{HighLevelPNML})
+    if net.type === :pt_hlpng
+        # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
+        ivt = Int
+        imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+        return input_matrix!(imatrix, net)
+    else
+        ivt = value_type(Inscription, pntd_of(net))
+        imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+        return input_matrix!(imatrix, net)
+    end
 end
 
 """
@@ -129,21 +130,22 @@ end
 Return matrix of proper type and shape, fill using `output_matrix!`
 """
 function output_matrix end
-function output_matrix(net::PnmlNet{T}) where {T <: AbstractPNTD}
+function output_matrix(net::PnmlNet{T}) where {T <: PNMLVariant}
     ivt = value_type(Inscription, pntd_of(net))
     omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return output_matrix!(omatrix, net)
 end
-function output_matrix(net::PnmlNet{PT_HLPNG})
-    # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-    ivt = Int
-    omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-    return output_matrix!(omatrix, net)
-end
-function output_matrix(net::PnmlNet{T}) where {T <: AbstractHLPNTD}
-    ivt = value_type(Inscription, pntd_of(net))
-    omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-    return output_matrix!(omatrix, net)
+function output_matrix(net::PnmlNet{HighLevelPNML})
+    if net.type === :pt_hlpng
+        # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
+        ivt = Int
+        omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+        return output_matrix!(omatrix, net)
+    else
+        ivt = value_type(Inscription, pntd_of(net))
+        omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+        return output_matrix!(omatrix, net)
+    end
 end
 
 function output_matrix!(omatrix, net::AbstractPnmlNet)
@@ -227,22 +229,21 @@ Other HL Nets use multisets.
 """
 function initial_markings end
 
-function initial_markings(net::AbstractPnmlNet)
+function initial_markings(net::PnmlNet{T}) where {T <: PNMLVariant}
     value_type(Marking, pntd_of(net))
     [initial_marking(p)::Number for p in PNML.places(net)]
 end
-
-# PT_HLPNG multisets of dotconstants map well to integer via cardinality.
-function initial_markings(net::PnmlNet{PT_HLPNG})
-    [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
-end
-
-#! XXX Other HL nets need it to be treated as multiset, not simple numbers! XXX
-function initial_markings(net::PnmlNet{<:AbstractHLPNTD})
-    # Evaluate the ground term expression into a multiset.
-    [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
+function initial_markings(net::PnmlNet{HighLevelPNML})
+    return if net.type === :pt_hlpng
+        # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
+        [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
+    else
+        #! XXX Other HL nets need it to be treated as multiset, not simple numbers! XXX
+        # Evaluate the ground term expression into a multiset.
+        [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
+    end
     #! FIFO places use queues, will co-exist with multisets from regular HL places.
-end
     # Use <fifoinitialMarking><structure><makelist> expression for initial queue contents.
     # DataStructures.Queue{sorttype} will be an element in the marking vector.
     #? Do we segregate  FIFO from HL markings by a new xml tag?
+end

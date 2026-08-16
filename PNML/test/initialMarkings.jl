@@ -7,7 +7,7 @@ using XMLDict: XMLDict
 #------------------------------------------------
 @testset "PT initMarking" begin
      @testset "PnmlCoreNet" begin
-        pntd = PnmlCoreNet()
+        pntd = :pnmlcore
         node = xmlnode("""
         <initialMarking>
             <text> 123 </text>
@@ -47,7 +47,7 @@ using XMLDict: XMLDict
     end
 
    @testset "ContinuousNet" begin
-        pntd = ContinuousNet()
+        pntd = :continuous
         node = xmlnode("""
         <initialMarking>
             <text> 123.0 </text>
@@ -102,7 +102,7 @@ end
         # numberof is an operator: natural number, element of a sort -> multiset
         # subterms are in an ordered collection, first is a number, second an element of a sort
         # This is a high-level integer, use the first part of this pair in contexts that want numbers.
-        net = make_net(pntd, :dot_net)
+        net = make_net(:hlcore, :dot_net)
         # Marking is a multiset in high-level nets with sort matching placetype, :dot.
         placetype = SortType("XXX", NamedSortRef(:dot), net)
 

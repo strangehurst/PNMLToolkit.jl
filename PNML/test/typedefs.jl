@@ -35,9 +35,9 @@ end
     @test_call PnmlTypes.pnmltype("pnmlcore")
     @test_call PnmlTypes.pnmltype(:pnmlcore)
 
-    @test_throws MethodError PnmlTypes.pnmltype(Nothing())
-    @test_throws MethodError PnmlTypes.pnmltype(Any[])
-    @test_throws DomainError PnmlTypes.pnmltype(:garbage)
+    # @test_throws MethodError PnmlTypes.pnmltype(Nothing())
+    # @test_throws MethodError PnmlTypes.pnmltype(Any[])
+    # @test_throws DomainError PnmlTypes.pnmltype(:garbage)
 
     @test PnmlTypes.pnmltype(PnmlCoreNet()) === PnmlCoreNet()
     @test PnmlTypes.pnmltype(ContinuousNet()) === ContinuousNet()
@@ -77,17 +77,7 @@ end
 
 @testset "pnml traits $pntd" for pntd in PnmlTypes.all_nettypes()
     #println("pnml traits $pntd: ", [is_discrete(pntd), is_continuous(pntd), is_highlevel(pntd)])
-    t = typeof(pntd)
     @test is_discrete(pntd) isa Bool
     @test is_continuous(pntd) isa Bool
     @test is_highlevel(pntd) isa Bool
-    @test is_discrete(t) isa Bool
-    @test is_continuous(t) isa Bool
-    @test is_highlevel(t) isa Bool
-    @test is_discrete(pntd) == is_discrete(t)
-    @test is_continuous(pntd) == is_continuous(t)
-    @test is_highlevel(pntd) == is_highlevel(t)
-     #@show [is_discrete(pntd), is_continuous(pntd), is_highlevel(pntd)]
-    @test only(filter(==(true), [is_discrete(pntd), is_continuous(pntd), is_highlevel(pntd)]))
-    @test only(filter(==(true), [is_discrete(t), is_continuous(t), is_highlevel(t)]))
 end

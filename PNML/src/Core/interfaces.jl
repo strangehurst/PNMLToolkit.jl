@@ -373,7 +373,7 @@ $(METHODLIST)
 function coordinate_type end
 
 """
-    value_type(::Type{<AbstractLabel}, ::AbstractPNTD) -> Type
+    value_type(::Type{<AbstractLabel}, [::Symbol | ::AbstractPNTD]) -> Type
 
 Return the `Type` of a label's value.
 

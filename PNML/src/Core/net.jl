@@ -1,3 +1,10 @@
+const elabelT =  LittleDict{Symbol, Any}
+const tparserT = LittleDict{String, LittleDict{String, Any}}
+const efilterT = LittleDict{Symbol, Any}
+const lparserT = LittleDict{Symbol, Any}
+const vsubT =    LittleDict{Symbol, Vector{NamedTuple}}
+const varsT =    LittleDict{Symbol, Set{Symbol}}
+
 """
 $(TYPEDEF)
 
@@ -6,16 +13,16 @@ One Petri Net of a PNML model.
 $(FIELDS)
 
 """
-@kwdef mutable struct PnmlNet{PNTD <: AbstractPNTD} <: AbstractPnmlNet
+@kwdef mutable struct PnmlNet{T <: PNMLVariant} <: AbstractPnmlNet
     #"The meta-model type this net implements."
-    const type::PNTD
+    const type::Symbol# PNTD
     # PNML ID needed here for multiple nets of same `type` in a `<pnml>` model.
     const id::Symbol
     # Ensure that each PNML ID in a net is unique using a registry.
     const idregistry::IDRegistry
     # Holds all pages. Shared by pages that may have sub-pages.
     # All PNML net objects are attached to a `Page` by ID. There must be at least one `Page`.
-    pagedict::OrderedDict{Symbol, Page{PnmlNet{PNTD}}}
+    pagedict::OrderedDict{Symbol, Page{PnmlNet{T}}}
     # These dictionaries hold all places, transitions, arcs, refs. Was in PnmlNetData
     place_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     transition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
@@ -42,39 +49,39 @@ $(FIELDS)
     # Zero or more extra PNML Labels may be attched to net.
     extralabels::LittleDict{Symbol, Any} = LittleDict{Symbol,Any}()
     # Map xml tag symbol to parser callable for built-in labels and extension labels.
-    #todo Reference to label parser interface.
-    labelparser::LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
+    #todo Referplugins!ence to label parser interface.
+    labelparser::lparserT = lparserT() #LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
     """
         Collection that associates a tool name & version with a callable parser.
         The parser turns `<toolspecific name="" version="">` into `ToolInfo` objects.
     """
-    toolparser::LittleDict{String, LittleDict{String, Any}} =
-                LittleDict{String, LittleDict{String, Any}}()
+    toolparser::tparserT = tparserT()  #LittleDict{String, LittleDict{String, Any}} =
+                #LittleDict{String, LittleDict{String, Any}}()
 
     # Collection of filters used by enabling rule.
-    enabled_filters::LittleDict{Symbol, Any} = LittleDict{Symbol, Any}()
+    enabled_filters::efilterT = efilterT() #LittleDict{Symbol, Any} = LittleDict{Symbol, Any}()
 
     # keys are transition ids, values are sets of variable ids
     "Cache of variable ids used by expressions related to the transition."
-    vars::LittleDict{Symbol, Set{Symbol}} = LittleDict{Symbol, Set{Symbol}}()
+    vars::varsT = varsT() #LittleDict{Symbol, Set{Symbol}} = LittleDict{Symbol, Set{Symbol}}()
 
     # keys are transition ids, values are vectors of substution namedtuples
     "Cache of variable substitutons for this transition"
-    varsubs::LittleDict{Symbol, Vector{NamedTuple}} = LittleDict{Symbol, Vector{NamedTuple}}()
+    varsubs::vsubT = vsubT() # = LittleDict{Symbol, Vector{NamedTuple}} = LittleDict{Symbol, Vector{NamedTuple}}()
 
 end #= mutable struct PnmlNet =#
-
 "Iterate enable filters"
-function filters(net::PnmlNet)
+function filters(net::APN)
     # @show net.enabled_filters
     values(net.enabled_filters)
 end
 
 "Create empty net with builtins installed for use in test scaffolding."
-function make_net(type::AbstractPNTD, id=:make_net,)
-    net = PnmlNet(; type, id,
+function make_net(pntd::Symbol, id=:make_net,)
+    var = pntd2variant(pntd)
+    net = PnmlNet{var}(; type=pntd, id,
                     idregistry=IDRegistry(),
-                    pagedict=OrderedDict{Symbol, Page{PnmlNet{typeof(type)}}}())
+                    pagedict=OrderedDict{Symbol, Page{PnmlNet{var}}}())
 
     net.ddict[] = DeclDict(net) # Empty DeclDict
     net.declaration = Declaration(; ddict=decldict(net)) # Empty Declarations
@@ -85,9 +92,26 @@ function make_net(type::AbstractPNTD, id=:make_net,)
     fill_builtin_enabled_filters!(net)
     return net
 end
+"""
+$METHODLIST
 
-pntd_of(net::PnmlNet) = net.type
-nettype(net::PnmlNet) = typeof(pntd_of(net))
+Extract the variant type of a `PnmlNet`.
+"""
+function vartype end
+vartype(::PnmlNet{T}) where {T <: PNMLVariant} = T
+vartype(::Type{PnmlNet{T}}) where {T <: PNMLVariant} = T
+"""
+$METHODLIST
+
+Extract the PNTD symbol of a `PnmlNet`.
+"""
+function pntdsym(net::AbstractPnmlNet)
+    if net isa PnmlNet
+        return net.type
+    end
+    error("expected PnmlNet found $(typeof(net))")
+end
+pntd_of(net::AbstractPnmlNet) = pnmltype(net.type)
 
 "Return IDRegistry of a PnmlNet."
 registry_of(net::PnmlNet) = net.idregistry
@@ -187,7 +211,6 @@ inhibitor(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
 reader(net::PnmlNet, arc_id::Symbol) = inscription(arcdict(net)[arc_id])
 condition(net::PnmlNet, trans_id::Symbol) = condition(transition(net, trans_id))
 
-
 """
     inscriptions(net::PnmlNet) -> Iterator
 
@@ -199,7 +222,7 @@ function inscriptions(net::AbstractPnmlNet)
     Iterators.map((arc_id, a) -> arc_id => inscription(a)(NamedTuple()), pairs(arcdict(net)))
 end
 
-function inscriptions(net::PnmlNet{AbstractHLPNTD}) #TODO! non-ground terms for HL
+function inscriptions(net::PnmlNet{HighLevelPNML}) #TODO! non-ground terms for HL
     @error "high level net $(pid(net)) needs variable substitution"
     varsubs = NamedTuple()
     Iterators.map((arc_id, a) -> arc_id => inscription(a)(varsubs), pairs(arcdict(net)))
@@ -216,7 +239,7 @@ function conditions(net::AbstractPnmlNet)
     Iterators.map((tr_id, t)->tr_id => condition(t)(NamedTuple()), pairs(transitiondict(net)))
 end
 
-function conditions(net::PnmlNet{AbstractHLPNTD}) #TODO! non-ground terms for HL
+function conditions(net::PnmlNet{HighLevelPNML}) #TODO! non-ground terms for HL
     @error "high level net $(pid(net)) needs variable substitution"
 end
 
@@ -242,12 +265,12 @@ multisetsorts(@nospecialize(net::PnmlNet))  = multisetsorts(decldict(net))
 productsorts(@nospecialize(net::PnmlNet))   = productsorts(decldict(net))
 
 variabledecl(net::PnmlNet, id::Symbol)  = variabledecls(net)[id]::VariableDeclaration
-namedsort(net::PnmlNet, id::Symbol)     = namedsorts(net)[id]::NamedSort
-arbitrarysort(net::PnmlNet, id::Symbol) = arbitrarysorts(net)[id]::ArbitrarySort
+namedsort(net::PnmlNet, id::Symbol)               = namedsorts(net)[id]::NamedSort
+arbitrarysort(net::PnmlNet, id::Symbol)       = arbitrarysorts(net)[id]::ArbitrarySort
 partitionsort(net::PnmlNet, id::Symbol) = partitionsorts(net)[id]::PartitionSort
 multisetsort(net::PnmlNet, id::Symbol)  = multisetsorts(net)[id]::MultisetSort
 productsort(net::PnmlNet, id::Symbol)   = productsorts(net)[id]::ProductSort
-namedop(net::PnmlNet, id::Symbol)       = namedoperators(net)[id]::NamedOperator
+namedop(net::PnmlNet, id::Symbol)      = namedoperators(net)[id]::NamedOperator
 arbitraryop(net::PnmlNet, id::Symbol)   = arbitraryops(net)[id]::ArbitraryOperator
 partitionop(net::PnmlNet, id::Symbol)   = partitionops(net)[id] ############# TODO! WHAT TYPE?
 feconstant(net::PnmlNet, id::Symbol)    = feconstants(net)[id]::FEConstant
@@ -388,29 +411,31 @@ end
 function Base.summary(net::PnmlNet)
     string(typeof(net), " id ", repr(pid(net)),
             " name ", repr(name(net)), ", ",
-            " type ", nettype(net), ", ",
+            " pntd ", pntdsym(net), ", ",
             npages(net), " pages, ",
-            has_tools(net) ? length(toolinfos(net)) : 0, " toolinfos, ")::String
+            has_tools(net) ? length(toolinfos(net)) : 0, " toolinfos")::String
 end
 
 # No indent here.
 function Base.show(io::IO, net::PnmlNet)
     print(io, indent(io), typeof(net), "(", )
-    print(repr(pid(net)), ", ")
-    print(repr(name(net)), ", ")
-    print(repr(nettype(net)), ", ")
+    print(io, repr(pid(net)), ", ")
+    print(io, repr(name(net)), ", ")
+    print(io, repr(pntdsym(net)), ", ")
     iio = inc_indent(io)
     println(io)
 
     print(io, "Pages = ", repr(page_idset(net)))
+    #println(io); flush(io); return nothing
+
     for page in values(pagedict(net))
-        print(iio, '\n', indent(iio)); show(iio, page)
+        print(iio, '\n', indent(iio))
+        show(iio, page)
     end
     println(io)
     println(io, "Declarations = ", repr(decldict(net)))
     show(io, toolinfos(net)); println(io, ", ")
     show(io, extralabels(net)); println(io, ", ")
-    show(io, nettype(net)); println(io, ")")
 
     println(io, "Arcs:")
     map(arcs(net)) do a
@@ -426,7 +451,7 @@ function Base.show(io::IO, net::PnmlNet)
     foreach(placeids(net)) do p
         show(io, p); println(io)
     end
-   println(io, "Transitions:")
+    println(io, "Transitions:")
     map(transitions(net)) do t
         show(io, t); println(io)
     end

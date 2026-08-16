@@ -3,7 +3,7 @@ $(TYPEDSIGNATURES)
 
 Return the stripped string of `<text>` node's content.
 """
-function parse_text(node::XMLNode, _::AbstractPNTD)
+function parse_text(node::XMLNode)
     check_nodename(node, "text")
     return string(strip(EzXML.nodecontent(node)))::String
 end
@@ -23,7 +23,7 @@ function parse_name(node::XMLNode, net::AbstractPnmlNet; parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            text = parse_text(child, pntd_of(net))
+            text = parse_text(child)
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -65,7 +65,7 @@ function parse_arctype(node::XMLNode, net::AbstractPnmlNet; parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            text = parse_text(child, pntd_of(net))
+            text = parse_text(child)
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -123,7 +123,7 @@ function parse_label_content(node::XMLNode, @nospecialize(termparser), net::Abst
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            text = parse_text(child, pntd_of(net))
+            text = parse_text(child)
         elseif tag == "structure"
             (; exp, ref, vars) = termparser(child, net)::TermJunk #collects variables
         elseif tag == "graphics"
@@ -174,7 +174,7 @@ Non-high-level `AbstractPNTD` initial marking parser. Most things are assumed to
 See also [`parse_hlinitialMarking`](@ref), [`parse_fifoinitialMarking`](@ref).
 """
 function parse_initialMarking(node::XMLNode, placetype::SortType, net::PnmlNet{P}; #AbstractPnmlNet;
-                              parentid::Symbol) where {P <: Union{AbstractDiscretePNTD, AbstractContinuousPNTD}}
+                              parentid::Symbol) where {P <: Union{DiscretePNML, ContinuousPNML}}
     nn = check_nodename(node, "initialMarking")
     # See if there is a <structure> attached to the label. This is non-standard.
     # Use of same mechanism used for high-level nets: if there is a <structure> attached
@@ -187,16 +187,16 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::PnmlNet{P
         @warn "$nn place $parentid <text> element expected for $(pntd_of(net)) net"
     end
     @assert isempty(l.vars) # All markings are ground terms.
-    ps = to_sort(sortref(placetype), net)
-    pT = eltype(ps)::Type{<:Number}
-    vT = value_type(Marking, pntd_of(net))::Type{<:Number}
+    placeS = to_sort(sortref(placetype), net)
+    placeT = eltype(placeS)::Type{<:Number}
+    valueT = value_type(Marking, pntd_of(net))::Type{<:Number}
     # marking value type restricts net, place type restricts individual places.
-    pT <: vT ||
-        error("parse initial marking of $(pntd_of(net)) place type must be a $vT, found: $pT")
+    valueT <: placeT ||
+        error("parse initial marking of $(pntdsym(net)) place value_type must be a $placeT, found: $valueT")
 
-    value = isnothing(l.text) ? zero(pT)::pT : parse(pT, l.text)::pT
-    value isa pT ||
-        error("initial marking value $value expected to be a $pT, found: $(typeof(value))")
+    value = isnothing(l.text) ? zero(valueT)::valueT : parse(valueT, l.text)::valueT
+    value isa placeT ||
+        error("initial marking value $value expected to be a $placeT, found: $(typeof(value))")
     # We ate the label's <text> to make the expression's value.
     term = NumberEx(sortref(placetype), value)
     Marking(; term, l.toolspecinfos, net, place=parentid)
@@ -363,7 +363,7 @@ function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net:
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = parse(value_type(Inscription, pntd_of(net)), parse_text(child, pntd_of(net)))
+            value = parse(value_type(Inscription, pntd_of(net)), parse_text(child))
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -605,8 +605,7 @@ function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = parse(value_type(Rate),
-                          parse_text(child, pntd_of(net)))
+            value = parse(value_type(Rate), parse_text(child))
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -648,7 +647,7 @@ function parse_priority(node::XMLNode, net::AbstractPnmlNet, parentid)
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "text"
-            value = parse(value_type(Priority, pntd_of(net)), parse_text(child, pntd_of(net)))
+            value = parse(value_type(Priority, pntdsym(net)), parse_text(child))
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"

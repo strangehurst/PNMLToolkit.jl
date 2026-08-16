@@ -13,6 +13,8 @@ export ContinuousNet, HLCoreNet, HLPNG, PTNet, PT_HLPNG, PnmlCoreNet, SymmetricN
 # Functions
 export is_collective_token, is_continuous, is_discrete, is_highlevel, is_individual_token,
     pnmltype
+export ContinuousPNML, DiscretePNML, HighLevelPNML, OtherPNTD, PNMLVariant, pntd2variant,
+    pntd_symbol, core_nettypes, all_nettypes
 
 """
 $(TYPEDEF)
@@ -172,16 +174,25 @@ const pntd_map = Dict{String, Symbol}(
 $(TYPEDEF)
 
 The key Symbols are the supported kinds of PNML Nets (PNTDs).
+:pnmlcore
+:hlcore
+:ptnet
+:hlnet
+:pt_hlpng
+:symmetric
+:continuous
+
 Values are concrete singletons.
 """
-const pnmltype_map = IdDict{Symbol, AbstractPNTD}(:pnmlcore => PnmlCoreNet(),
-                                            :hlcore => HLCoreNet(),
-                                            :ptnet => PTNet(),
-                                            :hlnet => HLPNG(),
-                                            :pt_hlpng => PT_HLPNG(),
-                                            :symmetric => SymmetricNet(),
-                                            :continuous => ContinuousNet()
-                                            )
+const pnmltype_map = Dict{Symbol, AbstractPNTD}(
+        :pnmlcore => PnmlCoreNet(),
+        :hlcore => HLCoreNet(),
+        :ptnet => PTNet(),
+        :hlnet => HLPNG(),
+        :pt_hlpng => PT_HLPNG(),
+        :symmetric => SymmetricNet(),
+        :continuous => ContinuousNet()
+        )
 
 """
     all_nettypes([predicate])
@@ -189,8 +200,8 @@ const pnmltype_map = IdDict{Symbol, AbstractPNTD}(:pnmlcore => PnmlCoreNet(),
 Return iterator over [`AbstractPNTD`](@ref) singletons.
 Filtered by a predicate `p` if one is provided.
 """
-all_nettypes() = values(pnmltype_map)
-all_nettypes(p) = Iterators.filter(p, values(pnmltype_map))
+all_nettypes() = keys(pnmltype_map)
+all_nettypes(p) = Iterators.filter(p, keys(pnmltype_map))
 
 """
     core_nettypes() -> Tuple{<:AbstractPNTD}
@@ -198,14 +209,101 @@ all_nettypes(p) = Iterators.filter(p, values(pnmltype_map))
 Useful for testing the 3 kinds of tokens corresponding to
 abstract subclasses of `AbstractPNTD` (or `AbstractPNTD`) .
 """
-core_nettypes() = (PnmlCoreNet(), HLCoreNet(), ContinuousNet())
+core_nettypes() = (:pnmlcore, :hlcore, :continuous)
 
+
+"Tokens represented by integers."
+function is_discrete end
+is_discrete(::AbstractPNTD) = false
+is_discrete(::AbstractDiscretePNTD) = true
+is_discrete(::Type{<:AbstractPNTD}) = false
+is_discrete(::Type{<:AbstractDiscretePNTD}) = true
+
+function is_discrete(s::Symbol)
+    s === :pnmlcore ||
+    s === :ptnet # || s === :pt_hlpng
+end
+is_discrete(::Val{:pnmlcore}) = true
+is_discrete(::Val{:hlcore}) = false
+is_discrete(::Val{:ptnet}) = true
+is_discrete(::Val{:hlnet}) = false
+is_discrete(::Val{:pt_hlpng}) = false
+is_discrete(::Val{:symmetric}) = false
+is_discrete(::Val{:continuous}) = false
+
+"Tokens represented by floating point."
+function is_continuous end
+is_continuous(::AbstractPNTD) = false
+is_continuous(::AbstractContinuousPNTD) = true
+is_continuous(::Type{<:AbstractPNTD}) = false
+is_continuous(::Type{<:AbstractContinuousPNTD}) = true
+
+function is_continuous(s::Symbol)
+    s === :continuous
+end
+is_continuous(::Val{:pnmlcore}) = true
+is_continuous(::Val{:hlcore}) = false
+is_continuous(::Val{:ptnet}) = true
+is_continuous(::Val{:hlnet}) = false
+is_continuous(::Val{:pt_hlpng}) = false
+is_continuous(::Val{:symmetric}) = false
+is_continuous(::Val{:continuous}) = true
+
+"Tokens represented by multiset (aka bag)."
+function is_highlevel end
+is_highlevel(::AbstractPNTD) = false
+is_highlevel(::AbstractHLPNTD) = true
+is_highlevel(::Type{<:AbstractPNTD}) = false
+is_highlevel(::Type{<:AbstractHLPNTD}) = true
+function is_highlevel(s::Symbol)
+    s === :hlcore ||
+    s === :pt_hlpng ||
+    s === :hlnet ||
+    s === :symmetric
+end
+is_highlevel(::Val{:pnmlcore}) = true
+is_highlevel(::Val{:hlcore}) = false
+is_highlevel(::Val{:ptnet}) = true
+is_highlevel(::Val{:hlnet}) = false
+is_highlevel(::Val{:pt_hlpng}) = false
+is_highlevel(::Val{:symmetric}) = false
+is_highlevel(::Val{:continuous}) = false
+
+"Token identity is collective."
+function is_collective_token end
+is_collective_token(pntd::AbstractPNTD) = is_discrete(pntd) || is_continuous(pntd)
+is_collective_token(s::Symbol) = is_discrete(Val(s)) || is_continuous(Val(s))
+
+is_collective_token(::Val{:pnmlcore}) = true
+is_collective_token(::Val{:hlcore}) = false
+is_collective_token(::Val{:ptnet}) = true
+is_collective_token(::Val{:hlnet}) = false
+is_collective_token(::Val{:pt_hlpng}) = true
+is_collective_token(::Val{:symmetric}) = false
+is_collective_token(::Val{:continuous}) = true
+
+
+"Token identity is individual."
+function is_individual_token end
+is_individual_token(pntd::AbstractPNTD) = is_highlevel(pntd)
+is_individual_token(s::Symbol) = is_highlevel(Val(s))
+
+is_individual_token(::Val{:pnmlcore}) = false
+is_individual_token(::Val{:hlcore}) = true
+is_individual_token(::Val{:ptnet}) = false
+is_individual_token(::Val{:hlnet}) = true
+is_individual_token(::Val{:pt_hlpng}) = false
+is_individual_token(::Val{:symmetric}) = true
+is_individual_token(::Val{:continuous}) = false
+
+
+#-----------------------------------------------------------------------------------------
 """
 $(TYPEDSIGNATURES)
 
 Add or replace mapping from Symbol `s` to [`AbstractPNTD`](@ref) singleton `pntd`.
 """
-function add_nettype!(dict::AbstractDict, s::Symbol, pntd::AbstractPNTD)
+function add_nettype!(dict::AbstractDict, s::Symbol, pntd::Symbol)
     action = s ∈ keys(dict) ? "updating" : "adding"
     @info  "$action mapping from $s to $pntd in $(typeof(dict))"
     dict[s] = pntd
@@ -229,7 +327,7 @@ julia> PNML.PnmlTypes.pntd_symbol("foo")
 pntd_symbol(s::AbstractString) = get(pntd_map, s, :pnmlcore)::Symbol
 
 """
-    pnmltype(pntd::AbstractPNTD) -> pntd
+    pnmltype(pntd::AbstractPNTD) -> AbstractPNTD
     pnmltype(uri::AbstractString) -> AbstractPNTD
     pnmltype(s::Symbol; pnmltype_map) -> AbstractPNTD
 
@@ -257,40 +355,84 @@ function pnmltype end
 pnmltype(pntd::AbstractPNTD) = pntd
 pnmltype(uri::AbstractString) = pnmltype(pntd_symbol(uri))
 pnmltype(s::Symbol) = if haskey(pnmltype_map, s)
-    pnmltype_map[s]
+    @inbounds pnmltype_map[s]
 else
     throw(DomainError("Unknown PNTD symbol $s"))
 end
 
 
-"Tokens represented by integers."
-function is_discrete end
-is_discrete(::AbstractPNTD) = false
-is_discrete(::AbstractDiscretePNTD) = true
-is_discrete(::Type{<:AbstractPNTD}) = false
-is_discrete(::Type{<:AbstractDiscretePNTD}) = true
+abstract type PNMLVariant end
 
-"Tokens represented by floating point."
-function is_continuous end
-is_continuous(::AbstractPNTD) = false
-is_continuous(::AbstractContinuousPNTD) = true
-is_continuous(::Type{<:AbstractPNTD}) = false
-is_continuous(::Type{<:AbstractContinuousPNTD}) = true
+# a tag known as the vartype
+"""
+    $TYPEDEF
 
-"Tokens represented by multiset (aka bag)."
-function is_highlevel end
-is_highlevel(::AbstractPNTD) = false
-is_highlevel(::AbstractHLPNTD) = true
-is_highlevel(::Type{<:AbstractPNTD}) = false
-is_highlevel(::Type{<:AbstractHLPNTD}) = true
+One of the possible values of the `PnmlNet` `vartype`.
+This variant is a Place Transition Petri net where
+the marking and inscription are restricted to integers.
 
-"Token identity is collective."
-function is_collective_token end
-is_collective_token(pntd::AbstractPNTD) = is_discrete(pntd) || is_continuous(pntd)
+`pntd_of(net)` is  `AbstractDiscretePNTD` || `PT_HLPNG`.
+"""
+abstract type DiscretePNML <: PNMLVariant end
+"""
+    $TYPEDEF
 
-"Token identity is individual."
-function is_individual_token end
-is_individual_token(pntd::AbstractPNTD) = is_highlevel(pntd)
+One of the possible values of the `PnmlNet` `vartype`.
+This variant is a Place Transition Petri net where
+the marking and inscription are floaing point numbers.
+
+`pntd_of(net)` is `<:AbstractContinuousPNTD`.
+"""
+abstract type ContinuousPNML <: PNMLVariant end
+"""
+    $TYPEDEF
+
+One of the possible values of the ``PnmlNet` vartype`.
+This variant is a High-levl Petri net were
+the marking and insciption is a multi-sorted algebra expression.
+
+`pntd_of(net)` is `AbstractHLPNTD && !PT_HLPNG`
+"""
+abstract type HighLevelPNML <: PNMLVariant end
+"""
+    $TYPEDEF
+
+One of the possible values of the `PnmlNet` `vartype`.
+This variant is for non-Petri net uses.
+
+`pntd_of(net)` is `AbstractPNTD && !AbstractHLPNTD && !AbstractContinuousPNTD && !AbstractDiscretePNTD
+"""
+abstract type OtherPNTD <: PNMLVariant end
+
+"""
+    $TYPEDSIGNATURES
+
+Deduce `PNMLVariant`.
+"""
+function pntd2variant end
+function pntd2variant(s::Symbol)
+    pntd2variant(pnmltype_map[s])
+    if is_continuous(s)
+        return ContinuousPNML
+    elseif is_discrete(s) # || s === :pt_hlpng
+        return DiscretePNML
+    elseif is_highlevel(s)
+        return HighLevelPNML
+    else
+        return OtherPNTD
+    end
+end
+function pntd2variant(pntd::AbstractPNTD)
+    if pntd isa AbstractContinuousPNTD
+        return ContinuousPNML
+    elseif pntd isa Union{AbstractDiscretePNTD, PT_HLPNG}
+        return DiscretePNML
+    elseif pntd isa AbstractHLPNTD
+        return HighLevelPNML
+    else
+        return OtherPNTD
+    end
+end
 
 #=
 Traits multiset, dot, number

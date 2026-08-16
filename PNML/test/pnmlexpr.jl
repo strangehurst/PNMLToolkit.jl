@@ -13,7 +13,7 @@ using ExproniconLite: xtuple, xnamedtuple, xcall, xpush, xgetindex, xfirst, xlas
 using PNML: mcontains
 
 @testset "pnmlexpr" begin
-    pntd = HLCoreNet()
+    pntd = :hlcore
     net = make_net(pntd, :pnmlexpr_net)
     varsub = NamedTuple()
 

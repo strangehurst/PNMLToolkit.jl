@@ -147,6 +147,21 @@ end
 # PT_HLPNG is restricted to DotSort, we treat its singleton multisets as  NaturalSort.
 value_type(::Type{Marking}, ::PT_HLPNG) = eltype(NaturalSort) #::Int
 
+function value_type(::Type{Marking}, s::Symbol)
+    if s === :pnmlcore || s === :ptnet
+        return Int
+    elseif s === :continuous
+        return Float64
+    elseif s == :pt_hlpng
+        return Int
+    elseif is_highlevel(s)
+        @error("value_type(::Type{Marking}, $s undefined. Using DotSort.", stacktrace())
+        return Bool #eltype(DotSort)
+    else
+        error("not a valit PNTD symbol: $s")
+    end
+end
+
 #~ Note the close relation of marking value_type to inscription value_type.
 #~ Inscription values are non-zero while marking values may be zero.
 

@@ -4,7 +4,7 @@ using .TestUtils
 using EzXML: EzXML
 using XMLDict: XMLDict
 
-@testset "PT inscription $pntd" for pntd in  (PnmlCoreNet(), ContinuousNet())
+@testset "PT inscription $pntd" for pntd in  (:pnmlcore, :continuous)
     n1 = xml"""<inscription>
         <text> 12 </text>
         <graphics><offset x="0" y="0"/></graphics>

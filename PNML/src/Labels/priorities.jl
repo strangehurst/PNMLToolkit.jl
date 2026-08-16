@@ -18,6 +18,7 @@ end
 
 value_type(::Type{Priority}) = Float64
 value_type(::Type{Priority}, ::AbstractPNTD) = Float64
+value_type(::Type{Priority}, ::Symbol) = Float64
 
 Base.eltype(::Priority) = value_type(Priority)
 Base.eltype(::Type{Priority}) = value_type(Priority)

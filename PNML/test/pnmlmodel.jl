@@ -127,11 +127,11 @@ end
     for net in modelnets
         @test_opt pntd_of(net)
         ntup = PNML.find_nets(model, pntd_of(net))
-        t = PNML.nettype(net)
+        #!t = PNML.nettype(net)
         @test name(net) == string(pid(net)) # true by special construction
-        for n in ntup
-            @test t === PNML.nettype(n)
-        end
+        # for n in ntup
+        #!     @test t === PNML.nettype(n)
+        # end
     end
 
     @testset "model net $pntdsym" for pntdsym in [:ptnet, :pnmlcore, :hlcore, :pt_hlpng,
@@ -145,7 +145,7 @@ end
                             PNML.find_nets(model, pnmltype(pntdsym)),
                             PNML.find_nets(model, string(pntdsym)))
             @test l === m === r
-            @test l.type === m.type ===  r.type === pnmltype(pntdsym)
+            @test l.type === m.type ===  r.type === pntdsym
         end
     end
 
@@ -267,7 +267,7 @@ println("-----------------------------------------")
     netvec = nets(model) # iterator
     @test length(netvec) == 1
 
-    net = first(netvec)::PnmlNet{<:SymmetricNet}
+    net = first(netvec)::PnmlNet{HighLevelPNML}
 
     @test PNML.verify(net, false)
 

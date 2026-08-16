@@ -91,7 +91,7 @@ import XMLDict
 @testset "parse tool specific info $(s.tool) $(s.version)" for s in [str1, str2, str3,
                                         str4, str5, str6, str7, str8]
     println("\n###### parse tool $(s.tool) $(s.version)")
-    net = make_net(PnmlCoreNet(), :specific_net)
+    net = make_net(:pnmlcore, :specific_net)
     # println(s.str)
     tooli = parse_toolspecific(xmlnode(s.str), net)
 
@@ -123,7 +123,7 @@ println()
     </place>
     """
     n::XMLNode = xmlnode(s)
-    net = make_net(PnmlCoreNet(), :combined_specific_net)
+    net = make_net(:pnmlcore, :combined_specific_net)
 
     combinedplace = parse_place(n, net)
 
@@ -153,8 +153,7 @@ end
 
 @testset "parse tool specific errors" begin
     println("\n\nparse tool specific errors")
-    pntd = PnmlCoreNet()
-    net = make_net(PnmlCoreNet(), :tool_specific_errors)
+    net = make_net(:pnmlcore, :tool_specific_errors)
 
     t1 = """<toolspecific version="" tool="toolname" />"""
     @test_throws ErrorException parse_toolspecific(xmlnode(t1), net)

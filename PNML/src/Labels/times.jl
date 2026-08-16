@@ -18,6 +18,7 @@ end
 
 value_type(::Type{Time}) = Float64
 value_type(::Type{Time}, ::AbstractPNTD) = Float64
+value_type(::Type{Time}, ::Symbol) = Float64
 
 Base.eltype(::Time) = value_type(Time)
 Base.eltype(::Type{Time}) = value_type(Time)

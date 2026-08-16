@@ -48,7 +48,7 @@ a higher-level will create multiple AbstractPetriNet instances, each a different
 Multiple [`Page`](@ref)s can (are permitted to) be merged into one page
 by [`PNML.flatten_pages!`](@ref) without losing any Petri Net semantics.
 """
-abstract type AbstractPetriNet{PNTD <: AbstractPNTD} end
+abstract type AbstractPetriNet{PNTD <: PNMLVariant} end
 
 # Interface is having id::Symbol, net::AbstractPnmlNet.
 # function Base.getproperty(pn::AbstractPetriNet, prop_name::Symbol)
@@ -60,7 +60,7 @@ abstract type AbstractPetriNet{PNTD <: AbstractPNTD} end
 #     return getfield(pn, prop_name)
 # end
 
-nettype(petrinet::AbstractPetriNet) = nettype(pnmlnet(petrinet))
+#! nettype(petrinet::AbstractPetriNet) = nettype(pnmlnet(petrinet))
 pid(petrinet::AbstractPetriNet)     = pid(pnmlnet(petrinet))
 name(petrinet::AbstractPetriNet)    = PNML.name(pnmlnet(petrinet))
 pnmlnet(petrinet::AbstractPetriNet) = petrinet.net::AbstractPnmlNet
@@ -114,7 +114,7 @@ $(TYPEDFIELDS)
 # Details
 
 """
-struct HLPetriNet{PNTD<:AbstractPNTD} <: AbstractPetriNet{PNTD}
+struct HLPetriNet{PNTD<:PNMLVariant} <: AbstractPetriNet{PNTD}
     net::PnmlNet{PNTD}
 end
 
@@ -168,7 +168,7 @@ Uses a flattened net to avoid the page level of the pnml hierarchy.
 Note: A multi-page petri net can always be flattened by removing
 referenceTransitions & referencePlaces, and merging pages into the first page.
 """
-struct SimpleNet{PNTD <: AbstractPNTD} <: AbstractPetriNet{PNTD}
+struct SimpleNet{PNTD <: PNMLVariant} <: AbstractPetriNet{PNTD}
     id::Symbol # Redundant copy of the net's ID for dispatch.
     net::PnmlNet{PNTD}
 end

@@ -4,7 +4,7 @@
 Create a graph.
 Note that when `is_collective_token` is true the graph `weight_function` becomes complex.
 """
-function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
+function metagraph(net::PnmlNet{P})where {P <: PNMLVariant}
     #! println("\nmetagraph $(pntd_of(net)) $(pid(net))")
 
     if !(narcs(net) > 0 && nplaces(net) > 0 && ntransitions(net) > 0)
@@ -36,14 +36,14 @@ function metagraph(net::PnmlNet{P})where {P <: AbstractPNTD}
 
     #todo weight function for MetaGraph
     weight_function, default_weight =
-    if is_collective_token(pntd_of(net))
-        # No variable substitutions here.
-        tuple(a -> inscription(a)(NamedTuple()),
-              PNML.Parser.default(PNML.Inscription, net))
-    else
-        #!@error "graph edge weight function of multiset in $(pntd_of(net)) $(pid(net))"
-        tuple(a -> 1, 1)
-    end
+        if is_collective_token(pntd_of(net))
+            # No variable substitutions here.
+            tuple(a -> inscription(a)(NamedTuple()),
+                PNML.Parser.default(PNML.Inscription, net))
+        else
+            #!@error "graph edge weight function of multiset in $(pntd_of(net)) $(pid(net))"
+            tuple(a -> 1, 1)
+        end
 
     MetaGraph(graph, vlabel, vdata,
                 edge_data, # edge metadata is an `Arc`

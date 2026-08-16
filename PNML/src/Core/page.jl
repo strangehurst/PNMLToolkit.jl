@@ -8,7 +8,7 @@ There must be at least 1 Page for a valid pnml model.
 `PNTD` binds the other type parameters together to express a specific PNG.
 See [`PnmlNet`](@ref)
 """
-@kwdef mutable struct Page{N <: AbstractPnmlNet} <: AbstractPnmlObject
+@kwdef mutable struct Page{N<:AbstractPnmlNet} <: AbstractPnmlObject
     net::N
     id::Symbol
     namelabel::Maybe{Name} = nothing
@@ -20,8 +20,6 @@ See [`PnmlNet`](@ref)
     # are attached to a `Page`. And there must be at least one `Page`.
     # There could be >1 nets. `netdata` is ordered, `netsets` are unordered.
 end
-
-nettype(pg::Page) = nettype(net(pg))
 
 net(page::Page) = page.net
 pagedict(page::Page) = pagedict(net(page))
@@ -77,7 +75,7 @@ function Base.show(io::IO, page::Page{N}) where {N <: AbstractPnmlNet}
     print(iio, indent(iio), "refPlaces:",     repr(refplace_idset(page)), ",\n");
     print(iio, indent(iio), "refTransitions: ", repr(reftransition_idset(page)), ",\n");
     print(iio, indent(iio), "subpages: ",     repr(page_idset(page)), ",\n");
-    print(io, ")")
+    print(iio, indent(iio), ")")
 end
 
 function verify(page::Page, verbose::Bool, net::AbstractPnmlNet)

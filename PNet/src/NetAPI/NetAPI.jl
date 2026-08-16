@@ -31,6 +31,7 @@ using PNML: APNTD, AbstractHLPNTD, AbstractPnmlNet, AbstractPNTD, Arc, Inscripti
     value_type, variabledecl, zero_marking
 using PNML.Declarations
 using PNML.PnmlGraphics
+using PNML.PnmlTypes
 using PNML.Sorts
 
 export conditions, dot2int, enabled, fire, fire2, incidence_matrix, initial_markings, input_matrix,

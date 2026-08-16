@@ -24,7 +24,8 @@ Lookup the `Arc`, find its inscription's value.
 """
 function civ(@nospecialize(net::AbstractPnmlNet), arc_id::Symbol)
     a = PNML.arcdict(net)[arc_id]::Arc
-    dot2int(pntd_of(net), inscription_value(a, NamedTuple()))
+    #!dot2int(pntd_of(net), inscription_value(a, NamedTuple()))
+    dot2int(vartype(net), inscription_value(a, NamedTuple()))
 end
 
 """

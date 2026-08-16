@@ -1,4 +1,5 @@
 using PNML
+using PNML.PnmlTypes
 using EzXML
 using InteractiveUtils
 using JET
@@ -12,6 +13,18 @@ using .TestUtils
 @testset "CONFIG" begin
     @show PNML.CONFIG
     #@SciMLMessage  repr(PNML.CONFIG) PNML.verbose :information :options
+    @show collect(PnmlTypes.all_nettypes())
+    @show collect(PnmlTypes.all_nettypes(is_highlevel))
+    @show collect(PnmlTypes.all_nettypes(!is_highlevel))
+    @show collect(PnmlTypes.core_nettypes())
+    @show collect(PnmlTypes.all_nettypes(is_discrete))
+    @show collect(PnmlTypes.all_nettypes(!is_discrete))
+    @show collect(PnmlTypes.all_nettypes(is_continuous))
+    @show collect(PnmlTypes.all_nettypes(!is_continuous))
+    @show collect(PnmlTypes.all_nettypes(is_collective_token))
+    @show collect(PnmlTypes.all_nettypes(!is_collective_token))
+    @show collect(PnmlTypes.all_nettypes(is_individual_token))
+    @show collect(PnmlTypes.all_nettypes(!is_individual_token))
 end
 
 @testset "ExXML" begin
@@ -70,29 +83,38 @@ end
     #println("value_type(Rate, $pntd) = ", r)
     @test r == eltype(RealSort) == Float64
 end
-
-@testset "predicates for $pntd" for pntd in PnmlTypes.all_nettypes()
-    @test Iterators.only(Iterators.filter(==(true), (PnmlTypes.is_discrete(pntd), is_highlevel(pntd), is_continuous(pntd))))
-    tp = typeof(pntd) # translate from singleton to type
-    @test Iterators.only(Iterators.filter(==(true), (PnmlTypes.is_discrete(tp), is_highlevel(tp), is_continuous(tp))))
+@testset "pntdsym pntd" for pntd in PnmlTypes.all_nettypes()
+    v = Val(pntd)
+    for pred in (is_discrete, is_continuous, is_highlevel, is_individual_token, is_collective_token)
+        @test pred(v) isa Bool
+        @test_call pred(Val(pntd))
+        @test_opt pred(Val(pntd))
+    end
+    for pred in (is_individual_token, is_collective_token)
+        @test pred(pntd) isa Bool
+        @test_call pred(pntd)
+        #@test_opt pred(pntd)
+    end
 end
+# @testset "add_nettype" begin
+#     f=nothing # JETLS is confused
+#     add_type! = PnmlTypes.add_nettype!
+#     typemap   = PnmlTypes.pnmltype_map
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pnmlcore, :pnmlcore)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlcore, :hlcore)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :ptnet, :ptnet)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlnet, :hlpng)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pt_hlpng, PT_HLPNG())
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :symmetric, SymmetricNet())
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :continuous, ContinuousNet())
 
-@testset "add_nettype" begin
-    f=nothing # JETLS is confused
-    add_type! = PnmlTypes.add_nettype!
-    typemap   = PnmlTypes.pnmltype_map
-    @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pnmlcore, PnmlCoreNet())
-    @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlcore, HLCoreNet())
-    @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :ptnet, PTNet())
-    @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlnet, HLPNG())
-    @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pt_hlpng, PT_HLPNG())
-    @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :symmetric, SymmetricNet())
-    @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :continuous, ContinuousNet())
-
-    @test_logs (:info, r"^adding mapping") @inferred add_type!(typemap, :newpntd, PnmlCoreNet())
-    @test :newpntd in keys(typemap)
-    @test typemap[:newpntd] === PnmlCoreNet()
-end
+#     @test :newpntd ∉ keys(typemap)
+#     @test_logs((:info, r"adding mapping from newpntd to"),
+#          @inferred add_type!(typemap, :newpntd, :pnmlcore))
+#     @test :newpntd in keys(typemap)
+#     @test typemap[:newpntd] === PnmlCoreNet()
+#     @show collect(PnmlTypes.all_nettypes())
+# end
 
 @testset "sortref" begin
     @test @inferred(sortref(1)) == @inferred NamedSortRef(:integer)

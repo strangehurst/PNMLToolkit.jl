@@ -3,7 +3,7 @@ using PNML, Test, JET, Logging
 include("TestUtils.jl")
 using .TestUtils
 
-net = make_net(PnmlCoreNet(), :idregistry_net)
+net = make_net(:pnmlcore, :idregistry_net)
 IDRegistrys.reset_reg!(net.idregistry)
 register_id!(net.idregistry, :p1)
 @test @inferred(isregistered(net.idregistry, :p1)) == true
