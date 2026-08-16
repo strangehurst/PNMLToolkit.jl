@@ -1,12 +1,12 @@
-using PNML, JET, NamedTupleTools, OrderedCollections
+using PNML, Test, JET, NamedTupleTools, OrderedCollections
 using EzXML: EzXML
 using XMLDict: XMLDict
 
 include("TestUtils.jl")
 using .TestUtils
 
-@testset "text $pntd" for pntd in PnmlTypes.core_nettypes()
-    @test parse_text(xml"<text>ready</text>", pntd) == "ready"
+@testset "text node" begin
+    @test PNML.Parser.parse_text(xml"<text>ready</text>") == "ready"
 end
 
 "Return PnmlLabel, AnyElement"
