@@ -33,6 +33,7 @@ where condition and inscription expressions may contain non-ground terms (using 
 """
 function parse_term(node::XMLNode, net::AbstractPnmlNet; vars)
     tag = Symbol(EzXML.nodename(node))
+    @infiltrate false
     tag === :namedoperator && error("namedoperator is a declaration, not a term!")
     tj = parse_term(Val(tag), node, net; vars)::TermJunk
     # Collects varible REFIDs in `vars`. `length(vars) == 0` means is a ground term.

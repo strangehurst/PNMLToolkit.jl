@@ -22,6 +22,8 @@ PrecompileTools.@recompile_invalidations begin
     using Moshi.Match: @match
 end
 
+using Infiltrator
+
 using ..Declarations
 using ..Expressions
 using ..IDRegistrys
