@@ -39,9 +39,11 @@ function pnmlmodel(node::XMLNode; kwargs...)
     namespace = pnml_namespace(node)
     nets = LittleDict{Symbol,Any}()
     idregistry = get(kwargs, :idregistry, IDRegistry())
+
     for child in EzXML.eachelement(node)
         tag = EzXML.nodename(child)
         if tag == "net"
+            @infiltrate false
             net = parse_net(child; idregistry, kwargs...)::PnmlNet # Fully formed
             nets[pid(net)] = net
         else
@@ -69,31 +71,32 @@ end
 Fill `dict` if `kwargs[plugintag]` exists and has a collection of tuples.
 
 The first tuple element being a key of `dict` and the last entry the callable.
-Intermediate tupel elements are keys for nested dictionaries.
+Intermediate tuple elements are keys for nested dictionaries.
 """
 function plugins!(dict::AbstractDict, kwargs, plugintag)
     if haskey(kwargs, plugintag) &&
-            !isnothing(kwargs[plugintag]) && !isempty(kwargs[plugintag])
-        @info "add $(length(kwargs[plugintag])) $plugintag plugin(s)" #kwargs[plugintag] dict
-        for plugin in kwargs[plugintag]
+       !isnothing(kwargs[plugintag]) &&
+       !isempty(kwargs[plugintag])
+
+        @info "add $(length(kwargs[plugintag])) $plugintag plugin(s)"
+        for plugin in kwargs[plugintag]::Tuple
             #! todo sanity check labelparser
-            if length(plugin) >= 2
-                push!(dict, recurse_plugin(plugin, 1, length(plugin)))
+            if length(plugin) == 3 # toolparser plugin
+                if haskey(dict, plugin[1])
+                    # Update toolname's version dictionary.
+                    dict[plugin[1]][plugin[2]] = plugin[end]
+                else
+                    # Add toolname's version dictionary.
+                    dict[plugin[1]] = LittleDict(plugin[2] => plugin[end])
+                end
+            elseif length(plugin) == 2
+                dict[plugin[1]] = plugin[end]
             else
                 error("plugin $plugin size wrong: $(length(plugin) )")
            end
         end
     end
 end #= function plugins! =#
-
-"If `i` < `n-1` recurse else callable found"
-function recurse_plugin(plugin, i, n)
-    if i < n - 1
-        return plugin[i] => LittleDict(plugin[i+1] => recurse_plugin(plugin, i+1, n))
-    else
-        return plugin[i] => plugin[n]
-    end
-end
 
 """
     parse_net(node::XMLNode[; options...]) -> PnmlNet
@@ -118,18 +121,20 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
         @info "net $netid pntd set to $pntd_override, overrides $typestr"
         typestr = pntd_override
     end
-    pntd = pnmltype(typestr)
-    D()&& println("\n## parse_net ", netid, " of type ", pntd)
+    #!pntd = pnmltype(typestr)
+    pnmltype = pntd_symbol(typestr)
+    D()&& println("\n## parse_net ", netid, " of type ", pnmltype)
 
-    #----------------------------------------------------------------
+    #-------------------------------------------------------------------------------------
     # Create net with empty data containers to be filled during parsing.
     # We already used `idregistry` and `pagedict` needs to be type stable.
     # `ddict` is a RefValue so that the types of values in its dictonaries
     # can be determined at runtime.
     #-------------------------------------------------------------------------------------
-    net = PnmlNet(; type=pntd, id=netid, idregistry,
-                    pagedict = OrderedDict{Symbol, Page{PnmlNet{typeof(pntd)}}}(),
-                    )
+    var = pntd2variant(pnmltype)
+    net = PnmlNet{var}(; type=pnmltype, id=netid, idregistry,
+                  pagedict = OrderedDict{Symbol, Page{PnmlNet{var}}}(),
+                  )
     net.ddict[] = DeclDict(net) # Create with empty dictionaries of net specific values.
 
     #^ Label Parsers
@@ -204,7 +209,7 @@ end #= function parse_net =#
 Call `_parse_page!` to create a page with its own `netsets`.
 Add created page to parent's `page_idset` and `pagedict(net)`.
 """
-function parse_page!(net::PnmlNet, page_idset, page_node::XMLNode)
+function parse_page!(net::PnmlNet{T}, page_idset, page_node::XMLNode) where {T <: PNMLVariant}
     check_nodename(page_node, "page")
     pageid = register_idof!(registry_of(net), page_node)
     push!(page_idset, pageid) # Record id before decending.
@@ -219,12 +224,12 @@ end
 
 Return `Page`. `pageid` already parsed from `page_node`.
 """
-function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) where {T<:AbstractPNTD}
+function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) where {T<:PNMLVariant}
     D()&& println("## parse_page ", pageid)
     #---------------------------------------------------------
     # Create "empty" page. Will have `toolinfos` parsed.
     #---------------------------------------------------------
-    page = Page{typeof(net)}(; net, id = pageid,
+    page = Page(; net, id = pageid,
                 netsets = PnmlNetKeys(),
                 toolspecinfos = find_toolinfos!(nothing, page_node, net))
 
