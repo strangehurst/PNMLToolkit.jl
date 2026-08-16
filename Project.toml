@@ -7,8 +7,10 @@ authors = ["Jeff Hurst <strangehurst@users.noreply.github.com>"]
 projects = ["docs", "benchmark", "examples", "profile", "PNML", "PNet", "test"]
 
 [deps]
+Infiltrator = "5903a43b-9cc3-4c30-8d17-598619ec4e9b"
 PNML = "1f34f301-fe8c-4464-8328-ff2334f05424"
 PNet = "b17e8b3e-4e57-4399-9a85-41e87fede9cd"
 
 [compat]
+Infiltrator = "1.9.11"
 julia = "1.12"

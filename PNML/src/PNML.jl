@@ -61,15 +61,13 @@ using Memoization
 using NamedTupleTools
 using Preferences: load_preference, set_preferences!
 using TermInterface
-
-export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef,
-    Arc, ArcTypeEnum, D, enabled,
-    MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place,
-    PnmlExpr, PnmlModel, PnmlNet,
-    ProductSortRef, REFID, RefPlace, RefTransition, SortRef, SortRefImpl,
-    Transition, UserSortRef, narcs, npages, nplaces, ntransitions,
-    arc, place, transition, pnmlmodel, xmlnode,
-    initial_marking, inscription, condition
+using Infiltrator
+export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef, Arc,
+    ArcTypeEnum, D, MultisetSortRef, NamedSortRef, Page, PartitionSortRef, Place,
+    PnmlExpr, PnmlModel, PnmlNet, ProductSortRef, REFID, RefPlace, RefTransition,
+    SortRef, SortRefImpl, Transition, UserSortRef, arc, condition, enabled,
+    initial_marking, inscription, narcs, npages, nplaces, ntransitions, place, pnmlmodel,
+    pntdsym, transition, xmlnode
 
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
 @public namedsort, productsort, Coordinate
