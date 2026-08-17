@@ -13,7 +13,7 @@ export ContinuousNet, HLCoreNet, HLPNG, PTNet, PT_HLPNG, PnmlCoreNet, SymmetricN
 # Functions
 export is_collective_token, is_continuous, is_discrete, is_highlevel, is_individual_token,
     pnmltype
-export ContinuousPNML, DiscretePNML, HighLevelPNML, OtherPNTD, PNMLVariant, pntd2variant,
+export ContinuousPNML, DiscretePNML, HighLevelPNML, OtherPNML, PNMLVariant, pntd2variant,
     pntd_symbol, core_nettypes, all_nettypes
 
 """
@@ -402,7 +402,7 @@ This variant is for non-Petri net uses.
 
 `pntd_of(net)` is `AbstractPNTD && !AbstractHLPNTD && !AbstractContinuousPNTD && !AbstractDiscretePNTD
 """
-abstract type OtherPNTD <: PNMLVariant end
+abstract type OtherPNML <: PNMLVariant end
 
 """
     $TYPEDSIGNATURES
@@ -419,7 +419,7 @@ function pntd2variant(s::Symbol)
     elseif is_highlevel(s)
         return HighLevelPNML
     else
-        return OtherPNTD
+        return OtherPNML
     end
 end
 function pntd2variant(pntd::AbstractPNTD)
@@ -430,7 +430,7 @@ function pntd2variant(pntd::AbstractPNTD)
     elseif pntd isa AbstractHLPNTD
         return HighLevelPNML
     else
-        return OtherPNTD
+        return OtherPNML
     end
 end
 
