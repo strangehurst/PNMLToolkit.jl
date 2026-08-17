@@ -36,7 +36,7 @@ $(FIELDS)
     # Declarations dictionarys filled with built-ins & when parsing `declaration`.
     # We use the declarations toolkit for non-high-level nets,
     # and assume a minimum level of function for high-level nets.
-    # Declarations present in the input file will overwrite these. Particulary '<dot>'.
+    # Declarations present in the input file will overwrite thesenet. Particulary '<dot>'.
     ddict::RefValue{DeclDict} = Ref{DeclDict}() # undef
 
     # PNML Label with `Text` `Graphics`, `ToolInfo` and zero or more `Declarations`.
@@ -71,7 +71,7 @@ $(FIELDS)
 
 end #= mutable struct PnmlNet =#
 "Iterate enable filters"
-function filters(net::APN)
+function filters(net::PnmlNet{T}) where {T <: PNMLVariant}
     # @show net.enabled_filters
     values(net.enabled_filters)
 end
