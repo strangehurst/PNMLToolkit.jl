@@ -70,7 +70,7 @@ const str1 = """
 
     @testset "inferred" begin
         # First @inferred failure throws exception ending testset.
-        @test firstpage(simp.net) === first(pages(simp.net))
+        @test firstpage(pnmlnet(simp)) === first(pages(pnmlnet(simp)))
 
         #@inferred places(first(pages(net.net)))
         #@inferred transitions(first(pages(net.net)))
@@ -82,13 +82,13 @@ const str1 = """
     end
 
     # page, pnmlnet, petrinet, the 3 top=levels
-    #@show typeof(first(pages(simp.net))) typeof(simp.net) typeof(simp)
+    #@show typeof(first(pages(pnmlnet(simp)))) typeof(pnmlnet(simp)) typeof(simp)
     @test first(pages(pnmlnet(simp))) isa Page
-    @test simp.net isa PnmlNet
+    @test pnmlnet(simp) isa PnmlNet
     @test simp isa AbstractPetriNet
 
     # For a flattened net these should have the same behavior.
-    for top in [first(pages(simp.net)), simp.net]
+    for top in [first(pages(pnmlnet(simp))), pnmlnet(simp)]
 
         @test_call target_modules=t_modules places(top)
         for placeid in PNML.place_idset(top)
@@ -122,7 +122,7 @@ const str1 = """
 
     # PetriNet-only methods.
     @testset "initialMarking" begin
-        u1 = @inferred Vector initial_markings(simp.net)
+        u1 = @inferred Vector initial_markings(pnmlnet(simp))
     end
 end
 
@@ -161,8 +161,8 @@ end
     net = @inferred PnmlNet first(PNML.nets(model))
     simp = @inferred SimpleNet(net)
     @test contains(sprint(show, simp), "SimpleNet")
-    #@show simp.net
-    β = [pid(tr) => PNML.rate_value(tr) for tr in PNML.transitions(simp.net)]
+    #@show pnmlnet(simp)
+    β = [pid(tr) => PNML.rate_value(tr) for tr in PNML.transitions(pnmlnet(simp))]
     @test β == [:birth=>0.3]
 end
 
@@ -191,9 +191,9 @@ end
     net1 = PNML.firstnet(model);          #@show typeof(net1)
     simp = @inferred SimpleNet(net1); #@show typeof(simp)
 
-    @show @inferred collect(PNML.place_idset(simp.net)) # [:rabbits, :wolves]
-    @show @inferred collect(PNML.transition_idset(simp.net))
-    @show m₀ = initial_markings(simp.net)
+    @show @inferred collect(PNML.place_idset(pnmlnet(simp))) # [:rabbits, :wolves]
+    @show @inferred collect(PNML.transition_idset(pnmlnet(simp)))
+    @show m₀ = initial_markings(pnmlnet(simp))
     @show input = input_matrix(pnmlnet(simp))
     @show output_matrix(pnmlnet(simp))
     @show dt = PNML.incidence_matrix(pnmlnet(simp))
@@ -203,15 +203,15 @@ end
     #@show t = collect(PNML.counted_transitions(net1))
 
 
-    @show enabled(simp.net, m₀)
+    @show enabled(pnmlnet(simp), m₀)
 
-    println("all arcs :wolves = ", collect(PNML.all_arcs(simp.net, :wolves)))
-    println("src arcs :wolves = ", collect(PNML.src_arcs(simp.net, :wolves)))
-    println("tgt arcs :wolves = ", collect(PNML.tgt_arcs(simp.net, :wolves)))
+    println("all arcs :wolves = ", collect(PNML.all_arcs(pnmlnet(simp), :wolves)))
+    println("src arcs :wolves = ", collect(PNML.src_arcs(pnmlnet(simp), :wolves)))
+    println("tgt arcs :wolves = ", collect(PNML.tgt_arcs(pnmlnet(simp), :wolves)))
 
     # # keys are transition ids
     # # values are input, output vectors of "tuples" place id -> inscription of arc
-    # Δ = PNML.PNet.transition_function(simp.net)#,T)
+    # Δ = PNML.PNet.transition_function(pnmlnet(simp))#,T)
     # @show Δ
     # println()
 
@@ -227,15 +227,15 @@ end
     # @test Δ.death     == expected_transition_function.death
 
     expected_u0 = [10.0, 100.0] # initialMarking
-    @show u0 = initial_markings(simp.net)
+    @show u0 = initial_markings(pnmlnet(simp))
     @test u0 == expected_u0
 
     expected_β = [:birth=>0.3, :predation=>0.015, :death=>0.7] # transition rate
-    @show β = [pid(tr) => PNML.rate_value(tr) for tr in PNML.transitions(simp.net)]
+    @show β = [pid(tr) => PNML.rate_value(tr) for tr in PNML.transitions(pnmlnet(simp))]
     @test β == expected_β
 
     let net = pnmlnet(simp)
-        @show du = map(last, initial_markings(simp.net))
+        @show du = map(last, initial_markings(pnmlnet(simp)))
         #map(last, collect(du))
         @show valtype(du)
         @show rate_vals = zeros(valtype(du), ntransitions(net)) # φ in paper
@@ -344,31 +344,31 @@ const ex_types = ("continuous",)
     anet = SimpleNet(PNML.Parser.xmlnode(str3))::AbstractPetriNet
     metagraph(pnmlnet(anet))
 
-    m₀ = initial_markings(anet.net)
-    C  = PNML.incidence_matrix(anet.net) # Matrix of PnmlMultiset
-    e  = PNML.enabled(anet.net, m₀)
+    m₀ = initial_markings(pnmlnet(anet))
+    C  = PNML.incidence_matrix(pnmlnet(anet)) # Matrix of PnmlMultiset
+    e  = PNML.enabled(pnmlnet(anet), m₀)
     #@show m₀ C e typeof(e)
 
     @test e == Bool[1,0,0,0]
     @test e == [true,false,false,false] # 3 representations of the enabled vector.
     @test e == [1,0,0,0]
 
-    m₁ = fire2(C, anet.net, m₀)
-    @test PNML.enabled(anet.net, m₁) == [false,true,false,false]
+    m₁ = fire2(C, pnmlnet(anet), m₀)
+    @test PNML.enabled(pnmlnet(anet), m₁) == [false,true,false,false]
 
-    m₂ = fire2(C, anet.net, m₁)
-    @test PNML.enabled(anet.net, m₂) == [false,false,true,false]
+    m₂ = fire2(C, pnmlnet(anet), m₁)
+    @test PNML.enabled(pnmlnet(anet), m₂) == [false,false,true,false]
 
-    m₃ = fire2(C, anet.net, m₂)
-    @test PNML.enabled(anet.net, m₃) == [false,false,false,true]
+    m₃ = fire2(C, pnmlnet(anet), m₂)
+    @test PNML.enabled(pnmlnet(anet), m₃) == [false,false,false,true]
 
-    m₄ = fire2(C, anet.net, m₃)
-    @test PNML.enabled(anet.net, m₄) == [true,false,false,false]
+    m₄ = fire2(C, pnmlnet(anet), m₃)
+    @test PNML.enabled(pnmlnet(anet), m₄) == [true,false,false,false]
 
     let mx = m₀
         for n in 1:10
-            mx = fire2(C, anet.net, mx)
+            mx = fire2(C, pnmlnet(anet), mx)
         end
-        @test PNML.enabled(anet.net, mx) == [false,false,true,false]
+        @test PNML.enabled(pnmlnet(anet), mx) == [false,false,true,false]
     end
 end

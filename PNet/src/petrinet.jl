@@ -81,19 +81,19 @@ initial_markings(petrinet::AbstractPetriNet) = initial_markings(pnmlnet(petrinet
 Base.summary(io::IO, pn::AbstractPetriNet) = print(io, summary(pn))
 function Base.summary(pn::AbstractPetriNet)
     string(typeof(pn), " id ", PNet.pid(pn), ", ",
-        PNML.nplaces(pn.net), " places, ",
-        PNML.ntransitions(pn.net), " transitions, ",
-        PNML.narcs(pn.net), " arcs")::String
+        PNML.nplaces(pnmlnet(pn)), " places, ",
+        PNML.ntransitions(pnmlnet(pn)), " transitions, ",
+        PNML.narcs(pnmlnet(pn)), " arcs")::String
 end
 
 function Base.show(io::IO, pn::AbstractPetriNet)
     println(io, summary(pn))
     println(io, "places")
-    println(io, PNML.places(pn.net))
+    println(io, PNML.places(pnmlnet(pn)))
     println(io, "transitions")
-    println(io, PNML.transitions(pn.net))
+    println(io, PNML.transitions(pnmlnet(pn)))
     println(io, "arcs")
-    print(io, PNML.arcs(pn.net))
+    print(io, PNML.arcs(pnmlnet(pn)))
 end
 
 #-----------------------------------------------------------------
