@@ -15,17 +15,17 @@ function default end
 function parse_place!(netsets, node, net::AbstractPnmlNet)
     pl = parse_place(node, net)::valtype(placedict(net))
     #@show valtype(placedict(net)) typeof(placedict(net))
-    push!(place_idset(netsets)::OrderedSet{Symbol}, pid(pl))
+    push!(netsets.place_set, pid(pl))
     placedict(net)[pid(pl)] = pl
-    return place_idset(netsets) #place_set
+    return place_idsets(netsets) #place_set
 end
 
 "Fill transition_idset, transitiondict."
 function parse_transition!(netsets, node, net::AbstractPnmlNet)
     tr = parse_transition(node, net)::valtype(transitiondict(net))
-    push!(transition_idset(netsets)::OrderedSet{Symbol}, pid(tr))
+    push!(netsets.transition_set, pid(tr))
     transitiondict(net)[pid(tr)] = tr
-    return transition_idset(netsets)
+    return transition_idsets(netsets)
 end
 
 "Fill arc_idset, arcdict."
@@ -33,31 +33,31 @@ function parse_arc!(netsets, node, net::AbstractPnmlNet)
     a = parse_arc(node, net)
     a isa valtype(arcdict(net)) ||
         @error("$(typeof(a)) not a $(valtype(arcdict(net)))) $(pntd_of(net)) $(repr(a))")
-    push!(arc_idset(netsets)::OrderedSet{Symbol}, pid(a))
+    push!(netsets.arc_set, pid(a))
     arcdict(net)[pid(a)] = a
-    return arc_idset(netsets)
+    return arc_idsets(netsets)
 end
 
 "Fill refplace_idset, refplacedict."
 function parse_refPlace!(netsets, node, net::AbstractPnmlNet)
     rp = parse_refPlace(node, net)::valtype(refplacedict(net))
-    push!(refplace_idset(netsets)::OrderedSet{Symbol}, pid(rp))
+    push!(netsets.refplace_set, pid(rp))
     refplacedict(net)[pid(rp)] = rp
-    return refplace_idset(netsets)
+    return refplace_idsets(netsets)
 end
 
 "Fill reftransition_idset, reftransitiondict."
 function parse_refTransition!(netsets, node, net::AbstractPnmlNet)
     rt = parse_refTransition(node, net)::valtype(reftransitiondict(net))
-    push!(reftransition_idset(netsets)::OrderedSet{Symbol}, pid(rt))
+    push!(netsets.reftransition_set, pid(rt))
     reftransitiondict(net)[pid(rt)] = rt
-    return reftransition_idset(netsets)
+    return reftransition_idsets(netsets)
 end
 
 """
-    def_sort_element(x)
+    def_sort_element(placetype)
 
-Return an arbitrary element of sort `x`.
+Return an arbitrary element of sort `placetype`.
 All sorts are expected to be iteratable and non-empty, so we return `first`.
 Uses include default inscription value and default initial marking value sorts.
 
@@ -315,7 +315,7 @@ function default(::Type{<:Marking}, net::AbstractPnmlNet, place::Symbol, placety
     ex = if pntd isa AbstractHLPNTD
         isnothing(placetype) &&
              throw(ArgumentError("placetype needed for $pntd"))
-        el = def_sort_element(placetype) # ::value_type(Marking, pntd_of(net))
+        el = def_sort_element(placetype)
         #@show placetype  el
         # the value type of DotSort is Bool <: Number
         Bag(sortref(placetype), el, 0)

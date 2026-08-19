@@ -189,7 +189,7 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::PnmlNet{P
     @assert isempty(l.vars) # All markings are ground terms.
     placeS = to_sort(sortref(placetype), net)
     placeT = eltype(placeS)::Type{<:Number}
-    valueT = value_type(Marking, pntd_of(net))::Type{<:Number}
+    valueT = value_type(Marking, Val(pntdsym(net)))::Type{<:Number}
     # marking value type restricts net, place type restricts individual places.
     valueT <: placeT ||
         error("parse initial marking of $(pntdsym(net)) place value_type must be a $placeT, found: $valueT")

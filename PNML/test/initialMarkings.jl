@@ -23,7 +23,7 @@ using XMLDict: XMLDict
 
         net = make_net(pntd, :pt_initmark)
         placetype = SortType("$pntd initMarking",
-            sortref(value_type(Marking, pntd))::SortRef,
+            sortref(value_type(Marking, Val(pntd)))::SortRef,
             nothing, nothing, net)
 
         # Parse ignoring unexpected child
@@ -38,7 +38,6 @@ using XMLDict: XMLDict
         @test_call Marking(23, net, :xxx)
         @test typeof(mark1()) == typeof(23)
         @test mark1() == 23
-        @show mark1()
         @test_call mark1()
         @test_opt broken=false mark1()
 
@@ -63,18 +62,16 @@ using XMLDict: XMLDict
 
         net = make_net(pntd, :pt_initmark)
         placetype = SortType("$pntd initMarking",
-            sortref(value_type(Marking, pntd))::SortRef,
+            sortref(value_type(Marking, Val(pntd)))::SortRef,
             nothing, nothing, net)
 
         # Parse ignoring unexpected child
         mark = @test_logs(match_mode=:any, (:warn, r"^ignoring unexpected child"),
                     parse_initialMarking(node, placetype, net; parentid=:xxx)::Marking)
-        #@test typeof(value(mark)) <: Union{Int,Float64}
         @test mark()::Union{Int,Float64} == 123
 
         # Floating point
         mark2 = Marking(3.5, net, :xxx)
-        @show mark2 mark2() mark2.net
         @test_opt broken=false Marking(3.5, net, :xxx)
         @test mark2() ≈ 3.5
         @test_call Marking(3.5, net, :xxx)
@@ -107,15 +104,12 @@ end
         placetype = SortType("XXX", NamedSortRef(:dot), net)
 
         mark = parse_hlinitialMarking(node, placetype, net; parentid=:bogusid)
-        #@show mark
         @test mark isa Marking
 
         @test term(mark) isa Bag
         @test text(mark) == "3`dot"
-        #println(); flush(stdout)
 
         @test has_graphics(mark) == false # This instance does not have any graphics.
-        #@show term(mark) toexpr(term(mark), NamedTuple(), net) #! debug
         @test eval(toexpr(term(mark), NamedTuple(), net)) isa PnmlMultiset
         # @test arity(markterm) == 2
         # @test inputs(markterm)[1] == NumberConstant(3, PositiveSort())
@@ -146,7 +140,6 @@ end
 
 
    @testset "placetype error" for pntd in PnmlTypes.all_nettypes(is_highlevel)
-        #println("\nplacetype error")
         node = xml"""
         <hlinitialMarking>
             <text>3`dot</text>
@@ -199,6 +192,7 @@ end
         net = make_net(pntd, :dot_dot)
         placetype = SortType("dot sorttype", NamedSortRef(:dot), net)
         mark = Parser.parse_hlinitialMarking(node, placetype, net; parentid=:tmp)
+        @test mark isa Marking
         #TODO add tests
     end
     # The constant eight.

@@ -19,12 +19,9 @@ end
 term(i::Inscription) = i.term
 sortref(i::Inscription) = expr_sortref(term(i), i.net)::SortRef
 
-@memoize Dict function evaluate(inscription::Inscription, varsub)
-    eval(toexpr(term(inscription), varsub, inscription.net))
-end
-
+#todo @memoize Dict function evaluate(inscription::Inscription, varsub)
 function (inscription::Inscription)(varsub::NamedTuple = NamedTuple())
-    evaluate(inscription, varsub)
+    eval(toexpr(term(inscription), varsub, inscription.net))
 end
 
 variables(inscription::Inscription) = inscription.vars
@@ -70,8 +67,8 @@ value_type(::Type{Inscription}, ::AbstractPNTD) = eltype(PositiveSort) #::Int
 value_type(::Type{Inscription}, ::AbstractContinuousPNTD) = eltype(RealSort) #::Float64
 value_type(::Type{Inscription}, ::PT_HLPNG) = eltype(DotSort)
 function value_type(::Type{Inscription}, pntd::AbstractHLPNTD)
-    @outline(pntd, @error("value_type(::Type{Inscription}, $pntd) undefined. Using DotSort.")) #! XXX TODO XXX
-    eltype(DotSort) #! XXX TODO XXX
+    @outline(pntd, @error("value_type(::Type{Inscription}, $pntd) undefined. Using Any.")) #! XXX TODO XXX
+    Any # eltype(DotSort) #! XXX TODO XXX
 end
 
 function value_type(::Type{Inscription}, s::Symbol)
@@ -88,10 +85,14 @@ function value_type(::Type{Inscription}, s::Symbol)
         error("not a valid PNTD symbol: $s")
     end
 end
+# is_collective_token
 value_type(::Type{Inscription}, ::Val{:pnmlcore}) = eltype(PositiveSort)
 value_type(::Type{Inscription}, ::Val{:ptnet}) = eltype(PositiveSort)
 value_type(::Type{Inscription}, ::Val{:pt_hlpng}) = eltype(DotSort)
-value_type(::Type{Inscription}, ::Val{:hlcore}) = eltype(DotSort)
-value_type(::Type{Inscription}, ::Val{:hlnet}) = eltype(DotSort)
-value_type(::Type{Inscription}, ::Val{:symmetric}) = eltype(DotSort)
 value_type(::Type{Inscription}, ::Val{:continuous}) = eltype(RealSort)
+# For rest of is_highlevel is_individual_token is true.
+# Each place and adjacent arcs' inscriptions have the same basis sort (SortType label).
+# Any basis sort except MultisetSort.
+value_type(::Type{Inscription}, ::Val{:hlcore}) = Any
+value_type(::Type{Inscription}, ::Val{:hlnet}) = Any
+value_type(::Type{Inscription}, ::Val{:symmetric}) = Any

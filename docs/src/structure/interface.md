@@ -265,7 +265,7 @@ Better to iterate than allocate. Using a set abstraction that iterates consisten
 | Object       | Synopsis                     | Comment                              |
 |:-------------|:-----------------------------|:-------------------------------------|
 | PnmlNet      | `keys(placedict(net))`       | Iterates OrderedDict keys |
-| Page         | `place_idset(netsets(page))` | Iterates OrderedSet |
+| Page         | `place_idsets(netsets(page))` | Iterates OrderedSet |
 | PnmlNetKeys  | `OrderedSet` | Iterates OrderedSet |
 
 Both iterate over REFIDs that are indices into dictionaries.,

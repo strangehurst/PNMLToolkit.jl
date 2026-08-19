@@ -61,9 +61,8 @@ const str1 = """
     #@test_opt target_modules=t_modules SimpleNet(model)
     @test_call broken=false SimpleNet(model)
 
-    for accessor in [PNML.pid,
-                     PNML.place_idset, PNML.transition_idset, PNML.arc_idset,
-                     PNML.reftransition_idset, PNML.refplace_idset]
+    for accessor in [PNML.place_idsets, PNML.transition_idsets, PNML.arc_idsets,
+                               PNML.reftransition_idsets, PNML.refplace_idsets]
         #@show accessor
         @test accessor(pnmlnet(simp1)) == accessor(pnmlnet(simp))
     end
@@ -91,7 +90,7 @@ const str1 = """
     for top in [first(pages(pnmlnet(simp))), pnmlnet(simp)]
 
         @test_call target_modules=t_modules places(top)
-        for placeid in PNML.place_idset(top)
+        for placeid in PNML.place_idsets(top)
             PNML.has_place(top, placeid)
             @test_call PNML.has_place(top, placeid)
             @test @inferred PNML.has_place(top, placeid)
@@ -191,8 +190,8 @@ end
     net1 = PNML.firstnet(model);          #@show typeof(net1)
     simp = @inferred SimpleNet(net1); #@show typeof(simp)
 
-    @show @inferred collect(PNML.place_idset(pnmlnet(simp))) # [:rabbits, :wolves]
-    @show @inferred collect(PNML.transition_idset(pnmlnet(simp)))
+    @show collect(PNML.place_idsets(pnmlnet(simp))) # [:rabbits, :wolves]
+    @show collect(PNML.transition_idsets(pnmlnet(simp)))
     @show m₀ = initial_markings(pnmlnet(simp))
     @show input = input_matrix(pnmlnet(simp))
     @show output_matrix(pnmlnet(simp))
@@ -266,14 +265,10 @@ end
 end
 
 
-# String so that pntd can be embedded in the XML.
-const core_types = ("pnmlcore","ptnet",)
 @warn "hl nets do not currently do linear algebra! 'fire' will error."
-const hl_types = ("pt_hlpng",) # ("hlcore","symmetric") #,"pt_hlpng","hlnet",)
-const ex_types = ("continuous",)
-
-@testset "extract a graph $pntd" for pntd in tuple(core_types..., hl_types..., ex_types...)
-    if pntd in hl_types
+@testset "extract a graph $pntd" for pntd in ("pnmlcore","ptnet","pt_hlpng","continuous",)
+    # String so that pntd can be embedded in the XML.
+    if pntd == "pt_hlpng"
         marking = """
         <hlinitialMarking>
             <text>1</text>
@@ -285,21 +280,18 @@ const ex_types = ("continuous",)
             </structure>
         </hlinitialMarking>
         """
-        insctag = "hlinscription"
     elseif pntd == "continuous"
         marking = """
         <initialMarking>
             <text>1.0</text>
         </initialMarking>
         """
-        insctag = "inscription"
     else
         marking = """
         <initialMarking>
             <text>1</text>
         </initialMarking>
         """
-        insctag = "inscription"
     end
     #println()
     #println(marking)
@@ -340,12 +332,15 @@ const ex_types = ("continuous",)
         </net>
     </pnml>
     """
-    println(pntd)
+
     anet = SimpleNet(PNML.Parser.xmlnode(str3))::AbstractPetriNet
+    @show summary(pnmlnet(anet))
     metagraph(pnmlnet(anet))
 
-    m₀ = initial_markings(pnmlnet(anet))
+    @show m₀ = initial_markings(pnmlnet(anet))
+    @test m₀ isa Vector
     C  = PNML.incidence_matrix(pnmlnet(anet)) # Matrix of PnmlMultiset
+    @show m₀ C
     e  = PNML.enabled(pnmlnet(anet), m₀)
     #@show m₀ C e typeof(e)
 

@@ -17,8 +17,7 @@ Dynamic priority is a function with arguments of net marking and transition.
 end
 
 value_type(::Type{Priority}) = Float64
-value_type(::Type{Priority}, ::AbstractPNTD) = Float64
-value_type(::Type{Priority}, ::Symbol) = Float64
+value_type(::Type{Priority}, ::Any) = Float64
 
 Base.eltype(::Priority) = value_type(Priority)
 Base.eltype(::Type{Priority}) = value_type(Priority)
@@ -26,12 +25,9 @@ Base.eltype(::Type{Priority}) = value_type(Priority)
 term(i::Priority{N, T}) where {N <: AbstractPnmlNet, T <: PnmlExpr} = i.term
 sortref(i::Priority) = expr_sortref(term(i), i.net)::SortRef
 
-@memoize Dict function evaluate(priority::Priority, varsub)
-    eval(toexpr(term(priority), varsub, priority.net))::value_type(Priority)
-end
-
+#todo @memoize Dict function evaluate(priority::Priority, varsub)
 function (priority::Priority)(varsub::NamedTuple=NamedTuple())
-    evaluate(priority, varsub)
+    eval(toexpr(term(priority), varsub, priority.net))::value_type(Priority)
 end
 
 value(r::Priority) = r()

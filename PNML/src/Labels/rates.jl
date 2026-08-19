@@ -16,22 +16,17 @@ Expected XML: `<rate>
 end
 
 value_type(::Type{Rate}) = Float64
-value_type(::Type{Rate}, ::AbstractPNTD) = Float64
-value_type(::Type{Rate}, ::Symbol) = Float64
+value_type(::Type{Rate}, ::Any) = Float64
 Base.eltype(::Rate) = value_type(Rate)
 Base.eltype(::Type{Rate}) = value_type(Rate)
 term(r::Rate) = r.term
 sortref(r::Rate) = expr_sortref(term(r), r.net)::SortRef
 value(r::Rate) = r()
 
-@memoize Dict function evaluate(rate::Rate, varsub)
+#todo @memoize Dict function evaluate(rate::Rate, varsub)
+function (rate::Rate)(varsub::NamedTuple=NamedTuple())
     eval(toexpr(term(rate), varsub, rate.net))::value_type(Rate)
 end
-
-function (rate::Rate)(varsub::NamedTuple=NamedTuple())
-    evaluate(rate, varsub)::value_type(Rate)
-end
-
 
 function Base.show(io::IO, r::Rate)
     print(io, "Rate(", r.term, ", ", repr(r.graphics),  ", ", repr(r.toolspecinfos), ")")

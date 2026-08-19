@@ -18,7 +18,7 @@ function flatten_pages!(net::AbstractPnmlNet; trim::Bool = true, verbose::Bool =
         pageids = keys(pagedict(net))
 
         # Choose the surviving page from those owned directly by net.
-        key1 = first(page_idset(net))
+        key1 = first(page_idsets(net)  )
         val1 = pagedict(net)[key1]
         delete!(pagedict(net), key1)
         @assert key1 ∉ pageids # Note the coupling of pageids and net.pagedict.
@@ -27,14 +27,14 @@ function flatten_pages!(net::AbstractPnmlNet; trim::Bool = true, verbose::Bool =
             cutid, cutpage = popfirst!(pagedict(net))
             @assert cutid ∉ pageids
             append_page!(val1, cutpage; verbose)
-            delete!(page_idset(net), cutid) # Remove from set of page ids owned by net.
+            delete!(net.page_idset, cutid) # Remove from set of page ids owned by net.
         end
         @assert isempty(pagedict(net))
 
         # Put the one-true-page back in the dictionary.
         pagedict(net)[key1] = val1
 
-        @assert key1 ∈ page_idset(net) # We never removed the one-true key.
+        @assert key1 ∈ page_idsets(net) # We never removed the one-true key.
         @assert key1 ∈ pageids # Note the coupling of pageids and net.pagedict.
 
         deref!(net; trim, verbose)
@@ -49,13 +49,13 @@ function post_flatten_verify(net::AbstractPnmlNet, verbose::Bool = CONFIG.verbos
 
     npages(net) == 1 ||
         push!(errors, "wrong pagedict length: expected 1 found $(npages(net)))")
-    @assert npages(net) == length(page_idset(net))
+    @assert npages(net) == length(page_idsets(net))
 
     nrefplaces(net) == 0 || push!(errors, "refplacedict not empty")
-    isempty(refplace_idset(net)) || push!(errors, "refplace_idset not empty")
+    isempty(refplace_idsets(net)) || push!(errors, "refplace_idset not empty")
 
     nreftransitions(net) == 0 || push!(errors, "reftransitiondict not empty")
-    isempty(reftransition_idset(net)) || push!(errors, "reftransition_idset not empty")
+    isempty(reftransition_idsets(net)) || push!(errors, "reftransition_idset not empty")
 
     isempty(errors) ||
         error("net $(pid(net)) post flatten errors: ", join(errors, ",\n "))
@@ -71,8 +71,8 @@ The idsets hold pnml IDs of per-net data "owned" by some page.
 """
 function append_page!(lpage::Page, rpage::Page;
             keys = (:toolspecinfos,), # non-idset and non-dict fields of page to merge
-            idsets = (place_idset, transition_idset, arc_idset,# except for page_idset
-                      refplace_idset, reftransition_idset,),
+            idsets = (place_idsets, transition_idsets, arc_idsets,# except for page_idsets
+                      refplace_idsets, reftransition_idsets,),
             verbose::Bool = CONFIG.verbose)
     verbose && println("## append_page!($(pid(lpage)), $(pid(rpage))")
     for k in keys
@@ -89,8 +89,8 @@ function append_page!(lpage::Page, rpage::Page;
         union!(s(lpage), s(rpage))
     end
 
-    delete!(page_idset(lpage), pid(rpage))
-    @assert pid(rpage) ∉ page_idset(lpage)
+    delete!(page_idsets(lpage), pid(rpage))
+    @assert pid(rpage) ∉ page_idsets(lpage)
     #~ ensure empty page garbage collected?
 
     return lpage
@@ -136,24 +136,24 @@ function deref!(net::AbstractPnmlNet; trim::Bool = true, verbose::Bool = CONFIG.
     end
     isempty(arcdict(net)) && error("no arcs")
 
-    for arc in arcs(net)
-        while arc.source[] ∈ refplace_idset(net)
+    for arc::Arc in arcs(net)
+        while arc.source[] ∈ refplace_idsets(net)
             arc.source[] = deref_place(net, arc.source[]; trim)
         end
-        while arc.target[] ∈ refplace_idset(net)
+        while arc.target[] ∈ refplace_idsets(net)
             arc.target[] = deref_place(net, arc.target[]; trim)
         end
-        while arc.source[] ∈ reftransition_idset(net)
+        while arc.source[] ∈ reftransition_idsets(net)
             arc.source[] = deref_transition(net, arc.source[]; trim)
         end
-        while arc.target[] ∈ reftransition_idset(net)
+        while arc.target[] ∈ reftransition_idsets(net)
             arc.target[] = deref_transition(net, arc.target[]; trim)
         end
     end
     if trim
         # Remove any reference node idsets from the only remaining page after flattening.
-        empty!(refplace_idset(firstpage(net)))
-        empty!(reftransition_idset(firstpage(net)))
+        empty!(refplace_idsets(firstpage(net)))
+        empty!(reftransition_idsets(firstpage(net)))
         # And the nodes themselves.
         empty!(refplacedict(net))
         empty!(reftransitiondict(net))

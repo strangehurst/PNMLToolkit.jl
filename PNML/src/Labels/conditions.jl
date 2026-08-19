@@ -27,8 +27,8 @@ Condition(text::AbstractString, expr::BooleanEx, net::AbstractPnmlNet) =
 
 Base.eltype(::Condition) = Bool
 Base.eltype(::Type{<:Condition}) = Bool
-value_type(::Type{<:Condition}, ::AbstractPNTD) = eltype(BoolSort)
-value_type(::Type{<:Condition}, ::Symbol) = eltype(BoolSort)
+value_type(::Type{<:Condition}) = eltype(BoolSort)
+value_type(::Type{<:Condition}, ::Any) = eltype(BoolSort)
 
 #! Term may be non-ground and need arguments:
 #! pnml variable expressions that reference a marking's value?
@@ -51,15 +51,12 @@ Use `args`, a dictionary of variable substitutions into the expression to return
     return cond_implementation(c, varsub)
 end
 
-@memoize Dict function evaluate(c::Condition, varsub)::eltype(c)
-    eval(toexpr(term(c), varsub, c.net))::eltype(c) # Bool isa Number
-end
-
 # color function?
+#todo @memoize Dict function evaluate(c::Condition, varsub)::eltype(c)
 function cond_implementation(c::Condition, varsub::NamedTuple)
     # BooleanEx is a literal. AbstractBoolExpr <: PnmlExpr can be non-literal (non-ground term).
     isa(term(c), BooleanEx) || @warn term(c) varsub  #! debug
-    evaluate(c, varsub)
+    eval(toexpr(term(c), varsub, c.net))::eltype(c) # Bool isa Number
 end
 
 

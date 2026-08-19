@@ -105,9 +105,9 @@ HL Net Marking values are a ground terms of this multi-sorted algebra.
 
 Used to initialize a marking vector that will then be updated by firing a transition.
 """
-(mark::Marking)() = evaluate_mark(mark) #::value_type(Marking, pntd_of(mark.net))
+(mark::Marking)() = evaluate_mark(mark)
 @memoize function evaluate_mark(mark::Marking)
-    eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net)) #::value_type(Marking, pntd_of(mark.net))
+    eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net))
 end
 
 basis(m::Marking) = sortref(term(m))::SortRef
@@ -128,39 +128,22 @@ function Base.show(io::IO, ptm::Marking)
 end
 
 #--------------------------------------------------------------------------------------
-value_type(::Type{Marking}, net::AbstractPnmlNet) = value_type(Marking, pntd_of(net))
-
-# These are networks where the tokens have a collective identities.
-value_type(::Type{Marking}, ::AbstractPNTD) = Int #eltype(NaturalSort) #::Int
-value_type(::Type{Marking}, ::AbstractContinuousPNTD) = Float64 #eltype(RealSort) #::Float64
-
-# These are networks were the tokens have individual identities.
-# Each place may have a different sort type.
-function value_type(::Type{Marking}, pntd::AbstractHLPNTD)
-     #@outline(pntd,
-        @error("value_type(::Type{Marking}, $pntd undefined. Using DotSort.",
-                stacktrace())
-            #))
-    Bool #eltype(DotSort)
-end
-
-# PT_HLPNG is restricted to DotSort, we treat its singleton multisets as  NaturalSort.
-value_type(::Type{Marking}, ::PT_HLPNG) = eltype(NaturalSort) #::Int
-
-function value_type(::Type{Marking}, s::Symbol)
-    if s === :pnmlcore || s === :ptnet
-        return Int
-    elseif s === :continuous
-        return Float64
-    elseif s == :pt_hlpng
-        return Int
-    elseif is_highlevel(s)
-        @error("value_type(::Type{Marking}, $s undefined. Using DotSort.", stacktrace())
-        return Bool #eltype(DotSort)
-    else
-        error("not a valit PNTD symbol: $s")
-    end
-end
+# is_collective_token
+value_type(::Type{Marking}, ::Val{:pnmlcore}) = Int
+value_type(::Type{Marking}, ::Val{:ptnet}) = Int
+value_type(::Type{Marking}, ::Val{:continuous}) = Float64
+value_type(::Type{Marking}, ::Val{:pt_hlpng}) = Int
+# For rest of is_highlevel is_individual_token is true.
+# Each place and adjacent arcs' inscriptions have the same basis sort (SortType label).
+# Any basis sort except MultisetSort.
+value_type(::Type{Marking}, ::Val{:hlcore}) = Any
+value_type(::Type{Marking}, ::Val{:hlnet}) = Any
+value_type(::Type{Marking}, ::Val{:symmetric}) = Any
+# Place markings are bags over a basis sort.
+# Place's SortType label wraps that basis sort.
+# Each place has a SortType refering to any non-multiset sort in net's DeclDicts.
+# Symmetric nets restricted to finite sorts. Enumerations, integer ranges.ArcType
+# High level adds sorts of integer, string, list, arbitrary.
 
 #~ Note the close relation of marking value_type to inscription value_type.
 #~ Inscription values are non-zero while marking values may be zero.

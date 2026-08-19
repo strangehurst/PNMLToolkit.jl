@@ -22,8 +22,7 @@ coordinate_type(::Symbol) = Coordinate
 
 Base.eltype(::Coordinate) = Float32
 Base.eltype(::Type{Coordinate}) = Float32
-value_type(::Type{Coordinate}, ::AbstractPNTD) = eltype(Coordinate)
-value_type(::Type{Coordinate}, ::Symbol) = eltype(Coordinate)
+value_type(::Type{Coordinate}, ::Any) = eltype(Coordinate)
 value_type(::Type{Coordinate}) = eltype(Coordinate)
 
 x(c::Coordinate) = c.x_

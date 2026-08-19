@@ -72,7 +72,7 @@ function enabled(net::AbstractPnmlNet, marking)
     enabled_dict = OrderedDict{Symbol, Bool}(id=>true for id in PNML.transitionids(net))
 
     # dictionary with key of place id, value of its marking value (from marking vector)
-    mark_dict = OrderedDict{Symbol, value_type(Marking, net)}(labeled_places(net, marking))
+    mark_dict = OrderedDict{Symbol, value_type(Marking, Val(pntdsym(net)))}(labeled_places(net, marking))
 
    for tr in transitions(net)
         transition_id = pid(tr)
@@ -219,7 +219,7 @@ end
 function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc, _, _, _) where {T <: PNMLVariant}
     # evaluate condition expression
     eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-    inscription_val = inscription_value(a, NamedTuple()) # Number:: value_type(Inscription)
+    inscription_val = inscription_value(a, NamedTuple())
     return mark >= inscription_val
  end
 
