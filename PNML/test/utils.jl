@@ -13,10 +13,10 @@ using .TestUtils
 @testset "CONFIG" begin
     @show PNML.CONFIG
     #@SciMLMessage  repr(PNML.CONFIG) PNML.verbose :information :options
+    @show collect(PnmlTypes.core_nettypes())
     @show collect(PnmlTypes.all_nettypes())
     @show collect(PnmlTypes.all_nettypes(is_highlevel))
     @show collect(PnmlTypes.all_nettypes(!is_highlevel))
-    @show collect(PnmlTypes.core_nettypes())
     @show collect(PnmlTypes.all_nettypes(is_discrete))
     @show collect(PnmlTypes.all_nettypes(!is_discrete))
     @show collect(PnmlTypes.all_nettypes(is_continuous))
@@ -26,6 +26,41 @@ using .TestUtils
     @show collect(PnmlTypes.all_nettypes(is_individual_token))
     @show collect(PnmlTypes.all_nettypes(!is_individual_token))
 end
+
+@testset "pntdsym pntd" for pntd in PnmlTypes.all_nettypes()
+    let v = Val(pntd)
+        @show v
+        for pred in (is_discrete, is_continuous, is_highlevel, is_individual_token, is_collective_token)
+            @test pred(v) isa Bool
+            @test_call pred(Val(pntd))
+            @test_opt pred(Val(pntd))
+        end
+    end
+    for pred in (is_individual_token, is_collective_token)
+        @test pred(pntd) isa Bool
+        @test_call pred(pntd)
+        #@test_opt pred(pntd)
+    end
+end
+# @testset "add_nettype" begin
+#     f=nothing # JETLS is confused
+#     add_type! = PnmlTypes.add_nettype!
+#     typemap   = PnmlTypes.pnmltype_map
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pnmlcore, :pnmlcore)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlcore, :hlcore)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :ptnet, :ptnet)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlnet, :hlpng)
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pt_hlpng, PT_HLPNG())
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :symmetric, SymmetricNet())
+#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :continuous, ContinuousNet())
+
+#     @test :newpntd ∉ keys(typemap)
+#     @test_logs((:info, r"adding mapping from newpntd to"),
+#          @inferred add_type!(typemap, :newpntd, :pnmlcore))
+#     @test :newpntd in keys(typemap)
+#     @test typemap[:newpntd] === PnmlCoreNet()
+#     @show collect(PnmlTypes.all_nettypes())
+# end
 
 @testset "ExXML" begin
     @test_throws ArgumentError xml""
@@ -83,39 +118,6 @@ end
     #println("value_type(Rate, $pntd) = ", r)
     @test r == eltype(RealSort) == Float64
 end
-@testset "pntdsym pntd" for pntd in PnmlTypes.all_nettypes()
-    v = Val(pntd)
-    for pred in (is_discrete, is_continuous, is_highlevel, is_individual_token, is_collective_token)
-        @test pred(v) isa Bool
-        @test_call pred(Val(pntd))
-        @test_opt pred(Val(pntd))
-    end
-    for pred in (is_individual_token, is_collective_token)
-        @test pred(pntd) isa Bool
-        @test_call pred(pntd)
-        #@test_opt pred(pntd)
-    end
-end
-# @testset "add_nettype" begin
-#     f=nothing # JETLS is confused
-#     add_type! = PnmlTypes.add_nettype!
-#     typemap   = PnmlTypes.pnmltype_map
-#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pnmlcore, :pnmlcore)
-#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlcore, :hlcore)
-#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :ptnet, :ptnet)
-#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :hlnet, :hlpng)
-#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :pt_hlpng, PT_HLPNG())
-#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :symmetric, SymmetricNet())
-#     @test_logs (:info, r"^updating mapping") @inferred add_type!(typemap, :continuous, ContinuousNet())
-
-#     @test :newpntd ∉ keys(typemap)
-#     @test_logs((:info, r"adding mapping from newpntd to"),
-#          @inferred add_type!(typemap, :newpntd, :pnmlcore))
-#     @test :newpntd in keys(typemap)
-#     @test typemap[:newpntd] === PnmlCoreNet()
-#     @show collect(PnmlTypes.all_nettypes())
-# end
-
 @testset "sortref" begin
     @test @inferred(sortref(1)) == @inferred NamedSortRef(:integer)
     @test @inferred(sortref(0x1)) == @inferred NamedSortRef(:natural)

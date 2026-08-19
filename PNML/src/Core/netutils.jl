@@ -88,37 +88,40 @@ Return matrix of proper type and shape, fill using `input_matrix!`
 function input_matrix end
 
 function input_matrix(net::PnmlNet{T}) where {T <: PNMLVariant}
-    ivt = value_type(Inscription, pntd_of(net))
+    ivt = value_type(Inscription, Val(pntdsym(net)))
     imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return input_matrix!(imatrix, net)
 end
-function input_matrix(net::PnmlNet{HighLevelPNML})
-    if net.type === :pt_hlpng
-        # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-        ivt = Int
-        imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-        return input_matrix!(imatrix, net)
-    else
-        ivt = value_type(Inscription, pntd_of(net))
-        imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-        return input_matrix!(imatrix, net)
-    end
-end
+# function input_matrix(net::PnmlNet{HighLevelPNML})
+#     if net.type === :pt_hlpng
+#         # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
+#         ivt = Int
+#         imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+#         return input_matrix!(imatrix, net)
+#     else
+#         ivt = value_type(Inscription, Val(pntdsym(net)))
+#         imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+#         return input_matrix!(imatrix, net)
+#     end
+# end
 
 """
     input_matrix!(imatrix, net::AbstractPnmlNet)
 """
-function input_matrix!(imatrix, net::AbstractPnmlNet)
+function input_matrix!(imatrix::Matrix{T}, net::AbstractPnmlNet) where T
     varsub = NamedTuple()  #todo! add Symmetric and HL support
-    for (p, place_id) in enumerate(place_idset(net))
-        for (t, transition_id) in enumerate(transition_idset(net))
+    for (p, place_id) in enumerate(place_idsets(net))
+        for (t, transition_id) in enumerate(transition_idsets(net))
             a = arc(net, place_id, transition_id)::Maybe{Arc}
             val = if isnothing(a)
-                zero_marking(place(net, place_id)) # 0 or empty multiset similar to placetype
+                dot2int(pntd_of(net), zero_marking(place(net, place_id)))
             else
                 inscription_value(a, varsub)
             end
-            imatrix[t, p] = dot2int(pntd_of(net), val)
+            val = convert(T, val)
+            val isa T ||
+                @warn("val $val type $(typeof(val)) is not $T")
+            imatrix[t, p] = val #dot2int(pntd_of(net), val)
         end
     end
     return imatrix
@@ -131,45 +134,43 @@ Return matrix of proper type and shape, fill using `output_matrix!`
 """
 function output_matrix end
 function output_matrix(net::PnmlNet{T}) where {T <: PNMLVariant}
-    ivt = value_type(Inscription, pntd_of(net))
-    omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+    valT = value_type(Inscription, Val(pntdsym(net)))
+    omatrix = Matrix{valT}(undef, ntransitions(net), nplaces(net))
     return output_matrix!(omatrix, net)
 end
-function output_matrix(net::PnmlNet{HighLevelPNML})
-    if net.type === :pt_hlpng
-        # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
-        ivt = Int
-        omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-        return output_matrix!(omatrix, net)
-    else
-        ivt = value_type(Inscription, pntd_of(net))
-        omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
-        return output_matrix!(omatrix, net)
-    end
-end
+# function output_matrix(net::PnmlNet{HighLevelPNML})
+#     if net.type === :pt_hlpng
+#         # PT_HLPNG will convert multiset of DotConstant to cardinality (an integer value).
+#         ivt = Int
+#         omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+#         return output_matrix!(omatrix, net)
+#     else
+#         ivt = value_type(Inscription, pntd_of(net))
+#         omatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
+#         return output_matrix!(omatrix, net)
+#     end
+# end
 
-function output_matrix!(omatrix, net::AbstractPnmlNet)
+function output_matrix!(omatrix::Matrix{T}, net::AbstractPnmlNet) where T
     varsub = NamedTuple() #todo! add Symmetric and HL support, variables
-    for (p, place_id) in enumerate(place_idset(net))
-        for (t, transition_id) in enumerate(transition_idset(net))
+    for (p, place_id) in enumerate(place_idsets(net))
+        for (t, transition_id) in enumerate(transition_idsets(net))
             a = arc(net, transition_id, place_id)::Maybe{Arc}
             val = if isnothing(a)
                 z = zero_marking(place(net, place_id))
-                if pntd_of(net) isa PT_HLPNG
-                    @assert dot2int(pntd_of(net), z) == 0
-                end
-                z
+                dot2int(pntd_of(net), z)
             else
                 inscription_value(a, varsub)
             end
-            #@show typeof(omatrix) typeof(val)
-            omatrix[t, p] = dot2int(pntd_of(net), val)
+            val = convert(T, val)
+            val isa T ||
+                @warn("val $val type $(typeof(val)) is not $T")
+            omatrix[t, p] = val
         end
     end
     return omatrix
 end
 dot2int(::PT_HLPNG, v) = cardinality(v)
-dot2int(::AbstractHLPNTD, v) = v
 dot2int(::AbstractPNTD, v) = v
 
 "backward (input) incidence matrix element"
@@ -229,14 +230,16 @@ Other HL Nets use multisets.
 """
 function initial_markings end
 
-function initial_markings(net::PnmlNet{T}) where {T <: PNMLVariant}
-    value_type(Marking, pntd_of(net))
-    [initial_marking(p)::Number for p in PNML.places(net)]
+function initial_markings(net::PnmlNet{DiscretePNML})
+    [initial_marking(p)::value_type(Marking, Val(pntdsym(net))) for p in PNML.places(net)]
+end
+function initial_markings(net::PnmlNet{ContinuousPNML})
+    [initial_marking(p)::value_type(Marking, Val(pntdsym(net))) for p in PNML.places(net)]
 end
 function initial_markings(net::PnmlNet{HighLevelPNML})
     return if net.type === :pt_hlpng
         # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
-        [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
+        [PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
     else
         #! XXX Other HL nets need it to be treated as multiset, not simple numbers! XXX
         # Evaluate the ground term expression into a multiset.
