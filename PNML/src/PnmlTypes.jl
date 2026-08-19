@@ -411,7 +411,6 @@ Deduce `PNMLVariant`.
 """
 function pntd2variant end
 function pntd2variant(s::Symbol)
-    pntd2variant(pnmltype_map[s])
     if is_continuous(s)
         return ContinuousPNML
     elseif is_discrete(s) # || s === :pt_hlpng
@@ -422,6 +421,7 @@ function pntd2variant(s::Symbol)
         return OtherPNML
     end
 end
+
 function pntd2variant(pntd::AbstractPNTD)
     if pntd isa AbstractContinuousPNTD
         return ContinuousPNML

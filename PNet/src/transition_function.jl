@@ -14,7 +14,7 @@ function transition_function end
 
 transition_function(petrinet::AbstractPetriNet) = transition_function(pnmlnet(petrinet))
 transition_function(@nospecialize(net::AbstractPnmlNet)) =
-    [tid => in_out(net, tid) for tid in PNML.transition_idset(net)]
+    [tid => in_out(net, tid) for tid in PNML.transition_idsets(net)]
 
 """
     civ(net, arcid) -> inscription_value
@@ -24,8 +24,7 @@ Lookup the `Arc`, find its inscription's value.
 """
 function civ(@nospecialize(net::AbstractPnmlNet), arc_id::Symbol)
     a = PNML.arcdict(net)[arc_id]::Arc
-    #!dot2int(pntd_of(net), inscription_value(a, NamedTuple()))
-    dot2int(vartype(net), inscription_value(a, NamedTuple()))
+    dot2int(pntd_of(net), inscription_value(a, NamedTuple()))
 end
 
 """

@@ -12,7 +12,7 @@ import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import PNML
 import PNML: AbstractPnmlMultiset, PnmlMultiset,
     conditions, initial_markings, inscriptions, nettype, pid,
-    pnmlmodel, pntd_of, rates
+    pnmlmodel, pntd_of, rates, vartype
 
 #!import PNML.NetAPI: inscriptions
 import StructEquality: @struct_hash_equal
@@ -24,7 +24,7 @@ using LoggingExtras
 using Memoization
 using NamedTupleTools
 using PNML
-using PNML: dot2int, input_matrix, inscription, inscription_value, inscriptions, output_matrix
+using PNML: dot2int, input_matrix, inscription, inscription_value, inscriptions, output_matrix, vartype
 #!using PNML.NetAPI #! Move to here
 using PNML.Parser
 using PNML.PnmlTypes

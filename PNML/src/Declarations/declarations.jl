@@ -198,11 +198,8 @@ NamedOperator(id::Symbol, str::AbstractString, net::AbstractPnmlNet) =
 
 parameters(no::NamedOperator) = no.parameter
 
-@memoize Dict function evaluate(no::NamedOperator, vars)
-    eval(toexpr(no.def, vars, no.net))(parameters(no))
-end
-
-(no::NamedOperator)(vars) = evaluate(no, vars)
+#todo @memoize Dict function evaluate(no::NamedOperator, vars)
+(no::NamedOperator)(vars) = eval(toexpr(no.def, vars, no.net))(parameters(no))
 
 function Base.show(io::IO, op::NamedOperator)
     print(io, nameof(typeof(op)), "(", repr(op.id), ", ", repr(op.name), ", ",

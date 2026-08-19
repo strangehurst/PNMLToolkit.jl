@@ -13,7 +13,7 @@ See `toolspecific_content_fallback`.
 @struct_hash_equal struct ToolParser{T}
     toolname::String
     version::String
-    func::T # arguments (::XMLNODE, ::PnmlNet{T}) where {T}
+    func::T # callable with arguments (::XMLNODE, ::AbstractPnmlNet)
 end
 
 tag(tp::ToolParser) = name(tp::ToolParser)

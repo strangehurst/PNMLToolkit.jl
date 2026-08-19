@@ -41,17 +41,17 @@ using NamedTupleTools
 using PNML
 using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, DotConstant, FEConstant,
     LabelParser, MalformedException, Maybe, MissingIDException, PnmlMultiset, PnmlNetKeys,
-    ToolParser, XmlDictType, arbitrarysorts, arc, arc_idset, arcdict, basis, coordinate_type,
+    ToolParser, XmlDictType, arbitrarysorts, arc, arc_idsets, arcdict, basis, coordinate_type,
     decldict, feconstants, fill_builtin_enabled_filters!, fill_builtin_labelparsers!,
     fill_builtin_sorts!, fill_builtin_toolparsers!, fill_sort_tag!, has_arbitrarysort,
     has_feconstant, has_multisetsort, has_namedop, has_namedsort, has_partitionsort, has_place,
     has_productsort, is_arbitrarysort, is_inhibitor, is_multisetsort, is_namedsort,
     is_normal, is_partitionsort, is_productsort, is_read, is_reset, is_usersort,
     multisetsorts, namedoperators, namedsorts, netsets, parse, operator,
-    @outline, page_idset, pagedict, partitionsorts, pid, place, place_idset, placedict,
+    @outline, page_idsets, pagedict, partitionsorts, pid, place, place_idsets, placedict,
     pnmlmultiset, pntd_of, productsort, productsorts,
-    refplace_idset, refplacedict, reftransition_idset, reftransitiondict, registry_of,
-    to_sort, toolinfos, transition_idset, transitiondict, value_type, variabledecl,
+    refplace_idsets, refplacedict, reftransition_idsets, reftransitiondict, registry_of,
+    to_sort, toolinfos, transition_idsets, transitiondict, value_type, variabledecl,
     variabledecls, verify
 using SciMLPublic: @public
 using TermInterface

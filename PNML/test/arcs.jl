@@ -54,7 +54,7 @@ function pl_node(net::AbstractPnmlNet, netsets::PnmlNetKeys)
             """
     end
     pl = parse_place(node, net)
-    push!(place_idset(netsets), pid(pl))
+    push!(netsets.place_set, pid(pl))
     placedict(net)[pid(pl)] = pl
 end
 
@@ -63,7 +63,7 @@ end
 function tr_node(net::AbstractPnmlNet, netsets::PnmlNetKeys)
     node = xml"""<transition id="transition1" />"""
     tr = parse_transition(node, net)
-    push!(transition_idset(netsets), pid(tr))
+    push!(netsets.transition_set, pid(tr))
     transitiondict(net)[pid(tr)] = tr
 end
 

@@ -25,21 +25,21 @@ using PNML: APNTD, AbstractHLPNTD, AbstractPnmlNet, AbstractPNTD, Arc, Inscripti
     Marking, Maybe, PT_HLPNG, Place, PnmlMultiset, arc, arcdict, arcs, cardinality,
     condition, filters, initial_marking, inscription,
     is_collective_token, is_productsort, multiset, narcs, nets, nplaces, ntransitions,
-    pid, place, place_idset, places, pntd_of, rate_value, refid_of, sortref,
+    pid, place, place_idsets, places, pntd_of, rate_value, refid_of, sortref,
     source, src_arcs, target, term,
-    tgt_arcs, toexpr, transition, transition_idset, transitiondict, transitions,
+    tgt_arcs, toexpr, transition, transition_idsets, transitiondict, transitions,
     value_type, variabledecl, zero_marking
 using PNML.Declarations
 using PNML.PnmlGraphics
 using PNML.PnmlTypes
 using PNML.Sorts
 
-export conditions, dot2int, enabled, fire, fire2, incidence_matrix, initial_markings, input_matrix,
+export conditions, enabled, fire, fire2, incidence_matrix, initial_markings, input_matrix,
     inscription_value, inscriptions, metagraph, output_matrix, post, postset, pre, preset,
     rates
 
-include("netutils.jl")
-include("enabling_rule.jl")
+#include("netutils.jl")
+#include("enabling_rule.jl")
 include("firing_rule.jl")
 include("metagraph.jl")
 

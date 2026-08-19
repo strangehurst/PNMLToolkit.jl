@@ -38,16 +38,17 @@ function inscription_value end
 function inscription_value(a::Arc, varsub)
     inscription_value(pntd_of(a.net), a, varsub)
 end
-
+# DiscretePNML || ContinupusPNML
 function inscription_value(::AbstractPNTD, a::Arc, varsub)
     return eval(toexpr(term(inscription(a)), varsub, a.net))
 end
-
+# :pt_hlpng
 function inscription_value(::PT_HLPNG, a::Arc, varsub)
     #! @show a inscription(a) term(inscription(a))
     val = eval(toexpr(term(inscription(a)), varsub, a.net))
     return cardinality(val)
 end
+# HighLevelPNML
 function inscription_value(::AbstractHLPNTD, a::Arc, varsub)
     val = eval(toexpr(term(inscription(a)), varsub, a.net))
     return cardinality(val)

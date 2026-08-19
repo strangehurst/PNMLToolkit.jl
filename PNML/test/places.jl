@@ -23,9 +23,8 @@ using .TestUtils
 
     placetype = SortType("XXX", NamedSortRef(:natural), net)
 
-    place  = parse_place(node, net)::Place
-    # pntd isa PnmlCoreNet &&
-    #     @test_opt target_modules=t_modules broken=false parse_place(node, net)
+    place = parse_place(node, net)
+    # @test_opt target_modules=t_modules broken=false parse_place(node, net)
     @test_call target_modules=t_modules broken=true parse_place(node, net)
     @test @inferred(pid(place)) === :place1
     @test @inferred(name(place)) == "with text"
@@ -54,13 +53,12 @@ end
     """
     net = make_net(pntd, :hl_place_net)
 
-    place = parse_place(node, net)::Place
+    place = parse_place(node, net)
     #!@test_call target_modules=t_modules parse_place(node, net)
 
     @test @inferred(pid(place)) === :place1
     @test @inferred(name(place)) == "with text"
     @test_call target_modules=t_modules initial_marking(place)
-    @show pntd, initial_marking(place) PNML.cardinality(initial_marking(place)::PnmlMultiset)
     @test PNML.cardinality(initial_marking(place)::PnmlMultiset) == 101
     @test get_label(place, :nosuchlabel) === nothing
 end
@@ -87,7 +85,7 @@ end
     net = make_net(pntd, :place_unknown_label)
     place = @test_logs((:info, "add PnmlLabel :somelabel1 to :place1"),
                        (:info, "add PnmlLabel :somelabel2 to :place1"),
-                       parse_place(node, net)::Place)
+                       parse_place(node, net))
     @test pid(place) === :place1
     @test name(place) == ""
     @test get_label(place, :nosuchlabel) === nothing
@@ -111,7 +109,7 @@ end
     </referencePlace>"""
 
     net = make_net(pntd, :refplace_net)
-    place = parse_refPlace(node, net)::RefPlace
+    place = parse_refPlace(node, net)
     @test pid(place) === :rp1
     @test PNML.refid_of(place) === :p1
     @test get_label(place, :nosuchlabel) === nothing
@@ -130,7 +128,7 @@ end
 
     net = make_net(pntd, :refplace_extra_net)
     place = @test_logs((:info, "add PnmlLabel :somelabel2 to :rp1"),
-            parse_refPlace(node, net)::RefPlace)
+            parse_refPlace(node, net))
     @test pid(place) === :rp1
     @test PNML.refid_of(place) === :p1
     @test elements(PNML.extralabels(place)[:somelabel2])[:c] == "value"
