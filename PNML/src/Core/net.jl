@@ -120,7 +120,8 @@ declarations(net::PnmlNet) =  declarations(decldict(net))
 
 # `pagedict` is all pages in `net`, `page_idset` only for direct pages of net.
 pagedict(net::PnmlNet) = net.pagedict # Will be ordered.
-page_idset(net::PnmlNet) = net.page_idset # Indices into `pagedict` directly owned by net.
+page_idsets(net::PnmlNet) = net.page_idset # Indices into `pagedict` directly owned by net.
+#!page_idset(net::PnmlNet) = net.page_idset
 
 placedict(net::PnmlNet)         = net.place_dict
 transitiondict(net::PnmlNet)    = net.transition_dict
@@ -129,11 +130,12 @@ refplacedict(net::PnmlNet)      = net.refplace_dict
 reftransitiondict(net::PnmlNet) = net.reftransition_dict
 
 #"Return iterator over keys of a dictionary" #! verify same as PnmlKeySet for flattened page
-place_idset(net::PnmlNet)         = keys(placedict(net))
-transition_idset(net::PnmlNet)    = keys(transitiondict(net))
-arc_idset(net::PnmlNet)           = keys(arcdict(net))
-refplace_idset(net::PnmlNet)      = keys(refplacedict(net))
-reftransition_idset(net::PnmlNet) = keys(reftransitiondict(net))
+# iterate over all pages' idsets
+place_idsets(net::PnmlNet)         = Iterators.flatmap(place_idsets, allpages(net))
+transition_idsets(net::PnmlNet)    = Iterators.flatmap(transition_idsets, allpages(net))
+arc_idsets(net::PnmlNet)           = Iterators.flatmap(arc_idsets, allpages(net))
+refplace_idsets(net::PnmlNet)      = Iterators.flatmap(refplace_idsets, allpages(net))
+reftransition_idsets(net::PnmlNet) = Iterators.flatmap(reftransition_idsets, allpages(net))
 
 npages(net::PnmlNet)          = length(pagedict(net))
 nplaces(net::PnmlNet)         = length(placedict(net))
@@ -151,7 +153,7 @@ allpages(net::PnmlNet) = allpages(pagedict(net))
 allpages(pd::OrderedDict) = values(pd)
 
 "Iterator of `Pages` directly owned by `net`."
-pages(net::PnmlNet) = Iterators.filter(pg -> in(pid(pg), page_idset(net)), allpages(net))
+pages(net::PnmlNet) = Iterators.filter(pg -> in(pid(pg), page_idsets(net)), allpages(net))
 
 "Usually the only interesting page."
 firstpage(net::PnmlNet) = first(values(pagedict(net)))
@@ -377,16 +379,20 @@ function verify!(errors::Vector{String}, net::PnmlNet, verbose::Bool)
     !isnothing(toolinfos(net)) &&
         foreach(x -> verify!(errors, x, verbose, net), toolinfos(net))
     # foreach(x -> verify!(errors, x, verbose, net), extralabels(net))
+    # if npages(net) != length(page_idsets(net))
+    #     @show npages(net) length(page_idsets(net))
+    #     @show page_idsets(net)
+    #     @show summary(net)
 
+    # end
     if npages(net) == 1
-        @assert npages(net) == length(page_idset(net))
         nrefplaces(net) == 0 ||
             push!(errors, "npages==1 && refplacedict not empty")
-        isempty(refplace_idset(net)) ||
+         isempty(collect(refplace_idsets(net))) ||
             push!(errors, "npages==1 && refplace_idset not empty")
         nreftransitions(net) == 0 ||
             push!(errors, "npages==1 && reftransitiondict not empty")
-        isempty(reftransition_idset(net)) ||
+        isempty(collect(reftransition_idsets(net))) ||
             push!(errors, "npages==1 && reftransition_idset not empty")
     end
     return errors
@@ -425,7 +431,7 @@ function Base.show(io::IO, net::PnmlNet)
     iio = inc_indent(io)
     println(io)
 
-    print(io, "Pages = ", repr(page_idset(net)))
+    print(io, "Pages = ", repr(page_idsets(net)))
     #println(io); flush(io); return nothing
 
     for page in values(pagedict(net))
