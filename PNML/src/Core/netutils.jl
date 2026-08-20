@@ -110,8 +110,8 @@ end
 """
 function input_matrix!(imatrix::Matrix{T}, net::AbstractPnmlNet) where T
     varsub = NamedTuple()  #todo! add Symmetric and HL support
-    for (p, place_id) in enumerate(place_idsets(net))
-        for (t, transition_id) in enumerate(transition_idsets(net))
+    for (p, place_id) in enumerate(place_ids(net))
+        for (t, transition_id) in enumerate(transition_ids(net))
             a = arc(net, place_id, transition_id)::Maybe{Arc}
             val = if isnothing(a)
                 dot2int(pntd_of(net), zero_marking(place(net, place_id)))
@@ -153,8 +153,8 @@ end
 
 function output_matrix!(omatrix::Matrix{T}, net::AbstractPnmlNet) where T
     varsub = NamedTuple() #todo! add Symmetric and HL support, variables
-    for (p, place_id) in enumerate(place_idsets(net))
-        for (t, transition_id) in enumerate(transition_idsets(net))
+    for (p, place_id) in enumerate(place_ids(net))
+        for (t, transition_id) in enumerate(transition_ids(net))
             a = arc(net, transition_id, place_id)::Maybe{Arc}
             val = if isnothing(a)
                 z = zero_marking(place(net, place_id))

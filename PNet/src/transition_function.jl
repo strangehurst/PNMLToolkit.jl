@@ -14,7 +14,7 @@ function transition_function end
 
 transition_function(petrinet::AbstractPetriNet) = transition_function(pnmlnet(petrinet))
 transition_function(@nospecialize(net::AbstractPnmlNet)) =
-    [tid => in_out(net, tid) for tid in PNML.transition_idsets(net)]
+    [tid => in_out(net, tid) for tid in PNML.transition_ids(net)]
 
 """
     civ(net, arcid) -> inscription_value

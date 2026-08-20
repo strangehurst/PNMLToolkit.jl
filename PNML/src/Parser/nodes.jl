@@ -17,7 +17,7 @@ function parse_place!(netsets, node, net::AbstractPnmlNet)
     #@show valtype(placedict(net)) typeof(placedict(net))
     push!(netsets.place_set, pid(pl))
     placedict(net)[pid(pl)] = pl
-    return place_idsets(netsets) #place_set
+    #return place_idset(netsets) #place_set
 end
 
 "Fill transition_idset, transitiondict."
@@ -25,7 +25,7 @@ function parse_transition!(netsets, node, net::AbstractPnmlNet)
     tr = parse_transition(node, net)::valtype(transitiondict(net))
     push!(netsets.transition_set, pid(tr))
     transitiondict(net)[pid(tr)] = tr
-    return transition_idsets(netsets)
+    #return transition_idset(netsets)
 end
 
 "Fill arc_idset, arcdict."
@@ -35,7 +35,7 @@ function parse_arc!(netsets, node, net::AbstractPnmlNet)
         @error("$(typeof(a)) not a $(valtype(arcdict(net)))) $(pntd_of(net)) $(repr(a))")
     push!(netsets.arc_set, pid(a))
     arcdict(net)[pid(a)] = a
-    return arc_idsets(netsets)
+    #return arc_idset(netsets)
 end
 
 "Fill refplace_idset, refplacedict."
@@ -43,7 +43,7 @@ function parse_refPlace!(netsets, node, net::AbstractPnmlNet)
     rp = parse_refPlace(node, net)::valtype(refplacedict(net))
     push!(netsets.refplace_set, pid(rp))
     refplacedict(net)[pid(rp)] = rp
-    return refplace_idsets(netsets)
+    #return refplace_idset(netsets)
 end
 
 "Fill reftransition_idset, reftransitiondict."
@@ -51,7 +51,7 @@ function parse_refTransition!(netsets, node, net::AbstractPnmlNet)
     rt = parse_refTransition(node, net)::valtype(reftransitiondict(net))
     push!(netsets.reftransition_set, pid(rt))
     reftransitiondict(net)[pid(rt)] = rt
-    return reftransition_idsets(netsets)
+    #return reftransition_idset(netsets)
 end
 
 """

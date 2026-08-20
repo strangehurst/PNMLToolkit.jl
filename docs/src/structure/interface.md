@@ -265,7 +265,7 @@ Better to iterate than allocate. Using a set abstraction that iterates consisten
 | Object       | Synopsis                     | Comment                              |
 |:-------------|:-----------------------------|:-------------------------------------|
 | PnmlNet      | `keys(placedict(net))`       | Iterates OrderedDict keys |
-| Page         | `place_idsets(netsets(page))` | Iterates OrderedSet |
+| Page         | `place_idset(netsets(page))` | Iterates OrderedSet |
 | PnmlNetKeys  | `OrderedSet` | Iterates OrderedSet |
 
 Both iterate over REFIDs that are indices into dictionaries.,
@@ -277,7 +277,7 @@ For the foreseeable future, there will be little use of multi-page APIs.
 It is expected that flattened PNML nets will be the fully supported,
 tested, thought-through API.
 
-The discussion using place\_idset also applies to other \*_idsets.
+The discussion using place\_idset also applies to other \*_idset.
 
 [`PNML.place_idset`](@ref)
 ```@example methods

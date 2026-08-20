@@ -120,8 +120,7 @@ declarations(net::PnmlNet) =  declarations(decldict(net))
 
 # `pagedict` is all pages in `net`, `page_idset` only for direct pages of net.
 pagedict(net::PnmlNet) = net.pagedict # Will be ordered.
-page_idsets(net::PnmlNet) = net.page_idset # Indices into `pagedict` directly owned by net.
-#!page_idset(net::PnmlNet) = net.page_idset
+page_idset(net::PnmlNet) = net.page_idset
 
 placedict(net::PnmlNet)         = net.place_dict
 transitiondict(net::PnmlNet)    = net.transition_dict
@@ -131,11 +130,11 @@ reftransitiondict(net::PnmlNet) = net.reftransition_dict
 
 #"Return iterator over keys of a dictionary" #! verify same as PnmlKeySet for flattened page
 # iterate over all pages' idsets
-place_idsets(net::PnmlNet)         = Iterators.flatmap(place_idsets, allpages(net))
-transition_idsets(net::PnmlNet)    = Iterators.flatmap(transition_idsets, allpages(net))
-arc_idsets(net::PnmlNet)           = Iterators.flatmap(arc_idsets, allpages(net))
-refplace_idsets(net::PnmlNet)      = Iterators.flatmap(refplace_idsets, allpages(net))
-reftransition_idsets(net::PnmlNet) = Iterators.flatmap(reftransition_idsets, allpages(net))
+# place_idset(net::PnmlNet)         = net.place_idset #Iterators.map(place_idset, allpages(net))
+# transition_idset(net::PnmlNet)    = net.transition_idset #Iterators.map(transition_idset, allpages(net))
+# arc_idset(net::PnmlNet)           = net.arc_idset #Iterators.map(arc_idset, allpages(net))
+# refplace_idset(net::PnmlNet)      = net.refplace_idset #Iterators.map(refplace_idset, allpages(net))
+# reftransition_idset(net::PnmlNet) = net.reftransition_idset #Iterators.map(reftransition_idset, allpages(net))
 
 npages(net::PnmlNet)          = length(pagedict(net))
 nplaces(net::PnmlNet)         = length(placedict(net))
@@ -153,7 +152,7 @@ allpages(net::PnmlNet) = allpages(pagedict(net))
 allpages(pd::OrderedDict) = values(pd)
 
 "Iterator of `Pages` directly owned by `net`."
-pages(net::PnmlNet) = Iterators.filter(pg -> in(pid(pg), page_idsets(net)), allpages(net))
+pages(net::PnmlNet) = Iterators.map(pg -> pagedict(net)[pg], page_idset(net))
 
 "Usually the only interesting page."
 firstpage(net::PnmlNet) = first(values(pagedict(net)))
@@ -167,17 +166,19 @@ has_reftransition(net::PnmlNet, id::Symbol) = haskey(reftransitiondict(net), id)
 
 toolinfos(net::PnmlNet) = net.toolspecinfos
 
+# Return iterator of dictionary values.
 places(net::PnmlNet)         = values(placedict(net))
 transitions(net::PnmlNet)    = values(transitiondict(net))
 arcs(net::PnmlNet)           = values(arcdict(net))
 refplaces(net::PnmlNet)      = values(refplacedict(net))
 reftransitions(net::PnmlNet) = values(reftransitiondict(net))
 
-placeids(net::PnmlNet)         = keys(placedict(net))
-transitionids(net::PnmlNet)    = keys(transitiondict(net))
-arcids(net::PnmlNet)           = keys(arcdict(net))
-refplaceids(net::PnmlNet)      = keys(refplacedict(net))
-reftransitionids(net::PnmlNet) = keys(reftransitiondict(net))
+# Return iterator of dictionary keys.
+place_ids(net::PnmlNet)         = keys(placedict(net))
+transition_ids(net::PnmlNet)    = keys(transitiondict(net))
+arc_ids(net::PnmlNet)           = keys(arcdict(net))
+refplace_ids(net::PnmlNet)      = keys(refplacedict(net))
+reftransition_ids(net::PnmlNet) = keys(reftransitiondict(net))
 
 place(net::PnmlNet, id::Symbol)         = placedict(net)[id]
 transition(net::PnmlNet, id::Symbol)    = transitiondict(net)[id]
@@ -378,22 +379,16 @@ function verify!(errors::Vector{String}, net::PnmlNet, verbose::Bool)
 
     !isnothing(toolinfos(net)) &&
         foreach(x -> verify!(errors, x, verbose, net), toolinfos(net))
-    # foreach(x -> verify!(errors, x, verbose, net), extralabels(net))
-    # if npages(net) != length(page_idsets(net))
-    #     @show npages(net) length(page_idsets(net))
-    #     @show page_idsets(net)
-    #     @show summary(net)
 
-    # end
     if npages(net) == 1
         nrefplaces(net) == 0 ||
             push!(errors, "npages==1 && refplacedict not empty")
-         isempty(collect(refplace_idsets(net))) ||
-            push!(errors, "npages==1 && refplace_idset not empty")
+        isempty(refplacedict(net)) ||
+            push!(errors, "npages==1 && refplacedict not empty")
         nreftransitions(net) == 0 ||
             push!(errors, "npages==1 && reftransitiondict not empty")
-        isempty(collect(reftransition_idsets(net))) ||
-            push!(errors, "npages==1 && reftransition_idset not empty")
+        isempty(reftransitiondict(net)) ||
+            push!(errors, "npages==1 && reftransitiondict not empty")
     end
     return errors
 end
@@ -431,45 +426,43 @@ function Base.show(io::IO, net::PnmlNet)
     iio = inc_indent(io)
     println(io)
 
-    print(io, "Pages = ", repr(page_idsets(net)))
-    #println(io); flush(io); return nothing
-
+    print(io, "Pages = ", collect(keys(pagedict(net))))
     for page in values(pagedict(net))
         print(iio, '\n', indent(iio))
-        show(iio, page)
+        println(iio, page)
     end
     println(io)
     println(io, "Declarations = ", repr(decldict(net)))
-    show(io, toolinfos(net)); println(io, ", ")
-    show(io, extralabels(net)); println(io, ", ")
+    println(io, toolinfos(net))
+    println(io, extralabels(net))
 
     println(io, "Arcs:")
-    map(arcs(net)) do a
+    foreach(arcs(net)) do a
         println(io, a)
     end
-    foreach(arcids(net)) do id
+    foreach(arc_ids(net)) do id
         println(io, id)
     end
     println(io, "Places:")
-    map(places(net)) do p
-        show(io, p); println(io)
+    foreach(places(net)) do p
+        println(io, p)
     end
-    foreach(placeids(net)) do p
+    foreach(place_ids(net)) do p
         show(io, p); println(io)
     end
     println(io, "Transitions:")
-    map(transitions(net)) do t
-        show(io, t); println(io)
+    foreach(transitions(net)) do t
+        println(io, t)
     end
 
     println(io, "Reference Places:")
-    map(refplaces(net)) do rp
-        show(io, rp); println(io)
+    foreach(refplaces(net)) do rp
+        println(io, rp)
     end
 
     println(io, "Reference Transitions:")
-    map(reftransitions(net)) do rt
-        show(io, rt); println(io)
+    foreach(reftransitions(net)) do rt
+        println(io, rt)
     end
 end
 

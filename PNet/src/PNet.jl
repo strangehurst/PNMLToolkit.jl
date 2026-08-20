@@ -24,7 +24,9 @@ using LoggingExtras
 using Memoization
 using NamedTupleTools
 using PNML
-using PNML: dot2int, input_matrix, inscription, inscription_value, inscriptions, output_matrix, vartype
+using PNML: dot2int, input_matrix, inscription, inscription_value, inscriptions,
+    output_matrix, vartype,
+    arc_ids, place_ids, transition_ids
 #!using PNML.NetAPI #! Move to here
 using PNML.Parser
 using PNML.PnmlTypes

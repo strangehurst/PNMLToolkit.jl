@@ -9,34 +9,32 @@ function verify_sets(net::PnmlNet)
     println("\nverify sets and structure ++++++++++++++++++++++")
     # @show net
     # @show keys(pagedict(net))
-    # @show page_idsets(net)  page_idsets(firstpage(net))
+    # @show pageids(net)  page_idset(firstpage(net))
 
-    @test page_idsets(net) isa AbstractSet
-    @test page_idsets(firstpage(net)) isa AbstractSet
-    @test !isempty(setdiff(page_idsets(net), page_idsets(firstpage(net))))
+    @test !isempty(setdiff(page_idset(net), page_idset(firstpage(net))))
 
-    # @test arc_idsets(net) isa AbstractSet
-    # @test arc_idsets(firstpage(net)) isa AbstractSet
-    # #@show arc_idsets(net) arc_idsets(firstpage(net))
-    # @test !isempty(setdiff(arc_idsets(net), arc_idsets(firstpage(net))))
+    # @test arc_ids(net) isa AbstractSet
+    # @test arc_idset(firstpage(net)) isa AbstractSet
+    # #@show arc_ids(net) arc_idset(firstpage(net))
+    # @test !isempty(setdiff(arc_ids(net), arc_idset(firstpage(net))))
 
-    # @test place_idsets(net) isa AbstractSet
-    # @test place_idsets(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(place_idsets(net), place_idsets(firstpage(net))))
+    # @test place_ids(net) isa AbstractSet
+    # @test place_idset(firstpage(net)) isa AbstractSet
+    # @test !isempty(setdiff(place_ids(net), place_idset(firstpage(net))))
 
-    # @test transition_idsets(net) isa AbstractSet
-    # @test transition_idsets(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(transition_idsets(net), transition_idsets(firstpage(net))))
+    # @test transition_ids(net) isa AbstractSet
+    # @test transition_idset(firstpage(net)) isa AbstractSet
+    # @test !isempty(setdiff(transition_ids(net), transition_idset(firstpage(net))))
 
-    # @test refplace_idsets(net) isa AbstractSet
-    # @test refplace_idsets(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(refplace_idsets(net), refplace_idsets(firstpage(net))))
+    # @test refplace_ids(net) isa AbstractSet
+    # @test refplace_idset(firstpage(net)) isa AbstractSet
+    # @test !isempty(setdiff(refplace_ids(net), refplace_idset(firstpage(net))))
 
-    # @test reftransition_idsets(net) isa AbstractSet
-    # @test reftransition_idsets(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(reftransition_idsets(net), reftransition_idsets(firstpage(net))))
+    # @test reftransition_ids(net) isa AbstractSet
+    # @test reftransition_idset(firstpage(net)) isa AbstractSet
+    # @test !isempty(setdiff(reftransition_ids(net), reftransition_idset(firstpage(net))))
 
-    for page in pages(net)
+    for page in allpages(net)
         @test pagedict(net) === pagedict(page) # There is only 1 pagedict.
     end
 
@@ -123,11 +121,11 @@ exp_transition_ids    = [:t1, :t2, :t3, :t31]
 exp_refplace_ids      = [:rp1, :rp2]
 exp_reftransition_ids = [:rt2]
 
-@test isempty(setdiff(@inferred(place_idsets(net)), exp_place_ids))
-@test isempty(setdiff(@inferred(arc_idsets(net)), exp_arc_ids))
-@test isempty(setdiff(@inferred(transition_idsets(net)), exp_transition_ids))
-@test isempty(setdiff(@inferred(refplace_idsets(net)), exp_refplace_ids))
-@test isempty(setdiff(@inferred(reftransition_idsets(net)), exp_reftransition_ids))
+@test isempty(setdiff(@inferred(PNML.place_ids(net)), exp_place_ids))
+@test isempty(setdiff(@inferred(PNML.arc_ids(net)), exp_arc_ids))
+@test isempty(setdiff(@inferred(PNML.transition_ids(net)), exp_transition_ids))
+@test isempty(setdiff(@inferred(PNML.refplace_ids(net)), exp_refplace_ids))
+@test isempty(setdiff(@inferred(PNML.reftransition_ids(net)), exp_reftransition_ids))
 
 for arcid in exp_arc_ids
     @test !isnothing(arc(net, arcid))
@@ -155,55 +153,59 @@ end
     expected_t = [:t1, :t2, :t3, :t31]
     expected_rt = [] # removed by flatten
     expected_rp = [] # removed by flatten
+    @show arc_ids(net)
+    @show arc_idset(firstpage(net))
+    @show expected_a
+    @show setdiff(arc_ids(net), expected_a)
 
-    @test isempty(setdiff(arc_idsets(net), expected_a))
-    @test isempty(setdiff(arc_idsets(firstpage(net)), expected_a))
-    @test isempty(setdiff(arc_idsets(net), arc_idsets(firstpage(net))))
-    @test_call target_modules=t_modules arc_idsets(net)
-    @test_call arc_idsets(firstpage(net))
+    @test isempty(setdiff(arc_ids(net), expected_a))
+    @test isempty(setdiff(arc_idset(firstpage(net)), expected_a))
+    @test isempty(setdiff(arc_ids(net), arc_idset(firstpage(net))))
+    @test_call target_modules=t_modules arc_ids(net)
+    @test_call arc_idset(firstpage(net))
     for a ∈ expected_a
-        @test a ∈ arc_idsets(net)
-        @test a ∈ arc_idsets(firstpage(net))
+        @test a ∈ arc_ids(net)
+        @test a ∈ arc_idset(firstpage(net))
     end
 
-    @test isempty(setdiff(place_idsets(net), expected_p))
-    @test isempty(setdiff(place_idsets(firstpage(net)), expected_p))
-    @test isempty(setdiff(place_idsets(net), place_idsets(firstpage(net))))
-    @test_call target_modules=t_modules place_idsets(net)
-    @test_call place_idsets(firstpage(net))
+    @test isempty(setdiff(place_ids(net), expected_p))
+    @test isempty(setdiff(place_idset(firstpage(net)), expected_p))
+    @test isempty(setdiff(place_ids(net), place_idset(firstpage(net))))
+    @test_call target_modules=t_modules place_ids(net)
+    @test_call place_idset(firstpage(net))
     for p ∈ expected_p
-        @test p ∈ place_idsets(net)
+        @test p ∈ place_ids(net)
     end
 
-    @test (sort ∘ collect)(transition_idsets(net)) == expected_t
-    @test (sort ∘ collect)(transition_idsets(firstpage(net))) == expected_t
-    @test (sort ∘ collect)(transition_idsets(net)) == (sort ∘ collect)(transition_idsets(firstpage(net)))
-    @test_call target_modules=t_modules transition_idsets(net)
-    @test_call transition_idsets(firstpage(net))
+    @test (sort ∘ collect)(transition_ids(net)) == expected_t
+    @test (sort ∘ collect)(transition_idset(firstpage(net))) == expected_t
+    @test (sort ∘ collect)(transition_ids(net)) == (sort ∘ collect)(transition_idset(firstpage(net)))
+    @test_call target_modules=t_modules transition_ids(net)
+    @test_call transition_idset(firstpage(net))
     for t ∈ expected_t
-        @test t ∈ transition_idsets(net)
+        @test t ∈ transition_ids(net)
     end
 
-    @test isempty(reftransition_idsets(net))
-    @test isempty(reftransition_idsets(firstpage(net)))
-    @test (sort ∘ collect)(reftransition_idsets(net)) == expected_rt
-    @test (sort ∘ collect)(reftransition_idsets(firstpage(net))) == expected_rt
-    @test (sort ∘ collect)(reftransition_idsets(net)) == (sort ∘ collect)(reftransition_idsets(firstpage(net)))
-    @test_call target_modules=t_modules reftransition_idsets(net)
-    @test_call reftransition_idsets(firstpage(net))
+    @test isempty(reftransition_ids(net))
+    @test isempty(reftransition_idset(firstpage(net)))
+    @test (sort ∘ collect)(reftransition_ids(net)) == expected_rt
+    @test (sort ∘ collect)(reftransition_idset(firstpage(net))) == expected_rt
+    @test (sort ∘ collect)(reftransition_ids(net)) == (sort ∘ collect)(reftransition_idset(firstpage(net)))
+    @test_call target_modules=t_modules reftransition_ids(net)
+    @test_call reftransition_idset(firstpage(net))
     for rt ∈ expected_rt
-        @test rt ∈ reftransition_idsets(net)
+        @test rt ∈ reftransition_ids(net)
     end
 
-    @test isempty(refplace_idsets(net))
-    @test isempty(refplace_idsets(firstpage(net)))
-    @test (sort ∘ collect)(refplace_idsets(net)) == expected_rp
-    @test (sort ∘ collect)(refplace_idsets(firstpage(net))) == expected_rp
-    @test (sort ∘ collect)(refplace_idsets(net)) == (sort ∘ collect)(refplace_idsets(firstpage(net)))
-    @test_call target_modules=t_modules refplace_idsets(net)
-    @test_call refplace_idsets(firstpage(net))
+    @test isempty(refplace_ids(net))
+    @test isempty(refplace_idset(firstpage(net)))
+    @test (sort ∘ collect)(refplace_ids(net)) == expected_rp
+    @test (sort ∘ collect)(refplace_idset(firstpage(net))) == expected_rp
+    @test (sort ∘ collect)(refplace_ids(net)) == (sort ∘ collect)(refplace_idset(firstpage(net)))
+    @test_call target_modules=t_modules refplace_ids(net)
+    @test_call refplace_idset(firstpage(net))
     for rp ∈ expected_rp
-        @test rp ∈ refplace_idsets(net)
+        @test rp ∈ refplace_ids(net)
     end
 end
 

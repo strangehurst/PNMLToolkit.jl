@@ -315,7 +315,7 @@ $(METHODLIST)
 function has_reftransition end
 
 """
-    refplace_idsets(x) -> OrderedSet{Symbol}
+    refplace_idset(x) -> OrderedSet{Symbol}
 
 Return reference place pnml ids.
 
@@ -324,7 +324,7 @@ $(METHODLIST)
 function refplace_idset end
 
 """
-    reftransition_idsets(x) -> OrderedSet{Symbol}
+    reftransition_idset(x) -> OrderedSet{Symbol}
 
 Return reference transition pnml ids.
 

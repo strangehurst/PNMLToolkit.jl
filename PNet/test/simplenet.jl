@@ -8,7 +8,7 @@ using PNML: @xml_str, Arc, Page, Place, PnmlModel, PnmlNet, Transition, arc, arc
     condition, enabled, firstpage, has_arc, has_place, has_transition, initial_marking,
     initial_markings, input_matrix, inscription, narcs, nets, nplaces, ntransitions,
     output_matrix, pages, pid, place, places, pnmlmodel, pntd_of, rates, transition,
-    transitions, xmlnode
+    transitions, xmlnode, place_ids, arc_ids, transition_ids, firstpage
 using PNet
 using PNet: metagraph, fire2
 using Test
@@ -61,62 +61,54 @@ const str1 = """
     #@test_opt target_modules=t_modules SimpleNet(model)
     @test_call broken=false SimpleNet(model)
 
-    for accessor in [PNML.place_idsets, PNML.transition_idsets, PNML.arc_idsets,
-                               PNML.reftransition_idsets, PNML.refplace_idsets]
+    for accessor in [PNML.place_ids, PNML.transition_ids, PNML.arc_ids,
+                               PNML.reftransition_ids, PNML.refplace_ids]
         #@show accessor
         @test accessor(pnmlnet(simp1)) == accessor(pnmlnet(simp))
     end
 
     @testset "inferred" begin
         # First @inferred failure throws exception ending testset.
-        @test firstpage(pnmlnet(simp)) === first(pages(pnmlnet(simp)))
-
         #@inferred places(first(pages(net.net)))
         #@inferred transitions(first(pages(net.net)))
         #@inferred arcs(first(pages(net.net)))
-
         @inferred places(net0)
         @inferred transitions(net0)
         @inferred arcs(net0)
     end
 
-    # page, pnmlnet, petrinet, the 3 top=levels
-    #@show typeof(first(pages(pnmlnet(simp)))) typeof(pnmlnet(simp)) typeof(simp)
-    @test first(pages(pnmlnet(simp))) isa Page
+    # page, pnmlnet, petrinet, the 3 pnmlnet(simp)=levels
+    @test firstpage(pnmlnet(simp)) isa Page
     @test pnmlnet(simp) isa PnmlNet
     @test simp isa AbstractPetriNet
 
-    # For a flattened net these should have the same behavior.
-    for top in [first(pages(pnmlnet(simp))), pnmlnet(simp)]
+    @test_call target_modules=t_modules places(pnmlnet(simp))
+    for placeid in PNML.place_ids(pnmlnet(simp))
+        PNML.has_place(pnmlnet(simp), placeid)
+        @test_call PNML.has_place(pnmlnet(simp), placeid)
+        @test @inferred PNML.has_place(pnmlnet(simp), placeid)
+        @inferred Union{Nothing,PNML.Place} PNML.place(pnmlnet(simp), placeid)
+    end
 
-        @test_call target_modules=t_modules places(top)
-        for placeid in PNML.place_idsets(top)
-            PNML.has_place(top, placeid)
-            @test_call PNML.has_place(top, placeid)
-            @test @inferred PNML.has_place(top, placeid)
-            p = @inferred Union{Nothing,PNML.Place} PNML.place(top, placeid)
-        end
+    @test_call target_modules=t_modules PNML.transitions(pnmlnet(simp))
+    for t in PNML.transitions(pnmlnet(simp))
+        @test PNML.ispid(pid(t))(pid(t))
+        @test_call has_transition(pnmlnet(simp), pid(t))
+        @test @inferred Union{Nothing,Bool} has_transition(pnmlnet(simp), pid(t))
+        t == @inferred Union{Nothing,Transition} transition(pnmlnet(simp), pid(t))
+        @test pid(t) === t.id
 
-        @test_call target_modules=t_modules PNML.transitions(top)
-        for t in PNML.transitions(top)
-            @test PNML.ispid(pid(t))(pid(t))
-            @test_call has_transition(top, pid(t))
-            @test @inferred Union{Nothing,Bool} has_transition(top, pid(t))
-            t == @inferred Union{Nothing,Transition} transition(top, pid(t))
-            @test pid(t) === t.id
+        @test @inferred(condition(t)()) !== nothing
+    end
 
-            @test @inferred(condition(t)()) !== nothing
-        end
-
-        @test_call target_modules=t_modules PNML.arcs(top)
-        for a in PNML.arcs(top)
-            @test @inferred Union{Nothing,Bool} has_arc(top, pid(a))
-            a == @inferred Union{Nothing,Arc} arc(top, pid(a))
-            @test pid(a) === a.id
-                        @test @inferred(PNML.source(a)) !== nothing
-            @test @inferred(PNML.target(a)) !== nothing
-            @test @inferred(Number, inscription(a)(NamedTuple())) !== nothing
-        end
+    @test_call target_modules=t_modules PNML.arcs(pnmlnet(simp))
+    for a in PNML.arcs(pnmlnet(simp))
+        @test @inferred Union{Nothing,Bool} has_arc(pnmlnet(simp), pid(a))
+        a == @inferred Union{Nothing,Arc} arc(pnmlnet(simp), pid(a))
+        @test pid(a) === a.id
+                    @test @inferred(PNML.source(a)) !== nothing
+        @test @inferred(PNML.target(a)) !== nothing
+        @test @inferred(Number, inscription(a)(NamedTuple())) !== nothing
     end
 
     # PetriNet-only methods.
@@ -190,8 +182,8 @@ end
     net1 = PNML.firstnet(model);          #@show typeof(net1)
     simp = @inferred SimpleNet(net1); #@show typeof(simp)
 
-    @show collect(PNML.place_idsets(pnmlnet(simp))) # [:rabbits, :wolves]
-    @show collect(PNML.transition_idsets(pnmlnet(simp)))
+    @show collect(PNML.place_ids(pnmlnet(simp))) # [:rabbits, :wolves]
+    @show collect(PNML.transition_ids(pnmlnet(simp)))
     @show m₀ = initial_markings(pnmlnet(simp))
     @show input = input_matrix(pnmlnet(simp))
     @show output_matrix(pnmlnet(simp))

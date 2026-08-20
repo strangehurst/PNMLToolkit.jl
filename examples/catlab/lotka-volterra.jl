@@ -215,7 +215,7 @@ valueat(f::Function, u, t) = try f(u,t) catch e f(t) end
 
 # Petri.jl
 function vectorfield(m::Model)
-    S = m.S # PNML.place_idsets(net) # [:rabbits, :wolves]
+    S = m.S # PNML.place_idset(net) # [:rabbits, :wolves]
     T = m.Δ # PNML.transition_function(net)
 
 

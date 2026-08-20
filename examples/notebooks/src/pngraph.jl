@@ -66,13 +66,13 @@ xml2 = """<?xml version="1.0"?>
 net = PNML.SimpleNet(xml2)
 
 # ╔═╡ 221681e3-656d-4fa1-8425-cece133df01d
-S = PNML.place_idsets(net)
+S = PNML.place_idset(net)
 
 # ╔═╡ ccb4e098-51b1-46dd-b563-1074a7ea9d82
-T = PNML.transition_idsets(net)
+T = PNML.transition_idset(net)
 
 # ╔═╡ 9f5d18d5-f8b7-44d2-8ddf-8b38be57a0a4
-A = PNML.arc_idsets(net)
+A = PNML.arc_idset(net)
 
 # ╔═╡ f282f10d-8e6a-462e-be8a-4c072df82d0a
 # LabelledArrays when empty (dimension 0) use Union{} as the element type.

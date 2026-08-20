@@ -69,7 +69,7 @@ function enabled(net::AbstractPnmlNet, marking)
     # Start by assuming all transitions are enabled.
     # dictionary with key of transaction id, value of enabled state boolean
     #!enabled_dict = OrderedDict{Symbol, Bool}(id=>true for (id,_) in pairs(transitiondict(net)))
-    enabled_dict = OrderedDict{Symbol, Bool}(id=>true for id in PNML.transitionids(net))
+    enabled_dict = OrderedDict{Symbol, Bool}(id=>true for id in PNML.transition_ids(net))
 
     # dictionary with key of place id, value of its marking value (from marking vector)
     mark_dict = OrderedDict{Symbol, value_type(Marking, Val(pntdsym(net)))}(labeled_places(net, marking))

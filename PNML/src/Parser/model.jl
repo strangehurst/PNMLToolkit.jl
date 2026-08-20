@@ -256,7 +256,7 @@ function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) wher
             #---------------------------------------------------------------------------
             # Subpage stored at net-level with key in page's id set (until flattened).
             #---------------------------------------------------------------------------
-            parse_page!(net, page_idsets(page), child)
+            parse_page!(net, page_idset(page), child)
         elseif nname == :name
             page.namelabel = net.labelparser[nname](child, net; parentid=pageid)
         elseif nname == :graphics

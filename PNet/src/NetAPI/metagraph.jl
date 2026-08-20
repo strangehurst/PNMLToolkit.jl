@@ -55,15 +55,15 @@ end
 "pnml id symbol mapped to graph vertex code integer."
 function vertex_codes(n::PnmlNet)
     Dict(s=>i for (i,s) in
-        enumerate(union(PNML.place_idsets(n),
-                        PNML.transition_idsets(n))))
+        enumerate(union(PNML.place_ids(n),
+                        PNML.transition_ids(n))))
 end
 
 "graph vertex code integer mapped to pnml id symbol."
 function vertex_labels(n::PnmlNet)
     Dict(i=>s for (i,s) in
-        enumerate(union(PNML.place_idsets(n),
-                        PNML.transition_idsets(n))))
+        enumerate(union(PNML.place_ids(n),
+                        PNML.transition_ids(n))))
 end
 
 """

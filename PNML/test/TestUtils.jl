@@ -9,19 +9,20 @@ Multisets.set_key_value_show()
     DuplicateIDException, FEConstant, MalformedException, Maybe, MissingIDException,
     NumberConstant, Page, PartitionElement, Place, PnmlException, PnmlExpr, PnmlModel,
     PnmlMultiset, PnmlNet, PnmlNetKeys, RefPlace, RefTransition, SortType,
-    Transition, XmlDictType, allpages, arbitrarysort, arbitrarysorts, arc, arc_idsets,
+    Transition, XmlDictType, allpages, arbitrarysort, arbitrarysorts, arc, arc_idset,
     arcdict, arcs, arity, cardinality, condition, decldict, elements, extralabels,
     fill_builtin_labelparsers!, fill_builtin_sorts!, fill_builtin_toolparsers!,
     fill_sort_tag!, firstnet, firstpage, flatten_pages!, graphics, has_arc, has_graphics, has_place,
     has_tools, has_transition, initial_marking, inputs, inscription, ispid, length,
     make_net, multiplicity, multiset, name, namedsort, namedsorts, narcs, nets,
     netsets, nettype, npages, nplaces, nrefplaces, nreftransitions, ntransitions,
-    page_idsets, pagedict, pages, partitionsort, partitionsorts, pid, place, place_idsets,
-    placedict, places, pntd_of, refid_of, refplace, refplace_idsets, refplacedict, refplaces,
-    reftransition, reftransition_idsets, reftransitiondict, reftransitions, registry_of,
+    page_idset, pagedict, pages, partitionsort, partitionsorts, pid, place, place_idset,
+    placedict, places, pntd_of, refid_of, refplace, refplace_idset, refplacedict, refplaces,
+    reftransition, reftransition_idset, reftransitiondict, reftransitions, registry_of,
     sortdefinition, sortelements, sortref, source, tag, target, term, toexpr, toolinfos,
-    transition, transition_idsets, transitiondict, transitions, value, value_type, varsubs,
-    zero
+    transition, transition_idset, transitiondict, transitions, value, value_type, varsubs,
+    zero,
+    place_ids, arc_ids, transition_ids, reftransition_ids, refplace_ids
 @reexport using PNML.Sorts
 @reexport using PNML.Labels
 @reexport using PNML.Labels: get_label

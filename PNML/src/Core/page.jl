@@ -32,34 +32,43 @@ refplacedict(page::Page)      = refplacedict(net(page))
 reftransitiondict(page::Page) = reftransitiondict(net(page))
 
 #! Do not expect the page api to see much use, so it is likely not very efficient.
-pages(page::Page)       = Iterators.filter(v -> in(pid(v), page_idsets(page)), values(pagedict(page)))
-places(page::Page)      = Iterators.filter(v -> in(pid(v), place_idsets(page)), values(placedict(page)))
-transitions(page::Page) = Iterators.filter(v -> in(pid(v), transition_idsets(page)), values(transitiondict(page)))
-arcs(page::Page)        = Iterators.filter(v -> in(pid(v), arc_idsets(page)), values(arcdict(page)))
-refplaces(page::Page)   = Iterators.filter(v -> in(pid(v), refplace_idsets(page)), values(refplacedict(page)))
-reftransitions(page::Page) = Iterators.filter(v -> in(pid(v), reftransition_idsets(page)), values(reftransitiondict(page)))
+# iterate
+#pages(page::Page)       = Iterators.filter(v -> in(pid(v), page_idset(page)), values(pagedict(page)))
+#places(page::Page)      = Iterators.filter(v -> in(pid(v), place_idset(page)), values(placedict(page)))
+#transitions(page::Page) = Iterators.filter(v -> in(pid(v), transition_idset(page)), values(transitiondict(page)))
+#arcs(page::Page)        = Iterators.filter(v -> in(pid(v), arc_idset(page)), values(arcdict(page)))
+#refplaces(page::Page)   = Iterators.filter(v -> in(pid(v), refplace_idset(page)), values(refplacedict(page)))
+#reftransitions(page::Page) = Iterators.filter(v -> in(pid(v), reftransition_idset(page)), values(reftransitiondict(page)))
 
-page_idsets(page::Page)          = page_idsets(netsets(page)) # subpages of this page
-place_idsets(page::Page)         = place_idsets(netsets(page))
-transition_idsets(page::Page)    = transition_idsets(netsets(page))
-arc_idsets(page::Page)           = arc_idsets(netsets(page))
-reftransition_idsets(page::Page) = reftransition_idsets(netsets(page))
-refplace_idsets(page::Page)      = refplace_idsets(netsets(page))
+pages(page::Page)       = Iterators.map(v -> pagedict(page)[v], page_idset(page))
+places(page::Page)      = Iterators.map(v -> placedict(page)[v], place_idset(page))
+transitions(page::Page) = Iterators.map(v -> transitiondict(page)[v], transition_idset(page))
+arcs(page::Page)        = Iterators.map(v -> arcdict(page)[v], arc_idset(page))
+refplaces(page::Page)   = Iterators.map(v -> refplacedict(page)[v], refplace_idset(page))
+reftransitions(page::Page) = Iterators.map(v -> reftransitiondict(page)[v], reftransition_idset(page))
+#Iterators.filter(v -> in(pid(v), arc_idset(page)), values(arcdict(page)))
+
+page_idset(page::Page)          = page_idset(netsets(page)) # subpages of this page
+place_idset(page::Page)         = place_idset(netsets(page))
+transition_idset(page::Page)    = transition_idset(netsets(page))
+arc_idset(page::Page)           = arc_idset(netsets(page))
+reftransition_idset(page::Page) = reftransition_idset(netsets(page))
+refplace_idset(page::Page)      = refplace_idset(netsets(page))
 
 place(page::Page, id::Symbol) = placedict(page)[id]
-has_place(page::Page, id::Symbol) = in(id, place_idsets(page))
+has_place(page::Page, id::Symbol) = in(id, place_idset(page))
 
 transition(page::Page, id::Symbol) = transitiondict(page)[id]
-has_transition(page::Page, id::Symbol) = in(id, transition_idsets(page))
+has_transition(page::Page, id::Symbol) = in(id, transition_idset(page))
 
 arc(page::Page, id::Symbol) = arcdict(page)[id]
-has_arc(page::Page, id::Symbol) = in(id, arc_idsets(page))
+has_arc(page::Page, id::Symbol) = in(id, arc_idset(page))
 
 refplace(page::Page, id::Symbol)     = refplacedict(page)[id]
-has_refplace(page::Page, id::Symbol) = in(id, refplace_idsets(page))
+has_refplace(page::Page, id::Symbol) = in(id, refplace_idset(page))
 
 reftransition(page::Page, id::Symbol)     = reftransitiondict(page)[id]
-has_reftransition(page::Page, id::Symbol) = in(id, reftransition_idsets(page))
+has_reftransition(page::Page, id::Symbol) = in(id, reftransition_idset(page))
 
 function Base.show(io::IO, page::Page{N}) where {N <: AbstractPnmlNet}
     #TODO Add support for :trim and :compact
@@ -68,12 +77,12 @@ function Base.show(io::IO, page::Page{N}) where {N <: AbstractPnmlNet}
     show(io, name(page)); print(io, ", ")
     println(io)
     iio = inc_indent(io)    # Will indent subpages.
-    print(iio, indent(iio), "places: ",       repr(place_idsets(page)), ",\n");
-    print(iio, indent(iio), "transitions: ",  repr(transition_idsets(page)), ",\n");
-    print(iio, indent(iio), "arcs: ",         repr(arc_idsets(page)), ",\n");
-    print(iio, indent(iio), "refPlaces:",     repr(refplace_idsets(page)), ",\n");
-    print(iio, indent(iio), "refTransitions: ", repr(reftransition_idsets(page)), ",\n");
-    print(iio, indent(iio), "subpages: ",     repr(page_idsets(page)), ",\n");
+    print(iio, indent(iio), "places: ",       repr(place_idset(page)), ",\n");
+    print(iio, indent(iio), "transitions: ",  repr(transition_idset(page)), ",\n");
+    print(iio, indent(iio), "arcs: ",         repr(arc_idset(page)), ",\n");
+    print(iio, indent(iio), "refPlaces:",     repr(refplace_idset(page)), ",\n");
+    print(iio, indent(iio), "refTransitions: ", repr(reftransition_idset(page)), ",\n");
+    print(iio, indent(iio), "subpages: ",     repr(page_idset(page)), ",\n");
     print(iio, indent(iio), ")")
 end
 
