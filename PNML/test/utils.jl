@@ -29,7 +29,6 @@ end
 
 @testset "pntdsym pntd" for pntd in PnmlTypes.all_nettypes()
     let v = Val(pntd)
-        @show v
         for pred in (is_discrete, is_continuous, is_highlevel, is_individual_token, is_collective_token)
             @test pred(v) isa Bool
             @test_call pred(Val(pntd))

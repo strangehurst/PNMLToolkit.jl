@@ -120,6 +120,6 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
             mx = fire2(imatrix, anet, mx)
         end
         @test PNML.enabled(anet, mx) == [false,false,true,false]
-        @show mx
+        #@show mx
     end
 end

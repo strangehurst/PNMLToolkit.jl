@@ -227,8 +227,6 @@ end
 
     let net = pnmlnet(simp)
         @show du = map(last, initial_markings(pnmlnet(simp)))
-        #map(last, collect(du))
-        @show valtype(du)
         @show rate_vals = zeros(valtype(du), ntransitions(net)) # φ in paper
         # φ = [βₜ Σ\_(s∈r(t)) uₛ for t in preset(net, transition_id)]
         # r : T → N^S is preset(net, transition_id)
@@ -329,7 +327,7 @@ end
     @show summary(pnmlnet(anet))
     metagraph(pnmlnet(anet))
 
-    @show m₀ = initial_markings(pnmlnet(anet))
+    m₀ = initial_markings(pnmlnet(anet))
     @test m₀ isa Vector
     C  = PNML.incidence_matrix(pnmlnet(anet)) # Matrix of PnmlMultiset
     @show m₀ C
