@@ -229,10 +229,8 @@ function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) wher
     #---------------------------------------------------------
     # Create "empty" page. Will have `toolinfos` parsed.
     #---------------------------------------------------------
-    page = Page(; net, id = pageid,
-                netsets = PnmlNetKeys(),
-                toolspecinfos = find_toolinfos!(nothing, page_node, net))
-
+    page = Page(; net, id = pageid, netsets = PnmlNetKeys())
+    find_toolinfos!(page.toolspecinfos, page_node, net)
     validate_toolinfos(toolinfos(page))
 
     #---------------------------------------------------------
@@ -275,9 +273,9 @@ end #= function __parse_page! =#
 Calls `add_toolinfo(toolspecinfos, info_node, net)` for each info found.
 See [`Labels.get_toolinfos`](@ref) for accessing `ToolInfo`s.
 """
-function find_toolinfos!(toolspecinfos::Maybe{Vector{ToolInfo}}, node, net)
+function find_toolinfos!(toolspecinfos::Vector{ToolInfo}, node, net)
     for info in allchildren(node, "toolspecific")
-        toolspecinfos = add_toolinfo(toolspecinfos, info, net) # nets and pages
+        add_toolinfo(toolspecinfos, info, net)
     end
-    return toolspecinfos
+    return nothing
 end
