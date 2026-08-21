@@ -70,14 +70,12 @@ Per-net data is not modified here.
 The idsets hold pnml IDs of per-net data "owned" by some page.
 """
 function append_page!(lpage::Page, rpage::Page;
-            keys = (:toolspecinfos,), # non-idset and non-dict fields of page to merge
             idsets = (place_idset, transition_idset, arc_idset,# except for page_idset
                       refplace_idset, reftransition_idset,),
             verbose::Bool = CONFIG.verbose)
     verbose && println("## append_page!($(pid(lpage)), $(pid(rpage))")
-    for k in keys
-        _update_maybe!(lpage, rpage, k)
-    end
+
+    append!(lpage.toolspecinfos, rpage.toolspecinfos)
 
     for (k,v) in pairs(rpage.extralabels)
         if !haskey(lpage.extralabels, k) # do not overwrite
@@ -103,17 +101,17 @@ end
 # the merged page's field could replace an optional field of the first page.
 # Implemented by testing lhs.key for nothing. This works because anything else is assumed
 # to be appendable.
-function _update_maybe!(l, r, key::Symbol) # pass a type for assertion
-    rval = getproperty(r, key)::Maybe{AbstractVector}
-    isnothing(rval) && return
-    lval = getproperty(l, key)::Maybe{AbstractVector}
-    if isnothing(lval)
-        setproperty!(l, key, rval)
-    else
-        @outline(lval, rval, @info "append! " lval rval) #!debug
-        append!(lval, rval)
-    end
-end
+# function _update_maybe!(l, r, key::Symbol) # pass a type for assertion
+#     rval = getproperty(r, key)::Maybe{AbstractVector}
+#     isnothing(rval) && return
+#     lval = getproperty(l, key)::Maybe{AbstractVector}
+#     if isnothing(lval)
+#         setproperty!(l, key, rval)
+#     else
+#         @outline(lval, rval, @info "append! " lval rval) #!debug
+#         append!(lval, rval)
+#     end
+# end
 
 """
 $(TYPEDSIGNATURES)

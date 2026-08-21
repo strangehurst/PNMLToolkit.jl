@@ -9,13 +9,13 @@ There must be at least 1 Page for a valid pnml model.
 See [`PnmlNet`](@ref)
 """
 @kwdef mutable struct Page{N<:AbstractPnmlNet} <: AbstractPnmlObject
-    net::N
-    id::Symbol
+    const net::N
+    const id::Symbol
     namelabel::Maybe{Name} = nothing
     graphics::Maybe{Graphics} = nothing
-    toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
+    toolspecinfos::Vector{ToolInfo} = Vector{ToolInfo}()
     extralabels::LittleDict{Symbol,Any} = LittleDict{Symbol,Any}()
-    netsets::PnmlNetKeys # This page's keys of items owned in net dictionaries. Not shared.
+    const netsets::PnmlNetKeys # This page's keys of items owned in net dictionaries. Not shared.
     # Note: `PnmlNet` only has `page_idset` because all PNML net Objects
     # are attached to a `Page`. And there must be at least one `Page`.
     # There could be >1 nets. `netdata` is ordered, `netsets` are unordered.
