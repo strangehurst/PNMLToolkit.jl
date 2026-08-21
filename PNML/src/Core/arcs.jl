@@ -4,7 +4,7 @@ Edge of a Petri Net Markup Language graph that connects place and transition.
 $(TYPEDEF)
 $(TYPEDFIELDS)
 """
-@kwdef mutable struct Arc{N <: AbstractPnmlNet, T <: PnmlExpr} <: AbstractPnmlNode #Object
+@kwdef struct Arc{N <: AbstractPnmlNet, T <: PnmlExpr} <: AbstractPnmlNode #Object
     id::Symbol
     source::RefValue{Symbol} # ID of Place or Transition
     target::RefValue{Symbol} # ID of Place or Transition
