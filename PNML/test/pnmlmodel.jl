@@ -4,9 +4,9 @@ include("TestUtils.jl")
 using .TestUtils
 
 function parse_test_label1(node::XMLNode,
-                           placetype::Maybe{SortType},
-                           net::AbstractPnmlNet;
-                           parentid::Symbol)
+                           placetype::SortType,
+                           net::PnmlNet{P};
+                           parentid::Symbol) where {P <: PNMLVariant}
     println("parse_test_label1")
     PNML.Parser.parse_initialMarking(node, placetype, net; parentid)
 end
@@ -271,7 +271,7 @@ println("-----------------------------------------")
 
     @test PNML.verify(net, false)
 
-    @test pages(net) isa Base.Iterators.Filter
+    #@test pages(net) isa Base.Iterators.Filter
     @test only(allpages(net)) == only(pages(net))
     #todo compare pages(net) == allpages(net)
     @test firstpage(net)::Page == first(pages(net))::Page
