@@ -19,11 +19,11 @@ end
 import Base: ==, hash
 function Base.:(==)(a::Marking, b::Marking)
     return (a.term == b.term) &&
-        (a.text == b.text) &&
-        (a.graphics == b.graphics) &&
-        (a.toolspecinfos == b.toolspecinfos) &&
-        (a.net == b.net) &&
-        (a.place == b.place)
+            (a.text == b.text) &&
+            (a.graphics == b.graphics) &&
+            (a.toolspecinfos == b.toolspecinfos) &&
+            (a.net == b.net) &&
+            (a.place == b.place)
 end
 
 function Base.hash(u::Marking, h::UInt)
