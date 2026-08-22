@@ -5,9 +5,9 @@ Multisets.set_key_value_show()
 
 @reexport using PNML
 @reexport using PNML: AbstractDeclaration, AbstractOperator, AbstractTerm, AbstractVariable,
-    AnyElement, BooleanConstant, Coordinate, DeclDict, DotConstant, DotConstantEx,
+    AnyElement, BooleanConstant, CONFIG, Coordinate, DeclDict, DotConstant, DotConstantEx,
     DuplicateIDException, FEConstant, MalformedException, Maybe, MissingIDException,
-    NumberConstant, Page, PartitionElement, Place, PnmlException, PnmlExpr, PnmlModel,
+    NumberConstant, Page, PartitionElement, Place, PnmlConfig, PnmlException, PnmlExpr, PnmlModel,
     PnmlMultiset, PnmlNet, PnmlNetKeys, RefPlace, RefTransition, SortType,
     Transition, XmlDictType, allpages, arbitrarysort, arbitrarysorts, arc, arc_idset,
     arcdict, arcs, arity, cardinality, condition, decldict, elements, extralabels,

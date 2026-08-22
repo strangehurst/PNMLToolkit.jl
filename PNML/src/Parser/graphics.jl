@@ -14,9 +14,12 @@ $(TYPEDSIGNATURES)
 
 Arcs, Annotations and Nodes have different graphics semantics.
 Return a [`Graphics`](@ref PnmlGraphics.Graphics) holding the union of possibilities.
+
+If skip=true return `nothing`.
 """
-function parse_graphics(node, pntd)
+function parse_graphics(node, pntd; skip=CONFIG.omit_graphics)
     check_nodename(node, "graphics")
+    skip && return nothing
     args = Pair{Symbol}[] #) # Dict()
     _positions = Coordinate[]
     #TODO Add these to labelparsers (though these are not "Labels")

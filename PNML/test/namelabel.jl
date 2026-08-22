@@ -28,7 +28,7 @@ using XMLDict: XMLDict
             <graphics/>
         </name>""", net, parentid=:xxx)
     @test PNML.text(n) == "some name2"
-    @test has_graphics(n) == true
+    @test PNML.CONFIG.omit_graphics || has_graphics(n) == true
 
     #TODO add toolinfo
     n = PNML.Parser.parse_name(xml"""

@@ -33,7 +33,7 @@ end
     """
     n = @test_logs(
             (:warn, r"^ignoring unexpected child of <graphics>: 'unexpected'"),
-             parse_graphics(node, pntd))
+             parse_graphics(node, pntd; skip=false))
 
     @test PNML.coordinate_type(pntd) == Coordinate
 

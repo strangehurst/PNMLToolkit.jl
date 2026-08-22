@@ -19,49 +19,44 @@ julia> PNML.save_config!(PNML.CONFIG); # Will be automatically read next time yo
 """
 function save_config!(config::PnmlConfig=CONFIG; kwargs...)
     set_preferences!(PNML,
+        "base_path" => config.base_path,
         "indent_width" => config.indent_width,
+        "log_date_format" => config.log_date_format,
+        "log_path" => config.log_path,
+        "log_to_file" => config.log_to_file,
+        "omit_graphics" => config.omit_graphics,
         "text_optional" => config.text_optional,
         "verbose" => config.verbose,
         "warn_on_namespace" => config.warn_on_namespace,
-        "warn_on_fixup" => config.warn_on_fixup,
-        "warn_on_unclaimed" => config.warn_on_unclaimed,
-        "warn_on_unimplemented" => config.warn_on_unimplemented,
-
-        "base_path" => config.base_path,
-        "log_path" => config.log_path,
-        "log_to_file" => config.log_to_file,
-        "log_date_format" => config.log_date_format; kwargs...
+        "warn_on_unimplemented" => config.warn_on_unimplemented; kwargs...
         )
 end
 
 function read_config!()
     global CONFIG
+    @reset CONFIG.base_path = load_preference(PNML, "base_path", CONFIG.base_path)
     @reset CONFIG.indent_width = load_preference(PNML, "indent_width", CONFIG.indent_width)
+    @reset CONFIG.log_date_format = load_preference(PNML, "log_date_format", CONFIG.log_date_format)
+    @reset CONFIG.log_path = load_preference(PNML, "log_path", CONFIG.log_path)
+    @reset CONFIG.log_to_file = load_preference(PNML, "log_to_file", CONFIG.log_to_file)
+    @reset CONFIG.omit_graphics = load_preference(PNML, "omit_graphics", CONFIG.omit_graphics)
     @reset CONFIG.text_optional = load_preference(PNML, "text_optional", CONFIG.text_optional)
     @reset CONFIG.verbose = load_preference(PNML, "verbose", CONFIG.verbose)
     @reset CONFIG.warn_on_namespace = load_preference(PNML, "warn_on_namespace", CONFIG.warn_on_namespace)
-    @reset CONFIG.warn_on_fixup = load_preference(PNML, "warn_on_fixup", CONFIG.warn_on_fixup)
-    @reset CONFIG.warn_on_unclaimed = load_preference(PNML, "warn_on_unclaimed", CONFIG.warn_on_unclaimed)
     @reset CONFIG.warn_on_unimplemented = load_preference(PNML, "warn_on_unimplemented", CONFIG.warn_on_unimplemented)
-
-    @reset CONFIG.base_path = load_preference(PNML, "base_path", CONFIG.base_path)
-    @reset CONFIG.log_path = load_preference(PNML, "log_path", CONFIG.log_path)
-    @reset CONFIG.log_to_file = load_preference(PNML, "log_to_file", CONFIG.log_to_file)
-    @reset CONFIG.log_date_format = load_preference(PNML, "log_date_format", CONFIG.log_date_format)
 end
 
 function Base.show(io::IO, config::PnmlConfig)
+    println(io, "base_path             = ", config.base_path)
     println(io, "indent_width          = ", config.indent_width)
+    println(io, "log_date_format       = ", config.log_date_format)
+    println(io, "log_path              = ", config.log_path)
+    println(io, "log_to_file           = ", config.log_to_file)
+    println(io, "omit_graphics         = ", config.omit_graphics)
     println(io, "text_optional         = ", config.text_optional)
     println(io, "verbose               = ", config.verbose)
     println(io, "warn_on_namespace     = ", config.warn_on_namespace)
-    println(io, "warn_on_fixup         = ", config.warn_on_fixup)
-    println(io, "warn_on_unclaimed     = ", config.warn_on_unclaimed)
     println(io, "warn_on_unimplemented = ", config.warn_on_unimplemented)
-    println(io, "base_path             = ", config.base_path)
-    println(io, "log_path              = ", config.log_path)
-    println(io, "log_to_file           = ", config.log_to_file)
-    println(io, "log_date_format       = ", config.log_date_format)
 end
 
 """

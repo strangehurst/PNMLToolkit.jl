@@ -93,7 +93,7 @@ println("\nARC\n")
     @test typeof(a) <: Arc
     @test pid(a) === :arc1
     @test name(a) == "Some arc"
-    @test has_graphics(a)
+    @test PNML.CONFIG.omit_graphics || has_graphics(a)
     @test_call inscription(a)
     #@show a inscription(a)(NamedTuple())
     if is_highlevel(pntd_of(net)) # assumes storttype of dot

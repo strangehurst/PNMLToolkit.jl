@@ -89,10 +89,12 @@ end
     """
     net = make_net(pntd, :refrans_net)
 
-    rtrans = parse_refTransition(node, net)::RefTransition
+    @show rtrans = parse_refTransition(node, net)::RefTransition
     @test pid(rtrans) === :rt1
     @test PNML.refid_of(rtrans) === :t1
-    @test PNML.has_graphics(rtrans) && startswith(repr(PNML.graphics(rtrans)), "Graphics")
+    @test PNML.CONFIG.omit_graphics ||
+            (PNML.has_graphics(rtrans) &&
+            startswith(repr(PNML.graphics(rtrans)), "Graphics"))
 end
 
 @testset "ref Trans unknown label $pntd" for pntd in PnmlTypes.all_nettypes()
@@ -110,7 +112,8 @@ end
             parse_refTransition(node, net)::RefTransition)
     @test pid(trans) === :rt1
     @test PNML.refid_of(trans) === :t1
-    @test PNML.has_graphics(trans) && startswith(repr(PNML.graphics(trans)), "Graphics")
+    @test PNML.CONFIG.omit_graphics ||
+        (PNML.has_graphics(trans) && startswith(repr(PNML.graphics(trans)), "Graphics"))
     @test PNML.extralabels(trans)[:somelabel2] == get_label(trans, :somelabel2)
     @test elements(get_label(trans, :somelabel2))[:c] == "value"
 end
