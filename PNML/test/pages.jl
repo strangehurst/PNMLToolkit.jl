@@ -211,6 +211,7 @@ end
 
 @testset "lookup types $pntd" for pntd in PnmlTypes.all_nettypes()
     if is_highlevel(pntd)
+        @show pntd
         @show value_type(Inscription, Val(pntd)) #<: PnmlMultiset
         @show value_type(Marking, Val(pntd)) #<: PNML.PnmlMultiset
     else
