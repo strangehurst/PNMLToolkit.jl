@@ -71,7 +71,7 @@ The idsets hold pnml IDs of per-net data "owned" by some page.
 """
 function append_page!(lpage::Page, rpage::Page;
             idsets = (place_idset, transition_idset, arc_idset,# except for page_idset
-                      refplace_idset, reftransition_idset,),
+                      refplace_idset, reftransition_idset),
             verbose::Bool = CONFIG.verbose)
     verbose && println("## append_page!($(pid(lpage)), $(pid(rpage))")
 
@@ -82,7 +82,7 @@ function append_page!(lpage::Page, rpage::Page;
             lpage.extralabels[k] = v
         end
     end
-    #
+
     for s in idsets
         union!(s(lpage), s(rpage))
     end
