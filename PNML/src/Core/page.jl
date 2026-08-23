@@ -3,9 +3,8 @@ $(TYPEDEF)
 $(TYPEDFIELDS)
 
 Contain all places, transitions & arcs. Pages are for visual presentation.
-There must be at least 1 Page for a valid pnml model.
+There must be at least 1 Page for a valid pnml net.
 
-`PNTD` binds the other type parameters together to express a specific PNG.
 See [`PnmlNet`](@ref)
 """
 @kwdef mutable struct Page{N<:AbstractPnmlNet} <: AbstractPnmlObject
@@ -13,8 +12,8 @@ See [`PnmlNet`](@ref)
     const id::Symbol
     namelabel::Maybe{Name} = nothing
     graphics::Maybe{Graphics} = nothing
-    toolspecinfos::Vector{ToolInfo} = Vector{ToolInfo}()
-    extralabels::LittleDict{Symbol,Any} = LittleDict{Symbol,Any}()
+    const toolspecinfos::Vector{ToolInfo} = Vector{ToolInfo}()
+    const extralabels::LittleDict{Symbol,Any} = LittleDict{Symbol,Any}()
     const netsets::PnmlNetKeys # This page's keys of items owned in net dictionaries. Not shared.
     # Note: `PnmlNet` only has `page_idset` because all PNML net Objects
     # are attached to a `Page`. And there must be at least one `Page`.
@@ -31,22 +30,12 @@ arcdict(page::Page)           = arcdict(net(page))
 refplacedict(page::Page)      = refplacedict(net(page))
 reftransitiondict(page::Page) = reftransitiondict(net(page))
 
-#! Do not expect the page api to see much use, so it is likely not very efficient.
-# iterate
-#pages(page::Page)       = Iterators.filter(v -> in(pid(v), page_idset(page)), values(pagedict(page)))
-#places(page::Page)      = Iterators.filter(v -> in(pid(v), place_idset(page)), values(placedict(page)))
-#transitions(page::Page) = Iterators.filter(v -> in(pid(v), transition_idset(page)), values(transitiondict(page)))
-#arcs(page::Page)        = Iterators.filter(v -> in(pid(v), arc_idset(page)), values(arcdict(page)))
-#refplaces(page::Page)   = Iterators.filter(v -> in(pid(v), refplace_idset(page)), values(refplacedict(page)))
-#reftransitions(page::Page) = Iterators.filter(v -> in(pid(v), reftransition_idset(page)), values(reftransitiondict(page)))
-
 pages(page::Page)       = Iterators.map(v -> pagedict(page)[v], page_idset(page))
 places(page::Page)      = Iterators.map(v -> placedict(page)[v], place_idset(page))
 transitions(page::Page) = Iterators.map(v -> transitiondict(page)[v], transition_idset(page))
 arcs(page::Page)        = Iterators.map(v -> arcdict(page)[v], arc_idset(page))
 refplaces(page::Page)   = Iterators.map(v -> refplacedict(page)[v], refplace_idset(page))
 reftransitions(page::Page) = Iterators.map(v -> reftransitiondict(page)[v], reftransition_idset(page))
-#Iterators.filter(v -> in(pid(v), arc_idset(page)), values(arcdict(page)))
 
 page_idset(page::Page)          = page_idset(netsets(page)) # subpages of this page
 place_idset(page::Page)         = place_idset(netsets(page))

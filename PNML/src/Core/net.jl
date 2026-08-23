@@ -22,16 +22,16 @@ $(FIELDS)
     const idregistry::IDRegistry
     # Holds all pages. Shared by pages that may have sub-pages.
     # All PNML net objects are attached to a `Page` by ID. There must be at least one `Page`.
-    pagedict::OrderedDict{Symbol, Page{PnmlNet{T}}}
+    const pagedict::OrderedDict{Symbol, Page{PnmlNet{T}}}
     # These dictionaries hold all places, transitions, arcs, refs. Was in PnmlNetData
-    place_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    transition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    refplace_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
-    reftransition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    const place_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    const transition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    const arc_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    const refplace_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
+    const reftransition_dict::OrderedDict{Symbol, Any} = OrderedDict{Symbol, Any}()
     # Keys of pages in `pagedict` owned by this net.
     # Use only `page_idset` not full `netsets` collection as net only contains pages.
-    page_idset::OrderedSet{Symbol} = OrderedSet{Symbol}()
+    const page_idset::OrderedSet{Symbol} = OrderedSet{Symbol}()
 
     # Declarations dictionarys filled with built-ins & when parsing `declaration`.
     # We use the declarations toolkit for non-high-level nets,
@@ -45,29 +45,29 @@ $(FIELDS)
     # PNML Label with `Text` `Graphics`, `ToolInfo`.
     namelabel::Maybe{Name} = nothing
     # Zero or more `<toolspecific>` may be attched to net.
-    toolspecinfos::Vector{ToolInfo} = ToolInfo[]
+    const toolspecinfos::Vector{ToolInfo} = ToolInfo[]
     # Zero or more extra PNML Labels may be attched to net.
-    extralabels::LittleDict{Symbol, Any} = LittleDict{Symbol,Any}()
+    const extralabels::LittleDict{Symbol, Any} = LittleDict{Symbol,Any}()
     # Map xml tag symbol to parser callable for built-in labels and extension labels.
     #todo Referplugins!ence to label parser interface.
-    labelparser::lparserT = lparserT() #LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
+    const labelparser::lparserT = lparserT() #LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
     """
         Collection that associates a tool name & version with a callable parser.
         The parser turns `<toolspecific name="" version="">` into `ToolInfo` objects.
     """
-    toolparser::tparserT = tparserT()  #LittleDict{String, LittleDict{String, Any}} =
+    const toolparser::tparserT = tparserT()  #LittleDict{String, LittleDict{String, Any}} =
                 #LittleDict{String, LittleDict{String, Any}}()
 
     # Collection of filters used by enabling rule.
-    enabled_filters::efilterT = efilterT() #LittleDict{Symbol, Any} = LittleDict{Symbol, Any}()
+    const enabled_filters::efilterT = efilterT() #LittleDict{Symbol, Any} = LittleDict{Symbol, Any}()
 
     # keys are transition ids, values are sets of variable ids
     "Cache of variable ids used by expressions related to the transition."
-    vars::varsT = varsT() #LittleDict{Symbol, Set{Symbol}} = LittleDict{Symbol, Set{Symbol}}()
+    const vars::varsT = varsT() #LittleDict{Symbol, Set{Symbol}} = LittleDict{Symbol, Set{Symbol}}()
 
     # keys are transition ids, values are vectors of substution namedtuples
     "Cache of variable substitutons for this transition"
-    varsubs::vsubT = vsubT() # = LittleDict{Symbol, Vector{NamedTuple}} = LittleDict{Symbol, Vector{NamedTuple}}()
+    const varsubs::vsubT = vsubT() # = LittleDict{Symbol, Vector{NamedTuple}} = LittleDict{Symbol, Vector{NamedTuple}}()
 
 end #= mutable struct PnmlNet =#
 "Iterate enable filters"
@@ -127,14 +127,6 @@ transitiondict(net::PnmlNet)    = net.transition_dict
 arcdict(net::PnmlNet)           = net.arc_dict
 refplacedict(net::PnmlNet)      = net.refplace_dict
 reftransitiondict(net::PnmlNet) = net.reftransition_dict
-
-#"Return iterator over keys of a dictionary" #! verify same as PnmlKeySet for flattened page
-# iterate over all pages' idsets
-# place_idset(net::PnmlNet)         = net.place_idset #Iterators.map(place_idset, allpages(net))
-# transition_idset(net::PnmlNet)    = net.transition_idset #Iterators.map(transition_idset, allpages(net))
-# arc_idset(net::PnmlNet)           = net.arc_idset #Iterators.map(arc_idset, allpages(net))
-# refplace_idset(net::PnmlNet)      = net.refplace_idset #Iterators.map(refplace_idset, allpages(net))
-# reftransition_idset(net::PnmlNet) = net.reftransition_idset #Iterators.map(reftransition_idset, allpages(net))
 
 npages(net::PnmlNet)          = length(pagedict(net))
 nplaces(net::PnmlNet)         = length(placedict(net))
