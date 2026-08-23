@@ -74,8 +74,8 @@ end
 #     @test arity(inscterm) == 2
 #     @test inputs(inscterm)[1] isa PNML.Variable
 #     @test inputs(inscterm)[2] isa PNML.Variable
-#     @test tag(inputs(inscterm)[1]) == :x
-#     @test tag(inputs(inscterm)[2]) == :v
+#     @test tag(inputs(inscterm)[1]) === :x
+#     @test tag(inputs(inscterm)[2]) === :v
 #     #@test value(inputs(inscterm)[1]) Needs DeclDict
 #     #@test value(inputs(inscterm)[2]) Needs DeclDict
 # end

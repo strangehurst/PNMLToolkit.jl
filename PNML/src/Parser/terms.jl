@@ -342,7 +342,7 @@ function parse_term(::Val{:numberof}, node::XMLNode, net::AbstractPnmlNet; vars)
     isort = nothing
     for st in EzXML.eachelement(node)
         tag, stnode = unwrap_subterm(st)
-        if tag == :numberconstant && isnothing(multiplicity)
+        if tag === :numberconstant && isnothing(multiplicity)
             multi_tj = parse_term(Val(tag), stnode, net; vars)::TermJunk
             multiplicity = multi_tj.exp
             vars = multi_tj.vars
@@ -588,7 +588,7 @@ function parse_term(::Val{:finiteintrangeconstant}, node::XMLNode, net::Abstract
         throw(MalformedException("<finiteintrangeconstant> missing sort element"))
 
     sorttag = Symbol(EzXML.nodename(child))
-    sorttag == :finiteintrange ||
+    sorttag === :finiteintrange ||
         throw(MalformedException("expected finiteintrange, found $sorttag"))
 
     # Note: The ISO 15909 Standard specifically allows (requires?) inline sorts here.

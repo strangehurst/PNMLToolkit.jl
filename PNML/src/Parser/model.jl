@@ -238,26 +238,26 @@ function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) wher
     #---------------------------------------------------------
     for child in EzXML.eachelement(page_node)
         nname = Symbol(EzXML.nodename(child))
-        if nname == :place
+        if nname === :place
             parse_place!(netsets(page), child, net)
-        elseif nname == :referencePlace
+        elseif nname === :referencePlace
             parse_refPlace!(netsets(page), child, net)
-        elseif nname == :transition
+        elseif nname === :transition
             parse_transition!(netsets(page), child,  net)
-        elseif nname == :referenceTransition
+        elseif nname === :referenceTransition
             parse_refTransition!(netsets(page), child,  net)
-        elseif nname == :arc
+        elseif nname === :arc
             parse_arc!(netsets(page), child, net)
         elseif nname in [:declaration, :toolspecific]
              # NOOP already parsed
-        elseif nname == :page
+        elseif nname === :page
             #---------------------------------------------------------------------------
             # Subpage stored at net-level with key in page's id set (until flattened).
             #---------------------------------------------------------------------------
             parse_page!(net, page_idset(page), child)
-        elseif nname == :name
+        elseif nname === :name
             page.namelabel = net.labelparser[nname](child, net; parentid=pageid)
-        elseif nname == :graphics
+        elseif nname === :graphics
             page.graphics = parse_graphics(child, pntd_of(net))
         else
             unexpected_label!(page.extralabels, child, nname, net; parentid=pageid)

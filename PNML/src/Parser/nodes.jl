@@ -17,7 +17,7 @@ function parse_place!(netsets, node, net::AbstractPnmlNet)
     #@show valtype(placedict(net)) typeof(placedict(net))
     push!(netsets.place_set, pid(pl))
     placedict(net)[pid(pl)] = pl
-    #return place_idset(netsets) #place_set
+    return nothing
 end
 
 "Fill transition_idset, transitiondict."
@@ -25,7 +25,7 @@ function parse_transition!(netsets, node, net::AbstractPnmlNet)
     tr = parse_transition(node, net)::valtype(transitiondict(net))
     push!(netsets.transition_set, pid(tr))
     transitiondict(net)[pid(tr)] = tr
-    #return transition_idset(netsets)
+    return nothing
 end
 
 "Fill arc_idset, arcdict."
@@ -35,7 +35,7 @@ function parse_arc!(netsets, node, net::AbstractPnmlNet)
         @error("$(typeof(a)) not a $(valtype(arcdict(net)))) $(pntd_of(net)) $(repr(a))")
     push!(netsets.arc_set, pid(a))
     arcdict(net)[pid(a)] = a
-    #return arc_idset(netsets)
+    return nothing
 end
 
 "Fill refplace_idset, refplacedict."
@@ -43,7 +43,7 @@ function parse_refPlace!(netsets, node, net::AbstractPnmlNet)
     rp = parse_refPlace(node, net)::valtype(refplacedict(net))
     push!(netsets.refplace_set, pid(rp))
     refplacedict(net)[pid(rp)] = rp
-    #return refplace_idset(netsets)
+    return nothing
 end
 
 "Fill reftransition_idset, reftransitiondict."
@@ -51,7 +51,7 @@ function parse_refTransition!(netsets, node, net::AbstractPnmlNet)
     rt = parse_refTransition(node, net)::valtype(reftransitiondict(net))
     push!(netsets.reftransition_set, pid(rt))
     reftransitiondict(net)[pid(rt)] = rt
-    #return reftransition_idset(netsets)
+    return nothing
 end
 
 """
@@ -90,23 +90,23 @@ function parse_place(node::XMLNode, net::AbstractPnmlNet)
         end
     end
 
-    namelabel::Maybe{Name}           = nothing
-    graphics::Maybe{Graphics}        = nothing
+    namelabel::Maybe{Name} = nothing
+    graphics::Maybe{Graphics} = nothing
     toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
     extralabels::LittleDict{Symbol, Any} = LittleDict{Symbol, Any}()
 
     for place_child in EzXML.eachelement(node)
         tag = Symbol(EzXML.nodename(place_child))
-        if tag == :initialMarking || tag == :hlinitialMarking tag == :fifoinitialMarking
+        if tag === :initialMarking || tag === :hlinitialMarking tag === :fifoinitialMarking
             isnothing(sorttype) && @warn "$(pntd_of(net)) parse_place $placeid sorttype is nothing"
             mark = net.labelparser[tag](place_child, sorttype, net, parentid=placeid)
-        elseif tag == :type
+        elseif tag === :type
             # we already handled this
-        elseif tag == :name
+        elseif tag === :name
             namelabel = net.labelparser[tag](place_child, net, parentid=placeid)
-        elseif tag == :graphics
+        elseif tag === :graphics
             graphics = parse_graphics(place_child, pntd_of(net))
-        elseif tag == :toolspecific
+        elseif tag === :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, place_child, net) # place
         else
             unexpected_label!(extralabels, place_child, tag, net; parentid=placeid)
@@ -149,13 +149,13 @@ function parse_transition(node::XMLNode, net::AbstractPnmlNet)
 
     for trans_child in EzXML.eachelement(node)
         tag = Symbol(EzXML.nodename(trans_child))
-        if tag == :condition
+        if tag === :condition
             cond = net.labelparser[tag](trans_child, net; parentid=transitionid)
-        elseif tag == :name
+        elseif tag === :name
             namelabel = net.labelparser[tag](trans_child, net, parentid=transitionid)
-        elseif tag == :graphics
+        elseif tag === :graphics
             graphics = parse_graphics(trans_child, pntd_of(net))
-        elseif tag == :toolspecific
+        elseif tag === :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, trans_child, net)
         else
             unexpected_label!(extralabels,
@@ -191,19 +191,19 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
 
     for arc_child in EzXML.eachelement(node)
         tag = Symbol(EzXML.nodename(arc_child))
-        if tag == :inscription || tag == :hlinscription
+        if tag === :inscription || tag === :hlinscription
             # Input arc inscription and source's marking/placesort must have equal Sorts.
             # Output arc inscription and target's marking/placesort must have equal Sorts.
             # Have IDREF to source & target place & transition.
             # Which must have been parsed and can be found in net data.
             inscription = net.labelparser[tag](arc_child, source, target, net, parentid=arc_id)
-        elseif tag == :name
+        elseif tag === :name
             namelabel = net.labelparser[tag](arc_child, net, parentid=arc_id)
-        elseif tag == :arctype
+        elseif tag === :arctype
             arc_type_label = net.labelparser[tag](arc_child, net, parentid=arc_id)
-        elseif tag == :graphics
+        elseif tag === :graphics
             graphics = parse_graphics(arc_child, pntd_of(net))
-        elseif tag == :toolspecific
+        elseif tag === :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, arc_child, net)
         else
             unexpected_label!(extralabels, arc_child, tag, net; parentid=arc_id)
@@ -265,11 +265,11 @@ function parse_refPlace(node::XMLNode, net::AbstractPnmlNet)
 
     for refp_child in EzXML.eachelement(node)
         tag = Symbol(EzXML.nodename(refp_child))
-        if tag == :name
+        if tag === :name
             namelabel = net.labelparser[tag](refp_child, net, parentid=refp_id)
-        elseif tag == :graphics
+        elseif tag === :graphics
             graphics =  parse_graphics(refp_child, pntd_of(net))
-        elseif tag == :toolspecific
+        elseif tag === :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, refp_child, net)
         else
             unexpected_label!(extralabels, refp_child, tag, net; parentid=refp_id)
@@ -296,11 +296,11 @@ function parse_refTransition(node::XMLNode, net::AbstractPnmlNet)
 
     for reft_child in EzXML.eachelement(node)
         tag = Symbol(EzXML.nodename(reft_child))
-        if tag == :name
+        if tag === :name
             namelabel = net.labelparser[tag](reft_child, net, parentid=reft_id)
-        elseif tag == :graphics
+        elseif tag === :graphics
             graphics = parse_graphics(reft_child, pntd_of(net))
-        elseif tag == :toolspecific
+        elseif tag === :toolspecific
             toolspecinfos = add_toolinfo(toolspecinfos, reft_child, net)
         else
             unexpected_label!(extralabels, reft_child, tag, net; parentid=reft_id)

@@ -29,7 +29,7 @@ Finite enumeration constant and its containing sort.
 
 # Usage
     fec = FEConstant(:anID, "somevalue", sortref)
-    fec() == :anID
+    fec() === :anID
     fec.name = "somevalue"
 """
 struct FEConstant <: AbstractOperator

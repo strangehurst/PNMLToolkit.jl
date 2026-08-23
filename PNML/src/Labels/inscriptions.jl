@@ -76,7 +76,7 @@ function value_type(::Type{Inscription}, s::Symbol)
         eltype(PositiveSort)
     elseif s === :continuous
         eltype(RealSort)
-    elseif s == :pt_hlpng
+    elseif s === :pt_hlpng
         eltype(DotSort)
     elseif is_highlevel(s)
         @outline(s, @error("value_type(::Type{Inscription}, $s) undefined. Using DotSort.")) #! XXX TODO XXX
@@ -88,7 +88,8 @@ end
 # is_collective_token
 value_type(::Type{Inscription}, ::Val{:pnmlcore}) = eltype(PositiveSort)
 value_type(::Type{Inscription}, ::Val{:ptnet}) = eltype(PositiveSort)
-value_type(::Type{Inscription}, ::Val{:pt_hlpng}) = eltype(DotSort)
+# dot2int used to produce value.
+value_type(::Type{Inscription}, ::Val{:pt_hlpng}) = Int
 value_type(::Type{Inscription}, ::Val{:continuous}) = eltype(RealSort)
 # For rest of is_highlevel is_individual_token is true.
 # Each place and adjacent arcs' inscriptions have the same basis sort (SortType label).

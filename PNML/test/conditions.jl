@@ -46,7 +46,7 @@ using .TestUtils
 #         @show cond
 #         @test text(cond) == "pt==cts||pt==ack"
 #         # @test value(cond) isa PNML.Operator
-#         # @test tag(value(cond)) == :or
+#         # @test tag(value(cond)) === :or
 #         @test PNML.has_graphics(cond) == true
 #     end
 # end
