@@ -6,38 +6,10 @@ using .TestUtils
 println("\nPAGES\n")
 
 function verify_sets(net::PnmlNet)
-    println("\nverify sets and structure ++++++++++++++++++++++")
-    # @show net
-    # @show keys(pagedict(net))
-    # @show pageids(net)  page_idset(firstpage(net))
-
     @test !isempty(setdiff(page_idset(net), page_idset(firstpage(net))))
-
-    # @test arc_ids(net) isa AbstractSet
-    # @test arc_idset(firstpage(net)) isa AbstractSet
-    # #@show arc_ids(net) arc_idset(firstpage(net))
-    # @test !isempty(setdiff(arc_ids(net), arc_idset(firstpage(net))))
-
-    # @test place_ids(net) isa AbstractSet
-    # @test place_idset(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(place_ids(net), place_idset(firstpage(net))))
-
-    # @test transition_ids(net) isa AbstractSet
-    # @test transition_idset(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(transition_ids(net), transition_idset(firstpage(net))))
-
-    # @test refplace_ids(net) isa AbstractSet
-    # @test refplace_idset(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(refplace_ids(net), refplace_idset(firstpage(net))))
-
-    # @test reftransition_ids(net) isa AbstractSet
-    # @test reftransition_idset(firstpage(net)) isa AbstractSet
-    # @test !isempty(setdiff(reftransition_ids(net), reftransition_idset(firstpage(net))))
-
     for page in allpages(net)
         @test pagedict(net) === pagedict(page) # There is only 1 pagedict.
     end
-
     @test PNML.has_tools(net) == true
 end
 
@@ -102,9 +74,11 @@ net = firstnet(model)
 verify_sets(net)
 
 @testset "by pntd $pntd" for pntd in PnmlTypes.core_nettypes()
+    # For each Type that has a value_type(::Type{t}), ::Val{Symbol}) method.
     for ot in (PNML.Coordinate, Inscription, PNML.Labels.Condition, Marking,
                 Priority, Rate, PNML.Labels.Time)
-        @test_opt function_filter=pff target_modules=t_modules value_type(ot, Val(pntd))
+        @test_opt value_type(ot, Val(pntd))
+        #!@test_opt function_filter=pff target_modules=t_modules value_type(ot, Val(pntd))
         @test_call value_type(ot, Val(pntd))
     end
 
@@ -144,19 +118,13 @@ end
 @test nreftransitions(net) != 0
 
 @testset "flatten" begin
-    println("---------------"^4)
     flatten_pages!(net; verbose=false)
-    println("---------------"^4)
 
     expected_a = [:a11, :a12, :a21, :a22, :a31, :a311]
     expected_p = [:p1, :p11, :p111, :p2, :p3, :p31, :p311, :p3111]
     expected_t = [:t1, :t2, :t3, :t31]
     expected_rt = [] # removed by flatten
     expected_rp = [] # removed by flatten
-    @show arc_ids(net)
-    @show arc_idset(firstpage(net))
-    @show expected_a
-    @show setdiff(arc_ids(net), expected_a)
 
     @test isempty(setdiff(arc_ids(net), expected_a))
     @test isempty(setdiff(arc_idset(firstpage(net)), expected_a))
@@ -212,11 +180,13 @@ end
 @testset "lookup types $pntd" for pntd in PnmlTypes.all_nettypes()
     if is_highlevel(pntd)
         @show pntd
-        @show value_type(Inscription, Val(pntd)) #<: PnmlMultiset
-        @show value_type(Marking, Val(pntd)) #<: PNML.PnmlMultiset
+        @show value_type(Inscription, Val(pntd))
+        @show value_type(Marking, Val(pntd))
+        @test value_type(Inscription, Val(pntd)) == value_type(Marking, Val(pntd))
     else
         @test value_type(Inscription, Val(pntd)) <: Number
         @test value_type(Marking, Val(pntd)) <: Number
+        @test value_type(Inscription, Val(pntd)) == value_type(Marking, Val(pntd))
     end
     @test value_type(PNML.Labels.Condition, Val(pntd)) <: Bool
     @test value_type(Rate, Val(pntd)) <: Float64

@@ -87,7 +87,6 @@ end
  end
 
 @testset "pnmlmodel(empty_pnml)" begin
-    println("pnmlmodel(empty_pnml)")
     empty_pnml = xml"""<?xml version="1.0"?>
         <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
         </pnml>
@@ -258,7 +257,6 @@ end
 
 println("\n-----------------------------------------")
 println("AirplaneLD-col-0010.pnml")
-println("-----------------------------------------")
 @testset let testfile=joinpath(@__DIR__, "data", "AirplaneLD-col-0010.pnml")
     #println(testfile); flush(stdout)
     model = pnmlmodel(testfile)

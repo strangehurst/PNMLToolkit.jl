@@ -6,7 +6,6 @@ using .TestUtils
 using PNML: fill_sort_tag!, fill_builtin_sorts!, fill_builtin_labelparsers!
 
 @testset "parser_context" begin
-    println("parser_context")
     pntd = :pnmlcore
     net = make_net(pntd, :parser_context_net)
 
@@ -121,13 +120,10 @@ end
     #            parse_sort(xml"""<productsort/>""", net, :emptyproduct, "emptyproduct"))
 
     IDRegistrys.reset_reg!(net.idregistry)
-    println("-------------------------------------------------------------")
-    println("-------------------------------------------------------------")
     sortref = parse_sort(xml"""<productsort>
                                 <integer/>
                                 <integer/>
                         </productsort>""", net, :redundant, "redundant")
-    #@show net sortref
     sort = to_sort(sortref, net)::ProductSort |> sortdefinition
     @test occursin(r"^ProductSort", sprint(show, sort))
     @test eltype(sort) == Tuple{Int64,Int64} #! TODO XXX
@@ -158,7 +154,6 @@ end
     sortref = parse_sort(xml"""<multisetsort>
                                 <usersort declaration="duck"/>
                             </multisetsort>""", net, :testduck, "testduck")
-    #@show net sortref
     sort = to_sort(sortref, net) |> sortdefinition
     fill_sort_tag!(net, :amultiset, sort) #~ test of method needed here
     @test occursin(r"^MultisetSort", sprint(show, sort))
@@ -175,7 +170,6 @@ end
     #^ String
 
     IDRegistrys.reset_reg!(net.idregistry)
-    #println()
     sortref = parse_sort(xml"<string/>", net)
     sort = to_sort(sortref, net)::NamedSort
     @test sortelements(sort, net) == ("",)

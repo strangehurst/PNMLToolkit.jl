@@ -10,12 +10,11 @@ const oracle = "data/XMLTestFilesRepository/Oracle"
 
 println("\n-----------------------------------------")
 println("full_coremodel.xml")
-println("-----------------------------------------")
 @testset let fname=joinpath(@__DIR__, oracle, "full_coremodel.xml";)
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #firstnet(model)))
     n = firstnet(model)
-    n = flatten_pages!(n; verbose=true)::PnmlNet
+    n = flatten_pages!(n; verbose=false)::PnmlNet
     @test narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0
 
     # vc = vertex_codes(n)::AbstractDict
@@ -36,7 +35,6 @@ end
 
 println("\n-----------------------------------------")
 println("full_ptnet.xml")
-println("-----------------------------------------")
 @testset let fname=joinpath(@__DIR__, oracle, "full_ptnet.xml")
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #firstnet(model)))
@@ -54,7 +52,6 @@ end
 
 println("\n-----------------------------------------")
 println("full_sn.xml") # modified
-println("-----------------------------------------")
 # finiteenumeration
 @testset let fname=joinpath(@__DIR__, oracle, "full_sn.xml")
     model = @test_logs((:error, r".*inscription not provided for arc.*"),
@@ -76,7 +73,6 @@ end
 
 println("\n-----------------------------------------")
 println("full_hlpn.xml") # modified
-println("-----------------------------------------")
 @testset let fname=joinpath(@__DIR__, oracle, "full_hlpn.xml")
     model = @test_logs((:error, r".*inscription not provided for arc.*"),
                        (:error, r".*has no sorttype, cannot infer initial marking sort"),

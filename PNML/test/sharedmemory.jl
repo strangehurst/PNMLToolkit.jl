@@ -5,7 +5,6 @@ using .TestUtils
 
 println("\n-----------------------------------------")
 println("SharedMemory.pnml")
-println("-----------------------------------------")
 @testset let fname=joinpath(@__DIR__, "data", "SharedMemory.pnml")
     model = @test_logs((:error, r".*nscription term sort mismatch.*"),
                        match_mode=:any,
@@ -26,7 +25,6 @@ end
 
 println("\n-----------------------------------------")
 println("SharedMemory-Hlpn.pnml") # modified
-println("-----------------------------------------")
 @testset let fname=joinpath(@__DIR__, "data", "SharedMemory-Hlpn.pnml")
     model = @test_logs((:error, r".*nscription term sort mismatch.*"),
                        match_mode=:any,

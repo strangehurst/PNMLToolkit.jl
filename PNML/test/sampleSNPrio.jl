@@ -8,7 +8,6 @@ using .TestUtils
 # From ePNK
 println("\n-----------------------------------------")
 println("sampleSNPrio.pnml")
-println("-----------------------------------------"); flush(stdout)
 # finiteenumeration, feconstant, partition, productsort, tuple,
 @testset let fname=joinpath(@__DIR__, "data", "sampleSNPrio.pnml")
     #false &&
@@ -31,7 +30,6 @@ end
 
 println("\n-----------------------------------------")
 println("Sudoku-COL-BN01.pnml")
-println("-----------------------------------------")
 # productsort, tuple, finiteintrangeconstant, or, and, equality
 @testset let fname=joinpath(@__DIR__, "data", "MCC/Sudoku-COL-BN01.pnml")
     model = pnmlmodel(fname)::PnmlModel

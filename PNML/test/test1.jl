@@ -5,7 +5,6 @@ using .TestUtils
 
 println("\n-----------------------------------------")
 println("test1.pnml")
-println("-----------------------------------------\n")
 @testset let fname=joinpath(@__DIR__, "data", "test1.pnml")
     # model = @test_logs(match_mode=:any,
     #     (:warn, "ignoring unexpected child of <condition>: 'name'"),
@@ -21,8 +20,6 @@ println("-----------------------------------------\n")
     for net in @inferred PNML.nets(model)
         @test pid(net) in Set([:net1,:net2,:net3,:net4,:net5,:net6,
                                :net7,:net8,:net9,:net10,:net11])
-        #println("-----------------------------------------")
-        #println(summary(net))
         @test PNML.verify(net, false)
         PNML.flatten_pages!(net; verbose=false)
         @test PNML.verify(net, false)
