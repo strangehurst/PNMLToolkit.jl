@@ -1,3 +1,11 @@
+"""
+$(TYPEDEF)
+"""
+abstract type AbstractDeclarationDicts end
+"""
+Alias for AbstractDeclarationDicts.
+"""
+const ADDicts = AbstractDeclarationDicts
 
 """
     struct DeclDict
@@ -32,11 +40,6 @@ Each keyed by REFID symbols.
     # FEConstants are 0-ary OperatorDeclarations.
     feconstants::Dict{Symbol, FE}
 
-    # SortDeclaration or OperatorDeclaration.
-    #! 2025-07-14 moving to SortRefImpl to wrap a REFID and retain type information.
-    #! 2025-09-27 moving to Moshi ADT.
-    #! 2025-10-12 Remove UserSort. Use NamedSortRef where proper, UserSortRef when needed.
-
     useroperators::Dict{Symbol, UO}
 end  #= struct DeclDict =#
 
@@ -45,7 +48,7 @@ function DeclDict(net::AbstractPnmlNet)
     DeclDict(;
                arbitraryoperators = Dict{Symbol, ArbitraryOperator{N}}(),
                arbitrarysorts = Dict{Symbol, ArbitrarySort{N}}(),
-               feconstants = Dict{Symbol, Any}(),
+               feconstants = Dict{Symbol, FEConstant}(),
                multisetsorts = Dict{Symbol, MultisetSort}(),
                namedoperators = Dict{Symbol, NamedOperator{N}}(),
                namedsorts = Dict{Symbol, NamedSort{N}}(),
