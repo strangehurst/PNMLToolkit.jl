@@ -38,11 +38,11 @@ function Base.hash(u::Marking, h::UInt)
 end
 
 # Allow any Number subtype, only a few concrete subtypes are expected.
-function Marking(m::Number, net::AbstractPnmlNet, place::Symbol)
-    Marking(; term=NumberEx(sortref(m)::SortRef, m), net, place)
+function Marking(mark::Number, net::AbstractPnmlNet, place::Symbol)
+    Marking(; term=NumberEx(sortref(mark)::SortRef, mark), net, place)
 end
 
-term(marking::Marking) = marking.term
+term(mark::Marking) = mark.term
 
 # 1'value where value isa eltype(marking)
 # because we assume a multiplicity of 1, and the sort is simple
@@ -110,19 +110,19 @@ Used to initialize a marking vector that will then be updated by firing a transi
     eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net))
 end
 
-basis(m::Marking) = sortref(term(m))::SortRef
-sortref(m::Marking) = expr_sortref(term(m), m.net)::SortRef
+basis(mark::Marking) = sortref(term(mark))::SortRef
+sortref(mark::Marking) = expr_sortref(term(mark), m.net)::SortRef
 
-function Base.show(io::IO, ptm::Marking)
+function Base.show(io::IO, mark::Marking)
     print(io, indent(io), "Marking(")
-    show(io, term(ptm))
-    if has_graphics(ptm)
+    show(io, term(mark))
+    if has_graphics(mark)
         print(io, ", ")
-        show(io, graphics(ptm))
+        show(io, graphics(mark))
     end
-    if has_tools(ptm)
+    if has_tools(mark)
         print(io, ", ")
-        show(io, toolinfos(ptm));
+        show(io, toolinfos(mark));
     end
     print(io, ")")
 end
