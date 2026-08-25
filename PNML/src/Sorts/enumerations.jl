@@ -10,9 +10,9 @@ abstract type EnumerationSort <: AbstractSort end
 """
     refs(sort::EnumerationSort) -> Vector{REFID}
 
-Return `Vector` of `FEConstant` `REFID`s.
+Return `Vector` of `FEConstant` `REFID` Symbols.
 """
-refs(sort::EnumerationSort) = sort.fec_refs # NTuple
+refs(sort::EnumerationSort) = sort.fec_refs::Vector{Symbol}
 
 """
     sortelements(sort::EnumerationSort, ::AbstractPnmlNet) -> Iterator
