@@ -109,7 +109,7 @@ include("Sorts/Sorts.jl") # used in Variables, Operators, Places
 using .Sorts
 include("Declarations/Declarations.jl")
 using .Declarations
-include("Core/parse_context.jl") # parse context has id registry and DeclDict
+include("Core/parse_context.jl") # parse context has id registry and DeclDicts
 include("Core/variables.jl")
 include("Core/multisets.jl")
 include("Core/expressions.jl")

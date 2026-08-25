@@ -1,5 +1,5 @@
 #!--------------------
-#! see decldictcore.jl for  struct DeclDict
+#! see decldictcore.jl for  struct DeclDicts
 #!--------------------
 
 function Base.show(io::IO, dd::ADDicts)

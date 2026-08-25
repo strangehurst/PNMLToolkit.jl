@@ -12,7 +12,7 @@ struct Variable{N <: AbstractPnmlNet} <: AbstractVariable
     net::N
 
     function Variable(v::Symbol, net::AbstractPnmlNet)
-        # Check that REFID is valid in DeclDict.
+        # Check that REFID is valid in DeclDicts.
         has_variabledecl(net, v) ||
             throw(ArgumentError("$(v) not a variable reference ID"))
         new{typeof(net)}(v, net)

@@ -53,7 +53,7 @@ $(TYPEDEF)
 [`NamedOperator`](@ref). `FEConstant`, [`PartitionElement`](@ref) and
 [`ArbitraryOperator`](@ref) are all referenced by `UserOperator`.
 
-`UserOperator` wraps REFID used to access `DeclDict`.
+`UserOperator` wraps REFID used to access `DeclDicts`.
 """
 abstract type OperatorDeclaration <: AbstractSort end #!<: AbstractDeclaration end
 

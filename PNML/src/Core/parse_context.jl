@@ -18,7 +18,7 @@ end
 """
     fill_builtin_sorts!(net::AbstractPnmlNet) -> Nothing
 
-Fill a DeclDict with built-ins and defaults (that may be redefined).
+Fill a DeclDicts with built-ins and defaults (that may be redefined).
 """
 function fill_builtin_sorts!(net::AbstractPnmlNet)
     __insert_sort!(net, :dot, "Dot", Sorts.DotSort()) # can be overridden
@@ -49,7 +49,7 @@ function fill_sort_tag!(net::AbstractPnmlNet, tag::Symbol, sort, dict)
     fill_sort_tag!(decldict(net), registry_of(net), tag, sort, dict)
 end
 
-function fill_sort_tag!(dd::DeclDict, idreg, tag::Symbol, sort, dict)
+function fill_sort_tag!(dd::DeclDicts, idreg, tag::Symbol, sort, dict)
     # Do not overwrite existing content (except dot).
     D()&& println("## fill_sort_tag! tag=$(repr(tag)) sort=$(nameof(typeof(sort))) dict=$dict")
     if tag === :dot || !haskey(dict(dd), tag)

@@ -135,7 +135,7 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
     net = PnmlNet{var}(; type=pnmltype, id=netid, idregistry,
                   pagedict = OrderedDict{Symbol, Page{PnmlNet{var}}}(),
                   )
-    net.ddict[] = DeclDict(net) # Create with empty dictionaries of net specific values.
+    net.ddict[] = DeclDicts(net) # Create with empty dictionaries of net specific values.
 
     #^ Label Parsers
     fill_builtin_labelparsers!(net.labelparser)
@@ -155,7 +155,7 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
     plugins!(net.enabled_filters, kwargs, :ef)
 
     # Parse *ALL* Declarations here. Including any Declarations attached to Pages.
-    # Place any/all declarations in single net-level DeclDict.
+    # Place any/all declarations in single net-level DeclDicts.
     # It is like we are flattening only the declarations.
     # Only the first <declaration> label's text and graphics will be preserved.
     # Though what use graphics could add escapes me (and the standard).

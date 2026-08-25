@@ -20,7 +20,7 @@ Assume behavior with the meaning in a <structure> for all nets.
 
 Note the use of both declaration and declarations, which comes from ISO 15909 Standard.
 We allow repeated declaration (without the s) here.
-All fill the same `DeclDict`. See [`fill_decl_dict!`](@ref)
+All fill the same `DeclDicts`. See [`fill_decl_dict!`](@ref)
 """
 function parse_declaration!(net::AbstractPnmlNet, nodes::Vector{XMLNode})
     text = nothing
@@ -52,7 +52,7 @@ end
 """
     fill_decl_dict!(net::AbstractPnmlNet, node::XMLNode) -> Nothing
 
-Add a `<declaration><structure><declarations>` to DeclDict.
+Add a `<declaration><structure><declarations>` to DeclDicts.
 `<declaration>` may be attached to `<net>` and/or `<page>` elements.
 Are network-level values even if attached to pages.
 """
@@ -84,6 +84,7 @@ function fill_decl_dict!(net::AbstractPnmlNet, node::XMLNode)
             @assert is_partitionsort(part) "expected partition sort found: $part"
         #! elseif tag === :partitionoperator
         #!      PartitionLessThan, PartitionGreaterThan, PartitionElementOf
+        #!      <ltp>, <gtp>, <partitionelementof refpartition="xxx">,
         #!      partop = parse_partition_op(child, pntd)
         #!      partitionops(net)[pid(partop)] = partop
 
@@ -217,7 +218,7 @@ From ePNK-pnml-examples/NetworkAlgorithms/runtimeValueEval.pnml.
     parse_variabledecl(node::XMLNode, net::AbstractPnmlNet) -> VariableDeclaration
 
 Variable declarations associate an `id`, `name` and `sort`.
-Stored in DeclDict with key of `id`.
+Stored in DeclDicts with key of `id`.
 
 Variable declarationss may appear in the definition of an operator
 as well as directly in a declaration.
@@ -260,7 +261,23 @@ end
 Place the constants into `feconstants(net)` dictionary and return vector of
 finite enumeration constant REFIDs.
 
-Access as 0-ary operator indexed by REFID
+Access as 0-ary operator indexed by REFID.
+
+Constants are 0-ary operators.
+
+`<feconstant id="id6" name="I"/>` can be thought of as behaving like this namedoperator:
+```
+<namedoperator id="id6" name="I">
+    <parameter/>
+    <def> I </def>
+</namedoperator>
+```
+
+Constant (0-arity operator) is invoked by `<useroperator declaration="id6"/>`.
+Non-constant operators invoked by `useoperator` holding subterms matching `namedsort`'s
+ordered `parameter`s in number and sorts.
+
+See [`operator`](@ref).
 """
 function parse_feconstants(node::XMLNode, net::AbstractPnmlNet, sortref::SortRef)
     sorttag = EzXML.nodename(node)
@@ -403,7 +420,7 @@ end
 # It is more important (for the big work) to be cache-friendly.
 #
 #? When is the REFID of a sort meaninful?
-#  - Index into DeclDict to access concrete sort object
+#  - Index into DeclDicts to access concrete sort object
 #       2 or more concrete sort objects (2 entries in dictionary) may be `equalSorts`
 #  -
 

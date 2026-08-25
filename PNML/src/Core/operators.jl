@@ -13,7 +13,7 @@ Let AbstractOpExpr <: PnmlExpr
 finite element constant is 0-ary operator expressed as useroperator wrapping an REFID
 
 `:(feconstant(REFID)())`
-locates the FEConstant element in the DeclDict and return its value/id/name(TBD).
+locates the FEConstant element in the DeclDicts and return its value/id/name(TBD).
 there are 4 kinds of operator declarations:
     feconstant, nameoperator, arbitraryoperator, partitionelement
 each have different types.

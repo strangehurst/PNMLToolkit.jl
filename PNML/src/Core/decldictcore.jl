@@ -8,14 +8,14 @@ Alias for AbstractDeclarationDicts.
 const ADDicts = AbstractDeclarationDicts
 
 """
-    struct DeclDict
+    struct DeclDicts
 
 $(DocStringExtensions.TYPEDFIELDS)
 
 Collection of dictionaries holding various kinds of PNML declarations.
 Each keyed by REFID symbols.
 """
-@kwdef struct DeclDict{V,NS,AS,PAS,MS,PRS,NO,AO,PO,FE,UO} <: AbstractDeclarationDicts
+@kwdef struct DeclDicts{V,NS,AS,PAS,MS,PRS,NO,AO,PO,FE,UO} <: AbstractDeclarationDicts
     """
         Holds [`VariableDeclaration`](@ref).
         A [`Variable`](@ref) is used to locate the declaration's name and sort.
@@ -41,11 +41,11 @@ Each keyed by REFID symbols.
     feconstants::Dict{Symbol, FE}
 
     useroperators::Dict{Symbol, UO}
-end  #= struct DeclDict =#
+end  #= struct DeclDicts =#
 
-function DeclDict(net::AbstractPnmlNet)
+function DeclDicts(net::AbstractPnmlNet)
     N = typeof(net)
-    DeclDict(;
+    DeclDicts(;
                arbitraryoperators = Dict{Symbol, ArbitraryOperator{N}}(),
                arbitrarysorts = Dict{Symbol, ArbitrarySort{N}}(),
                feconstants = Dict{Symbol, FEConstant}(),

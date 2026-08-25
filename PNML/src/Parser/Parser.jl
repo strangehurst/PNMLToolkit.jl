@@ -39,7 +39,7 @@ using Logging
 using LoggingExtras
 using NamedTupleTools
 using PNML
-using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDict, DotConstant, FEConstant,
+using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDicts, DotConstant, FEConstant,
     LabelParser, MalformedException, Maybe, MissingIDException, PnmlMultiset, PnmlNetKeys,
     ToolParser, XmlDictType, arbitrarysorts, arc, arc_idset, arcdict, basis, coordinate_type,
     decldict, feconstants, fill_builtin_enabled_filters!, fill_builtin_labelparsers!,

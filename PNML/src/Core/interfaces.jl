@@ -315,24 +315,6 @@ $(METHODLIST)
 function has_reftransition end
 
 """
-    refplace_idset(x) -> OrderedSet{Symbol}
-
-Return reference place pnml ids.
-
-$(METHODLIST)
-"""
-function refplace_idset end
-
-"""
-    reftransition_idset(x) -> OrderedSet{Symbol}
-
-Return reference transition pnml ids.
-
-$(METHODLIST)
-"""
-function reftransition_idset end
-
-"""
 $(TYPEDSIGNATURES)
 Return reference place matching `id`.
 
@@ -402,7 +384,7 @@ function sortref end
 
 Return concrete sort attached to a sort declaration object.
 
-Dictionaries in a network-level [`DeclDict`](@ref) hold, among other things,
+Dictionaries in a network-level [`DeclDicts`](@ref) hold, among other things,
 `NamedSort`, `ArbitrarySort` and `PartitionSort` declarations.
 These declarations add an ID and name to a concrete sort,
 with the ID symbol used as the dictionary key.
@@ -451,9 +433,9 @@ function adjacent_place end
 #todo Remove limitation of requiring arcs to be between place and transition.
 
 """
-    decldict(net::AbstractPnmlNet) -> DeclDict
+    decldict(net::AbstractPnmlNet) -> DeclDicts
 
-Access net-level `DeclDict`.
+Access net-level `DeclDicts`.
 
 $(METHODLIST)
 """
@@ -532,7 +514,7 @@ function has_operator end
 
 """
     has_key(net::AbstractPnmlnet, dict, key::Symbol) -> Bool
-Where `dict` is the access method for a dictionary in `DeclDict`.
+Where `dict` is the access method for a dictionary in `DeclDicts`.
 """
 function has_key end
 

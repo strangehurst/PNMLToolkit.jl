@@ -37,7 +37,7 @@ $(FIELDS)
     # We use the declarations toolkit for non-high-level nets,
     # and assume a minimum level of function for high-level nets.
     # Declarations present in the input file will overwrite thesenet. Particulary '<dot>'.
-    ddict::RefValue{DeclDict} = Ref{DeclDict}() # undef
+    ddict::RefValue{DeclDicts} = Ref{DeclDicts}() # undef
 
     # PNML Label with `Text` `Graphics`, `ToolInfo` and zero or more `Declarations`.
     # Yes, The ISO 15909-2 Standard uses `Declarations` inside `Declaration`.
@@ -83,7 +83,7 @@ function make_net(pntd::Symbol, id=:make_net,)
                     idregistry=IDRegistry(),
                     pagedict=OrderedDict{Symbol, Page{PnmlNet{var}}}())
 
-    net.ddict[] = DeclDict(net) # Empty DeclDict
+    net.ddict[] = DeclDicts(net) # Empty DeclDicts
     net.declaration = Declaration(; ddict=decldict(net)) # Empty Declarations
 
     fill_builtin_sorts!(net)
@@ -245,7 +245,7 @@ end
 
 
 #------------------------------------------------------------------------------
-# DeclDict access
+# DeclDicts access
 #------------------------------------------------------------------------------
 useroperators(@nospecialize(net::PnmlNet))  = useroperators(decldict(net))
 variabledecls(@nospecialize(net::PnmlNet))  = variabledecls(decldict(net))
@@ -259,17 +259,17 @@ feconstants(@nospecialize(net::PnmlNet))    = feconstants(decldict(net))
 multisetsorts(@nospecialize(net::PnmlNet))  = multisetsorts(decldict(net))
 productsorts(@nospecialize(net::PnmlNet))   = productsorts(decldict(net))
 
-variabledecl(net::PnmlNet, id::Symbol)  = variabledecls(net)[id]::VariableDeclaration
-namedsort(net::PnmlNet, id::Symbol)               = namedsorts(net)[id]::NamedSort
-arbitrarysort(net::PnmlNet, id::Symbol)       = arbitrarysorts(net)[id]::ArbitrarySort
-partitionsort(net::PnmlNet, id::Symbol) = partitionsorts(net)[id]::PartitionSort
+variabledecl(net::PnmlNet, id::Symbol)  = variabledecls(net)[id]::VariableDeclaration{typeof(net)}
+namedsort(net::PnmlNet, id::Symbol)               = namedsorts(net)[id]::NamedSort{typeof(net)}
+arbitrarysort(net::PnmlNet, id::Symbol)       = arbitrarysorts(net)[id]::ArbitrarySort{typeof(net)}
+partitionsort(net::PnmlNet, id::Symbol) = partitionsorts(net)[id]::PartitionSort{typeof(net)}
 multisetsort(net::PnmlNet, id::Symbol)  = multisetsorts(net)[id]::MultisetSort
-productsort(net::PnmlNet, id::Symbol)   = productsorts(net)[id]::ProductSort
-namedop(net::PnmlNet, id::Symbol)      = namedoperators(net)[id]::NamedOperator
-arbitraryop(net::PnmlNet, id::Symbol)   = arbitraryops(net)[id]::ArbitraryOperator
+productsort(net::PnmlNet, id::Symbol)   = productsorts(net)[id]::ProductSort{typeof(net)}
+namedop(net::PnmlNet, id::Symbol)      = namedoperators(net)[id]::NamedOperator{typeof(net)}
+arbitraryop(net::PnmlNet, id::Symbol)   = arbitraryops(net)[id]::ArbitraryOperator{typeof(net)}
 partitionop(net::PnmlNet, id::Symbol)   = partitionops(net)[id] ############# TODO! WHAT TYPE?
 feconstant(net::PnmlNet, id::Symbol)    = feconstants(net)[id]::FEConstant
-useroperator(net::PnmlNet, id::Symbol)  = useroperators(net)[id]::UserOperator
+useroperator(net::PnmlNet, id::Symbol)  = useroperators(net)[id]::UserOperator{typeof(net)}
 
 #useroperator(net::PnmlNet)  = useroperator(decldict(net)) # no SortRef
 #variabledecl(net::PnmlNet)  = variabledecl(decldict(net))
@@ -283,7 +283,7 @@ feconstant(net::PnmlNet, ref::SortRef)    = feconstant(net, refid_of(ref))
 multisetsort(net::PnmlNet, ref::SortRef)  = multisetsort(net, refid_of(ref))
 productsort(net::PnmlNet, ref::SortRef)   = productsort(net, refid_of(ref))
 
-"Lookup operator with `id` in DeclDict.::Symbol May be namedop, feconstant, etc"
+"Lookup operator with `id` in DeclDicts.::Symbol May be namedop, feconstant, etc"
 operator(net::PnmlNet, id::Symbol) = operator(decldict(net), id)
 """
     operators(net::PnmlNet)-> Iterator
@@ -295,7 +295,7 @@ has_operator(net::PnmlNet, id::Symbol) = has_operator(decldict(net), id)
 
 """
     has_key(net::PnmlNet, dict, key::Symbol) -> Bool
-Where `dict` is the access method for a dictionary in `DeclDict`.
+Where `dict` is the access method for a dictionary in `DeclDicts`.
 """
 has_key(net::PnmlNet, dict, key::Symbol) = haskey(dict(decldict(net)), key)::Bool
 

@@ -232,7 +232,7 @@ abstract type AbstractOperator <: AbstractTerm end
 """
 abstract type AbstractSort end
 
-abstract type AbstractDeclDict end
+abstract type AbstractDeclDicts end
 
 """
     $(TYPEDEF)

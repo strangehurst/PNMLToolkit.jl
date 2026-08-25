@@ -76,6 +76,6 @@ end
 #     @test inputs(inscterm)[2] isa PNML.Variable
 #     @test tag(inputs(inscterm)[1]) === :x
 #     @test tag(inputs(inscterm)[2]) === :v
-#     #@test value(inputs(inscterm)[1]) Needs DeclDict
-#     #@test value(inputs(inscterm)[2]) Needs DeclDict
+#     #@test value(inputs(inscterm)[1]) Needs DeclDicts
+#     #@test value(inputs(inscterm)[2]) Needs DeclDicts
 # end

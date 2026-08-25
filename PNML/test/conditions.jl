@@ -35,7 +35,7 @@ using .TestUtils
 #  </condition>
 #     """
 #     @testset for node in [n1]
-#         dd = PNML.DeclDict()
+#         dd = PNML.DeclDicts()
 #         # dd.variabledecls[:pt] = PNML.VariableDeclaration(:pt, "", DotSort())
 #         # dd.namedoperators[:cts] = PNML.NamedOperator(:cts, "")
 #         # dd.namedoperators[:ack] = PNML.NamedOperator(:ack, "")
