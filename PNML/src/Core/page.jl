@@ -61,7 +61,7 @@ has_reftransition(page::Page, id::Symbol) = in(id, reftransition_idset(page))
 
 function Base.show(io::IO, page::Page{N}) where {N <: AbstractPnmlNet}
     #TODO Add support for :trim and :compact
-    print(io, "Page{",N,"}("),
+    print(io, "Page{", N, "}("),
     show(io, pid(page)); print(io, ", ")
     show(io, name(page)); print(io, ", ")
     println(io)

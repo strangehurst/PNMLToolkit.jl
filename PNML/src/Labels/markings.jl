@@ -111,19 +111,12 @@ Used to initialize a marking vector that will then be updated by firing a transi
 end
 
 basis(mark::Marking) = sortref(term(mark))::SortRef
-sortref(mark::Marking) = expr_sortref(term(mark), m.net)::SortRef
+sortref(mark::Marking) = expr_sortref(term(mark), mark.net)::SortRef
 
 function Base.show(io::IO, mark::Marking)
-    print(io, indent(io), "Marking(")
-    show(io, term(mark))
-    if has_graphics(mark)
-        print(io, ", ")
-        show(io, graphics(mark))
-    end
-    if has_tools(mark)
-        print(io, ", ")
-        show(io, toolinfos(mark));
-    end
+    print(io, indent(io), "Marking(", term(mark))
+    has_graphics(mark) && print(io, ", ", graphics(mark))
+    has_tools(mark) && print(io, ", ", toolinfos(mark));
     print(io, ")")
 end
 
