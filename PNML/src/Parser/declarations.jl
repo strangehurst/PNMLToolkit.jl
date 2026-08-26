@@ -82,11 +82,8 @@ function fill_decl_dict!(net::AbstractPnmlNet, node::XMLNode)
             part = parse_partition(child, net)::SortRef
             has_partitionsort(net, part) || error("no parition sort found: $part")
             @assert is_partitionsort(part) "expected partition sort found: $part"
-        #! elseif tag === :partitionoperator
-        #!      PartitionLessThan, PartitionGreaterThan, PartitionElementOf
-        #!      <ltp>, <gtp>, <partitionelementof refpartition="xxx">,
-        #!      partop = parse_partition_op(child, pntd)
-        #!      partitionops(net)[pid(partop)] = partop
+        #!      terms: PartitionLessThan, PartitionGreaterThan, PartitionElementOf
+        #!      <partitionelementof refpartition="xxx">,
 
         elseif tag == "arbitrarysort"
             arb = parse_arbitrarysort(child, net)::SortRef

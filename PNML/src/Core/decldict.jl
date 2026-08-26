@@ -34,7 +34,6 @@ function Base.show(io::IO, dd::ADDicts)
     println(io, "]")
 
     print(io,  indent(io), "PartitionElement[")
-    print(iio, keys(partitionops(dd)))
     println(io, "]")
 
     print(io,  indent(io), "ArbitrarySort[")

@@ -15,7 +15,7 @@ $(DocStringExtensions.TYPEDFIELDS)
 Collection of dictionaries holding various kinds of PNML declarations.
 Each keyed by REFID symbols.
 """
-@kwdef struct DeclDicts{V,NS,AS,PAS,MS,PRS,NO,AO,PO,FE,UO} <: AbstractDeclarationDicts
+@kwdef struct DeclDicts{V,NS,AS,PAS,MS,PRS,NO,AO,FE,UO} <: AbstractDeclarationDicts
     """
         Holds [`VariableDeclaration`](@ref).
         A [`Variable`](@ref) is used to locate the declaration's name and sort.
@@ -36,14 +36,13 @@ Each keyed by REFID symbols.
     namedoperators::Dict{Symbol, NO}
     arbitraryoperators::Dict{Symbol, AO}
     # PartitionElement is an operator, there are other built-in operators
-    partitionops::Dict{Symbol, PO}
     # FEConstants are 0-ary OperatorDeclarations.
     feconstants::Dict{Symbol, FE}
 
     useroperators::Dict{Symbol, UO}
 end  #= struct DeclDicts =#
 
-function DeclDicts(net::AbstractPnmlNet)
+function decldicts(net::AbstractPnmlNet)
     N = typeof(net)
     DeclDicts(;
                arbitraryoperators = Dict{Symbol, ArbitraryOperator{N}}(),
@@ -52,7 +51,6 @@ function DeclDicts(net::AbstractPnmlNet)
                multisetsorts = Dict{Symbol, MultisetSort}(),
                namedoperators = Dict{Symbol, NamedOperator{N}}(),
                namedsorts = Dict{Symbol, NamedSort{N}}(),
-               partitionops = Dict{Symbol, Any}(), #TODO value type TBD
                partitionsorts = Dict{Symbol, PartitionSort{N}}(),
                productsorts = Dict{Symbol, ProductSort{N}}(),
                useroperators = Dict{Symbol, UserOperator{N}}(),
@@ -63,30 +61,29 @@ end
 __dd_fields(dd) = Iterators.map(Fix1(getproperty, dd),
                                 (:arbitraryoperators, :arbitrarysorts, :feconstants,
                                  :multisetsorts,  :namedoperators, :namedsorts,
-                                 :partitionops, :partitionsorts, :productsorts,
+                                 :partitionsorts, :productsorts,
                                  :variabledecls, :useroperators,))
 
-Base.isempty(dd::ADDicts) = all(isempty, __dd_fields(dd))
-Base.length(dd::ADDicts)  = sum(length,  __dd_fields(dd))
+Base.isempty(dd::DeclDicts) = all(isempty, __dd_fields(dd))
+Base.length(dd::DeclDicts)  = sum(length,  __dd_fields(dd))
 
-useroperators(dd::ADDicts)  = dd.useroperators
-variabledecls(dd::ADDicts)  = dd.variabledecls
-namedsorts(dd::ADDicts)     = dd.namedsorts
-arbitrarysorts(dd::ADDicts) = dd.arbitrarysorts
-partitionsorts(dd::ADDicts) = dd.partitionsorts
-namedoperators(dd::ADDicts) = dd.namedoperators
-arbitraryops(dd::ADDicts)   = dd.arbitraryoperators
-partitionops(dd::ADDicts)   = dd.partitionops
-feconstants(dd::ADDicts)    = dd.feconstants
-multisetsorts(dd::ADDicts)  = dd.multisetsorts
-productsorts(dd::ADDicts)   = dd.productsorts #! put in namedsorts like FiniteItRangeSort
+useroperators(dd::DeclDicts)  = dd.useroperators
+variabledecls(dd::DeclDicts)  = dd.variabledecls
+namedsorts(dd::DeclDicts)     = dd.namedsorts
+arbitrarysorts(dd::DeclDicts) = dd.arbitrarysorts
+partitionsorts(dd::DeclDicts) = dd.partitionsorts
+namedoperators(dd::DeclDicts) = dd.namedoperators
+arbitraryops(dd::DeclDicts)   = dd.arbitraryoperators
+feconstants(dd::DeclDicts)    = dd.feconstants
+multisetsorts(dd::DeclDicts)  = dd.multisetsorts
+productsorts(dd::DeclDicts)   = dd.productsorts #! put in namedsorts like FiniteItRangeSort
 
 """
-    declarations(dd::ADDicts) -> Iterator
+    declarations(dd::DeclDicts) -> Iterator
 
 Return an iterator over all the declaration dictionaries' values.
 """
-function declarations(dd::ADDicts)
+function declarations(dd::DeclDicts)
     Iterators.flatten([
         values(variabledecls(dd)),
         values(namedsorts(dd)),
@@ -94,7 +91,6 @@ function declarations(dd::ADDicts)
         values(partitionsorts(dd)),
         values(multisetsorts(dd)),
         values(productsorts(dd)),
-        values(partitionops(dd)),
         values(namedoperators(dd)),
         values(arbitraryops(dd)),
         values(feconstants(dd)),
@@ -102,34 +98,32 @@ function declarations(dd::ADDicts)
     ])
 end
 
-has_key(dd::ADDicts, dict, key::Symbol)   = haskey(dict(dd), key)::Bool
+has_key(dd::DeclDicts, dict, key::Symbol)   = haskey(dict(dd), key)::Bool
 
-has_variabledecl(dd::ADDicts, id::Symbol)   = has_key(dd, variabledecls, id)
-has_namedsort(dd::ADDicts, id::Symbol)      = has_key(dd, namedsorts, id)
-has_arbitrarysort(dd::ADDicts, id::Symbol)  = has_key(dd, arbitrarysorts, id)
-has_partitionsort(dd::ADDicts, id::Symbol)  = has_key(dd, partitionsorts, id)
-has_multisetsort(dd::ADDicts, id::Symbol)   = has_key(dd, multisetsorts, id)
-has_productsort(dd::ADDicts, id::Symbol)    = has_key(dd, productsorts, id)
-has_namedop(dd::ADDicts, id::Symbol)        = has_key(dd, namedoperators, id)
-has_arbitraryop(dd::ADDicts, id::Symbol)    = has_key(dd, arbitraryops, id)
-has_partitionop(dd::ADDicts, id::Symbol)    = has_key(dd, partitionops, id)
-has_feconstant(dd::ADDicts, id::Symbol)     = has_key(dd, feconstants, id)
-has_useroperator(dd::ADDicts, id::Symbol)   = has_key(dd, useroperators, id)
+has_variabledecl(dd::DeclDicts, id::Symbol)   = has_key(dd, variabledecls, id)
+has_namedsort(dd::DeclDicts, id::Symbol)      = has_key(dd, namedsorts, id)
+has_arbitrarysort(dd::DeclDicts, id::Symbol)  = has_key(dd, arbitrarysorts, id)
+has_partitionsort(dd::DeclDicts, id::Symbol)  = has_key(dd, partitionsorts, id)
+has_multisetsort(dd::DeclDicts, id::Symbol)   = has_key(dd, multisetsorts, id)
+has_productsort(dd::DeclDicts, id::Symbol)    = has_key(dd, productsorts, id)
+has_namedop(dd::DeclDicts, id::Symbol)        = has_key(dd, namedoperators, id)
+has_arbitraryop(dd::DeclDicts, id::Symbol)    = has_key(dd, arbitraryops, id)
+has_feconstant(dd::DeclDicts, id::Symbol)     = has_key(dd, feconstants, id)
+has_useroperator(dd::DeclDicts, id::Symbol)   = has_key(dd, useroperators, id)
 
-variabledecl(dd::ADDicts, id::Symbol)  = variabledecls(dd)[id]
-namedsort(dd::ADDicts, id::Symbol)     = namedsorts(dd)[id]
-arbitrarysort(dd::ADDicts, id::Symbol) = arbitrarysorts(dd)[id]
-partitionsort(dd::ADDicts, id::Symbol) = partitionsorts(dd)[id]
-multisetsort(dd::ADDicts, id::Symbol)  = multisetsorts(dd)[id]
-productsort(dd::ADDicts, id::Symbol)   = productsorts(dd)[id]
-namedop(dd::ADDicts, id::Symbol)       = namedoperators(dd)[id]
-arbitraryop(dd::ADDicts, id::Symbol)   = arbitraryops(dd)[id]
-partitionop(dd::ADDicts, id::Symbol)   = partitionops(dd)[id]
-feconstant(dd::ADDicts, id::Symbol)    = feconstants(dd)[id]
-useroperator(dd::ADDicts, id::Symbol)  = useroperators(dd)[id]
+variabledecl(dd::DeclDicts, id::Symbol)  = variabledecls(dd)[id]
+namedsort(dd::DeclDicts, id::Symbol)     = namedsorts(dd)[id]
+arbitrarysort(dd::DeclDicts, id::Symbol) = arbitrarysorts(dd)[id]
+partitionsort(dd::DeclDicts, id::Symbol) = partitionsorts(dd)[id]
+multisetsort(dd::DeclDicts, id::Symbol)  = multisetsorts(dd)[id]
+productsort(dd::DeclDicts, id::Symbol)   = productsorts(dd)[id]
+namedop(dd::DeclDicts, id::Symbol)       = namedoperators(dd)[id]
+arbitraryop(dd::DeclDicts, id::Symbol)   = arbitraryops(dd)[id]
+feconstant(dd::DeclDicts, id::Symbol)    = feconstants(dd)[id]
+useroperator(dd::DeclDicts, id::Symbol)  = useroperators(dd)[id]
 
 "Return tuple of operator dictionary fields in the Declaration Dictionaries."
-_op_dictionaries() = (:namedoperators, :feconstants, :partitionops, :arbitraryoperators)
+_op_dictionaries() = (:namedoperators, :feconstants, :arbitraryoperators)
 "Return iterator over operator dictionaries of Declaration Dictionaries."
 _ops(dd) = Iterators.map(Fix1(getfield, dd), _op_dictionaries())
 
@@ -140,15 +134,15 @@ _sort_dictionaries() = (:namedsorts, :partitionsorts,
 _sorts(dd) = Iterators.map(Fix1(getfield, dd), _sort_dictionaries())
 
 """
-    operators(dd::ADDicts)-> Iterator
+    operators(dd::DeclDicts)-> Iterator
 Iterate over each operator in the operator subset of declaration dictionaries .
 """
-operators(dd::ADDicts) = Iterators.flatten(Iterators.map(keys, _ops(dd)))
+operators(dd::DeclDicts) = Iterators.flatten(Iterators.map(keys, _ops(dd)))
 
-has_operator(dd::ADDicts, id::Symbol) = any(opdict -> haskey(opdict, id), _ops(dd))
+has_operator(dd::DeclDicts, id::Symbol) = any(opdict -> haskey(opdict, id), _ops(dd))
 
 """
-    operator(dd::ADDicts, id::Symbol) -> AbstractOperator
+    operator(dd::DeclDicts, id::Symbol) -> AbstractOperator
 
 Return operator TermInterface expression for `id`.
     `toexpr(::AbstractOpExpr, varsub, ddict) = :(useroperator(ddict, REFID)(varsub))`
@@ -203,7 +197,7 @@ With output sort to match `OperatorDeclaration` .
 
 #TODO built-in operators
 """
-function operator(dd::ADDicts, opid::Symbol)
+function operator(dd::DeclDicts, opid::Symbol)
     for dict in _ops(dd) # Look through all the dictionaries.
         if haskey(dict, opid)
             return dict[opid] #! not type stable because each dict holds different type.
@@ -213,17 +207,17 @@ function operator(dd::ADDicts, opid::Symbol)
 end
 
 """
-    verify(dd::ADDicts, verbose::Bool, net::AbstractPnmlNet) -> Bool
+    verify(dd::DeclDicts, verbose::Bool, net::AbstractPnmlNet) -> Bool
 """
-function verify(dd::ADDicts, verbose::Bool, net::AbstractPnmlNet)
+function verify(dd::DeclDicts, verbose::Bool, net::AbstractPnmlNet)
     errors = String[]
     verify!(errors, dd, verbose, net)
     isempty(errors) ||
-        error("verify(::ADDicts) error(s):\n ", join(errors, ",\n "))
+        error("verify(::DeclDicts) error(s):\n ", join(errors, ",\n "))
     return true
 end
 
-function verify!(errors::Vector{String}, dd::ADDicts, verbose::Bool, net::AbstractPnmlNet)
+function verify!(errors::Vector{String}, dd::DeclDicts, verbose::Bool, net::AbstractPnmlNet)
     verbose && println("## verify $(typeof(dd))")
     for k in Iterators.flatten([keys(variabledecls(dd)),
                             keys(namedsorts(dd)),
@@ -231,7 +225,6 @@ function verify!(errors::Vector{String}, dd::ADDicts, verbose::Bool, net::Abstra
                             keys(partitionsorts(dd)),
                             keys(multisetsorts(dd)),
                             keys(productsorts(dd)),
-                            keys(partitionops(dd)),
                             keys(namedoperators(dd)),
                             keys(arbitraryops(dd)),
                             keys(feconstants(dd)),
@@ -247,7 +240,7 @@ function verify!(errors::Vector{String}, dd::ADDicts, verbose::Bool, net::Abstra
 end
 
 
-function show_sorts(dd::ADDicts)
+function show_sorts(dd::DeclDicts)
     println("show_sorts")
     #@show _sort_dictionaries()
     foreach(_sort_dictionaries()) do s

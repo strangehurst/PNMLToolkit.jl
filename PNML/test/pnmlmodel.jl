@@ -198,7 +198,6 @@ end
                     PNML.has_productsort,
                     PNML.has_namedop,
                     PNML.has_arbitraryop,
-                    PNML.has_partitionop,
                     PNML.has_feconstant,
                     PNML.has_useroperator]
             @test h(net, :nosuch) == false
@@ -212,7 +211,6 @@ end
                     PNML.productsort,
                     PNML.namedop,
                     PNML.arbitraryop,
-                    PNML.partitionop,
                     PNML.feconstant,
                     PNML.useroperator]
             @test_throws KeyError d(net, :nosuch)

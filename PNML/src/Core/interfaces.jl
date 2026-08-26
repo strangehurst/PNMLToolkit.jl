@@ -475,8 +475,6 @@ function partitionsorts end
 function namedoperators end
 "Return dictionary of ``id` => ArbitraryOperator`"
 function arbitraryops end
-"Return dictionary of `id` => partitionops (`PartitionElement`)"
-function partitionops end
 "Return dictionary of `id` => `FEConstant`"
 function feconstants end
 "Return dictionary of `id` => `MultisetSort`"
@@ -501,8 +499,6 @@ function productsort end
 function namedop end
 "Lookup arbitraryop with `id`."
 function arbitraryop end
-"Lookup partitionop with `id`."
-function partitionop end
 "Lookup feconstant with `id`."
 function feconstant end
 "Lookup useroperator with `id`."
@@ -526,7 +522,6 @@ function has_multisetsort end
 function has_productsort end
 function has_namedop end
 function has_arbitraryop end
-function has_partitionop end
 function has_feconstant end
 function has_useroperator end
 

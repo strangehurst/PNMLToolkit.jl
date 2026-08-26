@@ -83,7 +83,7 @@ function make_net(pntd::Symbol, id=:make_net,)
                     idregistry=IDRegistry(),
                     pagedict=OrderedDict{Symbol, Page{PnmlNet{var}}}())
 
-    net.ddict[] = DeclDicts(net) # Empty DeclDicts
+    net.ddict[] = decldicts(net) # Empty DeclDicts
     net.declaration = Declaration(; ddict=decldict(net)) # Empty Declarations
 
     fill_builtin_sorts!(net)
@@ -254,7 +254,6 @@ arbitrarysorts(@nospecialize(net::PnmlNet)) = arbitrarysorts(decldict(net))
 partitionsorts(@nospecialize(net::PnmlNet)) = partitionsorts(decldict(net))
 namedoperators(@nospecialize(net::PnmlNet)) = namedoperators(decldict(net))
 arbitraryops(@nospecialize(net::PnmlNet))   = arbitraryops(decldict(net))
-partitionops(@nospecialize(net::PnmlNet))   = partitionops(decldict(net))
 feconstants(@nospecialize(net::PnmlNet))    = feconstants(decldict(net))
 multisetsorts(@nospecialize(net::PnmlNet))  = multisetsorts(decldict(net))
 productsorts(@nospecialize(net::PnmlNet))   = productsorts(decldict(net))
@@ -267,7 +266,6 @@ multisetsort(net::PnmlNet, id::Symbol)  = multisetsorts(net)[id]::MultisetSort
 productsort(net::PnmlNet, id::Symbol)   = productsorts(net)[id]::ProductSort{typeof(net)}
 namedop(net::PnmlNet, id::Symbol)      = namedoperators(net)[id]::NamedOperator{typeof(net)}
 arbitraryop(net::PnmlNet, id::Symbol)   = arbitraryops(net)[id]::ArbitraryOperator{typeof(net)}
-partitionop(net::PnmlNet, id::Symbol)   = partitionops(net)[id] ############# TODO! WHAT TYPE?
 feconstant(net::PnmlNet, id::Symbol)    = feconstants(net)[id]::FEConstant
 useroperator(net::PnmlNet, id::Symbol)  = useroperators(net)[id]::UserOperator{typeof(net)}
 
@@ -278,7 +276,6 @@ arbitrarysort(net::PnmlNet, ref::SortRef) = arbitrarysort(net, refid_of(ref))
 partitionsort(net::PnmlNet, ref::SortRef) = partitionsort(net, refid_of(ref))
 #namedoperator(net::PnmlNet) = namedoperator(decldict(net))
 #arbitraryop(net::PnmlNet)   = arbitraryoperator(decldict(net))
-#partitionop(net::PnmlNet)   = partitionop(decldict(net))
 feconstant(net::PnmlNet, ref::SortRef)    = feconstant(net, refid_of(ref))
 multisetsort(net::PnmlNet, ref::SortRef)  = multisetsort(net, refid_of(ref))
 productsort(net::PnmlNet, ref::SortRef)   = productsort(net, refid_of(ref))
@@ -307,7 +304,6 @@ has_multisetsort(net::PnmlNet, id::Symbol)   = has_key(net, multisetsorts, id)
 has_productsort(net::PnmlNet, id::Symbol)    = has_key(net, productsorts, id)
 has_namedop(net::PnmlNet, id::Symbol)        = has_key(net, namedoperators, id)
 has_arbitraryop(net::PnmlNet, id::Symbol)    = has_key(net, arbitraryops, id)
-has_partitionop(net::PnmlNet, id::Symbol)    = has_key(net, partitionops, id)
 has_feconstant(net::PnmlNet, id::Symbol)     = has_key(net, feconstants, id)
 has_useroperator(net::PnmlNet, id::Symbol)   = has_key(net, useroperators, id)
 
@@ -319,7 +315,6 @@ has_multisetsort(net::PnmlNet, ref::SortRef)  = has_key(net, multisetsorts, refi
 has_productsort(net::PnmlNet, ref::SortRef)   = has_key(net, productsorts,refid_of(ref) )
 has_namedop(net::PnmlNet, ref::SortRef)       = has_key(net, namedoperators, refid_of(ref))
 has_arbitraryop(net::PnmlNet, ref::SortRef)   = has_key(net, arbitraryops, refid_of(ref))
-has_partitionop(net::PnmlNet, ref::SortRef)   = has_key(net, partitionops, refid_of(ref))
 has_feconstant(net::PnmlNet, ref::SortRef)    = has_key(net, feconstants, refid_of(ref))
 has_useroperator(net::PnmlNet, ref::SortRef)  = has_key(net, useroperators, refid_of(ref))
 
