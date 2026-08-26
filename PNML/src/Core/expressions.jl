@@ -227,8 +227,13 @@ end
 
 ###################################################################################
 # expression wrapping a REFID symbol used to do operator lookup `operator(net, REFID)`.
+# UserOperator refid maps to a declaration.
+# Includes FEConstant, built-ins, NamedOperator.
+# NamedOperator creates expression using variables and operators.AbstractBoolExpr
+# Operator scheme:
+#
 @matchable struct UserOperatorEx <: AbstractOpExpr
-    refid::Symbol # operator(net, REFID) returns operator callable.
+    refid::Symbol # operator(net, REFID) returns UserOperator callable.
 end
 """
     UserOperatorEx(refid:Symbol)
@@ -989,14 +994,18 @@ function Base.show(io::IO, x::PartitionGreaterThan)
 end
 
 # 0-arity despite the refpartition
-@matchable struct PartitionElementOf{T} <: PnmlExpr
+@matchable struct PartitionElementOf{T <: PnmlExpr} <: PnmlExpr
     arg::T # TODO variable that should be a feconstant
     refpartition::Symbol # TODO! wrap in PartitionSortRef
 end
 """
     PartitionElementOf
 
-Wraps `arg` , `rhrefpartitions`.
+$(TYPEDFIELDS)
+
+Return the `PartitionElement` of the  `refpartition` `PartitionSort` (over an `EnumeratedSort`)
+to which `arg` (a PnmlExpr that evaluates to `FEConstant`) belongs.
+Otherwise throw an exception.
 
 `toexpr` returns `Expr` that calls #! TBD
 """
@@ -1004,16 +1013,23 @@ PartitionElementOf
 
 expr_sortref(a::PartitionElementOf, net) = sortref(partitionsort(net, a.refpartition))::SortRef
 
-function _peo_impl(fec::FEConstant, refpart, net)
-    #@warn "peo_impl" lhs refpart
+function partitionelementof_impl(fec::FEConstant, refpart, net)
+    @warn "peo_impl" fec refpart PNML.pid(net)
     p = partitionsort(net, refpart)
-    # look for value of fec in findfirst(e -> contains(e, fec()), p.elements)
-    findfirst(Fix2(PNML.Declarations.contains, fec()), p.elements)
+    isnothing(p) &&
+        throw(ArgumentError("did not find PartitionSort with id $refpart"))
+    return let fec_val = fec()
+        partition_element = findfirst(Fix2(PNML.Declarations.contains, fec_val),
+                                      PNML.Declarations.sortelements(p, net))
+        isnothing(partition_element) &&
+            throw(ArgumentError("fec value $fec_val not in PartitionSort $refpart"))
+        partition_element::PNML.Declarations.PartitionElement
+    end
 end
 
 function toexpr(op::PartitionElementOf, varsub::NamedTuple, net)
     #@warn "toexpr PartitionElementOf" op varsub
-    Expr(:call, _peo_impl, toexpr(op.arg, varsub, net), QuoteNode(op.refpartition), net)
+    Expr(:call, partitionelementof_impl, toexpr(op.arg, varsub, net), QuoteNode(op.refpartition), net)
 end
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
 
