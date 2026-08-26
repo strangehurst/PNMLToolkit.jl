@@ -71,7 +71,7 @@ export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef, A
 
 @public PnmlException, MissingIDException, DuplicateIDException, MalformedException
 @public namedsort, productsort, Coordinate
-@public basis, conditions, inscriptions, name, rates, mcontains, nrefplaces, nreftransitions, to_sort, inscription_value
+@public basis, conditions, decldicts, inscriptions, name, rates, mcontains, nrefplaces, nreftransitions, to_sort, inscription_value
 @public is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
 @public src_arcs, tgt_arcs, source, target
 

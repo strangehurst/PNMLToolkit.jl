@@ -135,7 +135,7 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
     net = PnmlNet{var}(; type=pnmltype, id=netid, idregistry,
                   pagedict = OrderedDict{Symbol, Page{PnmlNet{var}}}(),
                   )
-    net.ddict[] = DeclDicts(net) # Create with empty dictionaries of net specific values.
+    net.ddict[] = decldicts(net) # Create with empty dictionaries of net specific values.
 
     #^ Label Parsers
     fill_builtin_labelparsers!(net.labelparser)

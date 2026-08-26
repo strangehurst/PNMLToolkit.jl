@@ -10,7 +10,7 @@ Multisets.set_key_value_show()
     NumberConstant, Page, PartitionElement, Place, PnmlConfig, PnmlException, PnmlExpr, PnmlModel,
     PnmlMultiset, PnmlNet, PnmlNetKeys, RefPlace, RefTransition, SortType,
     Transition, XmlDictType, allpages, arbitrarysort, arbitrarysorts, arc, arc_idset,
-    arcdict, arcs, arity, cardinality, condition, decldict, elements, extralabels,
+    arcdict, arcs, arity, cardinality, condition, decldict, decldicts, elements, extralabels,
     fill_builtin_labelparsers!, fill_builtin_sorts!, fill_builtin_toolparsers!,
     fill_sort_tag!, firstnet, firstpage, flatten_pages!, graphics, has_arc, has_graphics, has_place,
     has_tools, has_transition, initial_marking, inputs, inscription, ispid, length,
