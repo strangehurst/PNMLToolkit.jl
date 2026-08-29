@@ -29,6 +29,8 @@ initial_marking(place::Place) = (place.initialMarking)()
 net(place::Place) = place.net
 sortref(place::Place) = sortref(place.sorttype)::SortRef
 
+Base.eltype(place::Place) = eltype(to_sort(sortref(place), net(place)))
+
 """
 Return zero-valued object with same `basis` and `eltype` as place's marking.
 
