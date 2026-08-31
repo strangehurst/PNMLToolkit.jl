@@ -11,25 +11,8 @@ mutable struct Transition{N <: AbstractPnmlNet, T <: PnmlExpr}  <: AbstractPnmlN
     graphics::Maybe{Graphics}
     toolspecinfos::Maybe{Vector{ToolInfo}}
     extralabels::LittleDict{Symbol,Any}
-
-    #! Move to net as dictionaries keyed by transition id 2026-05-16
-    # vars::Set{REFID}
-    # "Cache of variable substitutons for this transition"
-    # varsubs::Vector{NamedTuple}
     net::N
 end
-
-"""
-    varsubs(transition) -> Vector{NamedTuple}
-
-Access the variable substitutions of a transition.
-
-Variable substitutions depend on the current marking.
-Cache value in transition field as part of enabling rule phase of a Petri net lifecycle.
-"""
-function varsubs end
-
-varsubs(transition::Transition) = transition.net.varsubs[pid(transition)]
 
 """
     condition(::Transition) -> Condition
