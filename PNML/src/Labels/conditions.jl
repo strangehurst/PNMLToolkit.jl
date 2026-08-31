@@ -36,6 +36,11 @@ value_type(::Type{<:Condition}, ::Any) = eltype(BoolSort)
 # The Condition functor is the color function.
 term(c::Condition) = c.term #todo! pnml variables
 
+"""
+    $(TYPEDSIGNATURES)
+
+Return iterable collection of `Symbol`s.
+"""
 variables(c::Condition) = c.vars
 
 """

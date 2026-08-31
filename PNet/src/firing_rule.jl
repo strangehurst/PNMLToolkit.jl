@@ -15,7 +15,9 @@ find a transition with all input place marking >= arc inscription
 #output_matrix(petrinet::AbstractPetriNet) = output_matrix(pnmlnet(petrinet))
 #incidence_matrix(petrinet::AbstractPetriNet) = incidence_matrix(pnmlnet(petrinet))
 
-is_enabled(petrinet::AbstractPetriNet, marking) = enabled(pnmlnet(petrinet), marking)
+"Does the enabled vector have any `true` (a.k.a. an enabled transition)."
+is_enabled(petrinet::AbstractPetriNet, marking) =
+    any(enabled(pnmlnet(petrinet), marking))
 
 
 #^+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

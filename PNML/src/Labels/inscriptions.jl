@@ -24,6 +24,11 @@ function (inscription::Inscription)(varsub::NamedTuple = NamedTuple())
     eval(toexpr(term(inscription), varsub, inscription.net))
 end
 
+"""
+    $(TYPEDSIGNATURES)
+
+Return iterable collection of `Symbol`s.
+"""
 variables(inscription::Inscription) = inscription.vars
 
 function Base.show(io::IO, inscription::Inscription)
