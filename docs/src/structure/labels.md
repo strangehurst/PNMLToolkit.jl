@@ -34,7 +34,7 @@ component Core {
     [Expression]
 }
 component Storage {
-    component [DeclDict] {
+    component [DeclDicts] {
         component variabledecls
         component namedsorts
         component arbitrarysorts

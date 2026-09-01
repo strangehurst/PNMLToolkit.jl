@@ -65,14 +65,14 @@ Concepts from High-Level Petri Nets will be present in the Core layer.
 
 The XML file format allows declarations to be declared in <net> and <page> elements.
 
-All [`Declaration`](@ref) labels for a net share the same `DeclDict`.
+All [`Declaration`](@ref) labels for a net share the same `DeclDicts`.
 It is net-level data even when in a <page>.
 
 XML XPath is used to gather this information before parsing the rest of the elements.
-Allows using `DeclDict` while parsing.
+Allows using `DeclDicts` while parsing.
 
 ```@docs; canonical=false
-DeclDict
+DeclDicts
 ```
 
 ## Net Data Dictionaries
