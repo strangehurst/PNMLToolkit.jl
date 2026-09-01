@@ -20,7 +20,7 @@ Multisets.set_key_value_show()
     placedict, places, pntd_of, refid_of, refplace, refplace_idset, refplacedict, refplaces,
     reftransition, reftransition_idset, reftransitiondict, reftransitions, registry_of,
     sortdefinition, sortelements, sortref, source, tag, target, term, toexpr, toolinfos,
-    transition, transition_idset, transitiondict, transitions, value, value_type, varsubs,
+    transition, transition_idset, transitiondict, transitions, value, value_type,
     zero,
     place_ids, arc_ids, transition_ids, reftransition_ids, refplace_ids
 @reexport using PNML.Sorts
