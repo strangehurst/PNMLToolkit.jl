@@ -152,6 +152,7 @@ end
 # end
 
 function output_matrix!(omatrix::Matrix{T}, net::AbstractPnmlNet) where T
+    @show T
     varsub = NamedTuple() #todo! add Symmetric and HL support, variables
     for (p, place_id) in enumerate(place_ids(net))
         for (t, transition_id) in enumerate(transition_ids(net))
@@ -215,6 +216,7 @@ Symmetric nets restricts multisets of finite enumerations, and thus easier to de
 function incidence_matrix end
 
 function incidence_matrix(net::AbstractPnmlNet)
+    @show net.varsubs net.vars
     return output_matrix(net) - input_matrix(net)
 end
 
@@ -243,7 +245,7 @@ function initial_markings(net::PnmlNet{HighLevelPNML})
     else
         #! XXX Other HL nets need it to be treated as multiset, not simple numbers! XXX
         # Evaluate the ground term expression into a multiset.
-        [PNML.cardinality(initial_marking(p)::PnmlMultiset)::Number for p in PNML.places(net)]
+        [(multiset ∘ initial_marking)(p) for p in PNML.places(net)]
     end
     #! FIFO places use queues, will co-exist with multisets from regular HL places.
     # Use <fifoinitialMarking><structure><makelist> expression for initial queue contents.
