@@ -2,8 +2,21 @@ const elabelT =  LittleDict{Symbol, Any}
 const tparserT = LittleDict{String, LittleDict{String, Any}}
 const efilterT = LittleDict{Symbol, Any}
 const lparserT = LittleDict{Symbol, Any}
-const vsubT =    LittleDict{Symbol, Vector{NamedTuple}}
-const varsT =    LittleDict{Symbol, Set{Symbol}}
+
+const substT = Vector{NamedTuple}
+"""
+Map variable id to vector of named tuples for substitution value bindings.
+"""
+const vsubT = LittleDict{Symbol, substT}
+
+const varsetT = Set{Symbol}
+"""
+Map transition id to set of variable ids found in expressions of
+inscription and transition guard condition.
+"""
+const varsT = LittleDict{Symbol, varsetT}
+
+public elabelT, tparserT, efilterT, lparserT, vsubT, varsT, varsetT, substT
 
 """
 $(TYPEDEF)
@@ -159,17 +172,27 @@ has_reftransition(net::PnmlNet, id::Symbol) = haskey(reftransitiondict(net), id)
 toolinfos(net::PnmlNet) = net.toolspecinfos
 
 # Return iterator of dictionary values.
+"Values of placedict."
 places(net::PnmlNet)         = values(placedict(net))
+"Values of transitiondict."
 transitions(net::PnmlNet)    = values(transitiondict(net))
+"Values of arcdict."
 arcs(net::PnmlNet)           = values(arcdict(net))
+"Values of refplacedict."
 refplaces(net::PnmlNet)      = values(refplacedict(net))
+"Values of reftransitiondict."
 reftransitions(net::PnmlNet) = values(reftransitiondict(net))
 
 # Return iterator of dictionary keys.
+"Keys of `placedict`."
 place_ids(net::PnmlNet)         = keys(placedict(net))
+"Keys of transitiondict."
 transition_ids(net::PnmlNet)    = keys(transitiondict(net))
+"Keys of arcdict."
 arc_ids(net::PnmlNet)           = keys(arcdict(net))
+"Keys of refplacedict."
 refplace_ids(net::PnmlNet)      = keys(refplacedict(net))
+"Keys of reftransitiondict."
 reftransition_ids(net::PnmlNet) = keys(reftransitiondict(net))
 
 place(net::PnmlNet, id::Symbol)         = placedict(net)[id]
