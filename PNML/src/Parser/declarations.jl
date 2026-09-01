@@ -606,7 +606,8 @@ function parse_partition(node::XMLNode, net::AbstractPnmlNet) #! a sort declarat
 
     part_sort = PartitionSort(partition_id, nameval, partitioned_sortref, elements, net)
 
-    verify_partition(part_sort) || error("verify_partition failed: $part_sort")
+    verify_partition(part_sort) ||
+        throw(ErrorException("verify_partition failed: $part_sort"))
 
     # add to productsorts
     fill_sort_tag!(net, partition_id, part_sort) # add to partitionsorts without a sortref

@@ -74,8 +74,8 @@ set_config(config::PnmlConfig, parameters::NamedTuple) = setproperties(config, p
 """
     set_config!(; kwargs...)
 
-Create a new `PnmlConfig` with [`set_config`](@ref), then update the binding `PNML.CONFIG`
-to now refer to that object.
+Create a new `PnmlConfig` with [`set_config`](@ref),
+then update the global binding `PNML.CONFIG` to now refer to that object.
 """
 function set_config!(; kwargs...)
     global CONFIG = set_config(CONFIG; kwargs...)
