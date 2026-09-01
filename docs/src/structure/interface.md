@@ -261,14 +261,7 @@ methods(PNML.reftransition)  # hide
 
 Better to iterate than allocate. Using a set abstraction that iterates consistently, perhaps in insertion order.
 
-### place\_idset
-| Object       | Synopsis                     | Comment                              |
-|:-------------|:-----------------------------|:-------------------------------------|
-| PnmlNet      | `keys(placedict(net))`       | Iterates OrderedDict keys |
-| Page         | `place_idset(netsets(page))` | Iterates OrderedSet |
-| PnmlNetKeys  | `OrderedSet` | Iterates OrderedSet |
-
-Both iterate over REFIDs that are indices into dictionaries.,
+### place\_ids
 
 The contents of PnmlKeySet are indices into PnmlNet dictionaries.
 When there is only one page, the keys of the `placedict` and `place_set` will be (must be) the same.
@@ -277,31 +270,31 @@ For the foreseeable future, there will be little use of multi-page APIs.
 It is expected that flattened PNML nets will be the fully supported,
 tested, thought-through API.
 
-The discussion using place\_idset also applies to other \*_idset.
+The discussion using place\_ids also applies to other \*_ids.
 
-[`PNML.place_idset`](@ref)
+[`PNML.place_ids`](@ref)
 ```@example methods
-methods(PNML.place_idset)  # hide
+methods(PNML.place_ids)  # hide
 ```
-### transition\_idset
-[`PNML.transition_idset`](@ref)
+### transition\_ids
+[`PNML.transition_ids`](@ref)
 ```@example methods
-methods(PNML.transition_idset)  # hide
+methods(PNML.transition_ids)  # hide
 ```
-### arc\_idset
-[`PNML.arc_idset`](@ref)
+### arc\_ids
+[`PNML.arc_ids`](@ref)
 ```@example methods
-methods(PNML.arc_idset)  # hide
+methods(PNML.arc_ids)  # hide
 ```
-### refplace\_idset
-[`PNML.refplace_idset`](@ref)
+### refplace\_ids
+[`PNML.refplace_ids`](@ref)
 ```@example methods
-methods(PNML.refplace_idset)  # hide
+methods(PNML.refplace_ids)  # hide
 ```
-### reftransition\_idset
-[`PNML.reftransition_idset`](@ref)
+### reftransition\_ids
+[`PNML.reftransition_ids`](@ref)
 ```@example methods
-methods(PNML.reftransition_idset)  # hide
+methods(PNML.reftransition_ids)  # hide
 ```
 
 ## Arc Related
