@@ -95,7 +95,7 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
     m₀ = PNML.initial_markings(anet)
     #println("imatrix")
     imatrix  = PNML.incidence_matrix(anet) # Matrix of PnmlMultiset
-    #println("enabled_vec")
+    #println("enabled_vec $pntd")
     enabled_vec  = PNML.enabled(anet, m₀)
     #~ @show pntd m₀ imatrix enabled_vec #typeof(e)
     # 3 representations of the enabled vector.
