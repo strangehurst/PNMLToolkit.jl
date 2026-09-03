@@ -19,7 +19,15 @@ refs(sort::EnumerationSort) = sort.fec_refs::Vector{Symbol}
 
 Return iteratable ordered collection of keys into `feconstant(net)` dictionary.
 """
-sortelements(sort::EnumerationSort, ::AbstractPnmlNet) = refs(sort)
+function sortelements(sort::EnumerationSort, ::AbstractPnmlNet)
+    #@show sort.fec_refs
+    if sort isa Union{FiniteEnumerationSort, CyclicEnumerationSort}
+        refs(sort)
+        #map(Base.Fix1(PNML.feconstant, net), sort.fec_refs)
+    else
+        error("expected FiniteEnumerationSort or CyclicEnumerationSort, found $(typeof(sort))")
+    end
+end
 
 #"Return number of `FEConstants` contained by this sort."
 Base.length(sort::EnumerationSort) = length(refs(sort))
