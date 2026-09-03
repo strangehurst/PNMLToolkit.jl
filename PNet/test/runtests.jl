@@ -50,7 +50,7 @@ const FAILFAST = parse(Bool, get(ENV, "JULIA_TEST_FAILFAST", "true"))
         @safetestset "netapi"       begin include("netapi.jl") end
         @safetestset "simplenet"    begin include("simplenet.jl") end
     end
-    if select(("sample",), ("!FOO",))
+    if select(("SAMPLE",), ("!FOO",))
         @safetestset "sampleSNPrio" begin include("sampleSNPrio.jl") end
     end
     # if select(("ALL", "DOC"), ("!DOC",))
