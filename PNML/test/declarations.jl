@@ -157,7 +157,7 @@ end
 
     net = make_net(pntd, :declaration_net)
     decl = @inferred Declaration parse_declaration!(net, [node])
-    @test typeof(decl) <: Declaration
+    @test decl isa Declaration
 
     # Examine 3 partition sorts
     for psort in values(partitionsorts(decl.ddict))
