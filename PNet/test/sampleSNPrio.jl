@@ -15,7 +15,7 @@ using PNML: @xml_str, Arc, Page, Place, PnmlModel, PnmlNet, Transition, arc, arc
 println("\n-----------------------------------------")
 println("sampleSNPrio.pnml")
 # finiteenumeration, feconstant, partition, productsort, tuple,
-Multisets.set_julia_show()
+Multisets.set_key_value_show()
 @testset let fname=joinpath(@__DIR__, "data", "sampleSNPrio.pnml")
     #false &&
     model = pnmlmodel(fname)::PnmlModel
@@ -25,7 +25,11 @@ Multisets.set_julia_show()
     # @test vertex_labels(n) isa AbstractDict
     # PNML.show_sorts(n)
     #@show PNML.elabelT PNML.tparserT PNML.efilterT PNML.lparserT
-    @show PNML.vsubT PNML.varsT
+    println()
+    @show PNML.vsubT
+    println()
+    @show PNML.varsT
+    println()
 
     # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
     #     @test_throws ArgumentError PNML.metagraph(n)
@@ -37,7 +41,7 @@ Multisets.set_julia_show()
     @show m₀ = initial_markings(n)
     @show e = enabled(n, m₀)
     @show C  = PNML.incidence_matrix(n) # Matrix of PnmlMultiset
-    m₁ = fire2(C, n, m₀)
+    @show m₁ = fire2(C, n, m₀)
     #@test PNML.verify(net, true)
 end
 
