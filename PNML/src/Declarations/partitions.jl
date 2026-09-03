@@ -1,12 +1,10 @@
 #= Example from sampleSNPrio.pnml
 <declaration>
-<text>Fs
-    Without the following structure this Symmetric net
-    example will not be a structurally conformant High-level Petri Net.
+<text>
+    Partition of an finite enumeration.
 </text>
 <structure>
     <declarations>
-        <!-- Sorts declaration -->
         <namedsort id="usersnamed" name="USERS">
             <finiteenumeration>
                 <feconstant id="apacheId" name="apache" />
@@ -151,7 +149,7 @@ may be accessed by `UserSortRef` indirection.
 struct PartitionSort{N <: AbstractPnmlNet} <: SortDeclaration
     id::Symbol
     name::Union{String, SubString{String}}
-    def::SortRef # Like a NamedSort, refers to a sort (EnumerationSort)
+    def::SortRef # Refers to an EnumerationSort.
     elements::Vector{PartitionElement} # 1 or more PartitionElements that index into `def`
     elid2index::Dict{Symbol,Int} # Support for less than, greater than operations.
     net::N
@@ -216,9 +214,12 @@ function verify!(errors::Vector{String}, psort::PartitionSort, verbose::Bool, ne
 end
 
 function verify_partition(part::PartitionSort)
-    defelements = sortelements(sortdefinition(part), part.net)
-    partels = collect(Iterators.flatmap(e->e.terms, sortelements(part, part.net)))
-    defelements == partels
+    #println("verify_partition")
+    es = sortdefinition(part)::EnumerationSort
+    sort_elementids = sortelements(es, part.net)
+    partel_ids = collect(Iterators.flatmap(e->e.terms, sortelements(part, part.net)))
+    #@show sort_elementids partel_ids
+    sort_elementids == partel_ids
 end
 
 function Base.show(io::IO, ps::PartitionSort)
