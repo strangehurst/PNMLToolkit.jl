@@ -158,3 +158,4 @@ function to_sort(@nospecialize(sr::SortRef), @nospecialize(net::AbstractPnmlNet)
         error("to_sort no match for: $sr")
     end
 end
+to_sort(net::AbstractPnmlNet) = Fix2(to_sort, net)
