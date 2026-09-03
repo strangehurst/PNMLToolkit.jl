@@ -9,16 +9,16 @@ function fire2(C, net::PnmlNet{HighLevelPNML}, marking)
 end
 
 """
-    fire(incidence, enabled, marking) -> ArbitraryOperator
+    fire(incidence, enabled_vector, marking) -> ArbitraryOperator
 
-Return the marking vector after firing transition: marking + incidence * enabled
+Return the marking vector after firing transition: marking + incidence * enabled_vector
 
-`marking` values added to product of `incidence'` matrix and firing vector `enabled`.
+`marking` values added to product of `incidence'` matrix and firing `enabled_vector`.
 """
-function fire(incidence, enabled, m₀)
+function fire(incidence, enabled_vector, m₀)
     #println("fire $incidence $enabled $m₀ ")
     #@show typeof(incidence) enabled typeof(m₀)
     #@show permutedims(incidence) * enabled
     #! Multisets do not have negative multiplicities so fail here with incorrect marking!
-    muladd(permutedims(incidence), enabled, m₀) # old names, new values
+    muladd(permutedims(incidence), enabled_vector, m₀) # old names, new values
 end
