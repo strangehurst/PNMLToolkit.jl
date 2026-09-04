@@ -81,7 +81,7 @@ fill_sort_tag!(net::APN, tag, sort::MultisetSort) = fill_sort_tag!(net, tag, sor
 
 Fill context with the base built-in label parsers.
 """
-fill_builtin_labelparsers!(net::APN) = fill_builtin_labelparsers!(net.labelparser)
+fill_builtin_labelparsers!(net::APN) = fill_builtin_labelparsers!(net.labelparsers)
 
 function fill_builtin_labelparsers!(labelparser::AbstractDict)
     labelparser[:initialMarking]   = Parser.parse_initialMarking
@@ -114,7 +114,7 @@ Fill context with the base built-in tool parsers.
 """
 function fill_builtin_toolparsers! end
 
-fill_builtin_toolparsers!(net::APN) = fill_builtin_toolparsers!(net.toolparser)
+fill_builtin_toolparsers!(net::APN) = fill_builtin_toolparsers!(net.toolparsers)
 
 function fill_builtin_toolparsers!(toolparsers::AbstractDict)
     for plugin in (

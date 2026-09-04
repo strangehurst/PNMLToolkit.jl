@@ -138,13 +138,13 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
     net.ddict[] = decldicts(net) # Create with empty dictionaries of net specific values.
 
     #^ Label Parsers
-    fill_builtin_labelparsers!(net.labelparser)
-    @assert !isempty(net.labelparser) "There are expected to be built-in label parsers."
-    plugins!(net.labelparser, kwargs, :lp)
+    fill_builtin_labelparsers!(net.labelparsers)
+    @assert !isempty(net.labelparsers) "There are expected to be built-in label parsers."
+    plugins!(net.labelparsers, kwargs, :lp)
 
     #^ Tool Parsers
-    fill_builtin_toolparsers!(net.toolparser)
-    plugins!(net.toolparser, kwargs, :tp)
+    fill_builtin_toolparsers!(net.toolparsers)
+    plugins!(net.toolparsers, kwargs, :tp)
 
     #^ Sorts
     fill_builtin_sorts!(net)
@@ -163,7 +163,7 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
 
     let n = firstchild(net_node, "name")
         if !isnothing(n)
-            net.namelabel = net.labelparser[:name](n, net; parentid=netid)::Name
+            net.namelabel = net.labelparsers[:name](n, net; parentid=netid)::Name
         end
     end
 
@@ -256,7 +256,7 @@ function __parse_page!(net::PnmlNet{T}, page_node::XMLNode, pageid::Symbol) wher
             #---------------------------------------------------------------------------
             parse_page!(net, page_idset(page), child)
         elseif nname === :name
-            page.namelabel = net.labelparser[nname](child, net; parentid=pageid)
+            page.namelabel = net.labelparsers[nname](child, net; parentid=pageid)
         elseif nname === :graphics
             page.graphics = parse_graphics(child, pntd_of(net))
         else

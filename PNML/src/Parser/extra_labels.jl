@@ -5,8 +5,8 @@ Apply a labelparser to `child` if one matches `tag`, otherwise call [`xmldict`](
 Add to `extralabels`.
 """
 function unexpected_label!(extralabels::AbstractDict, child::XMLNode, tag::Symbol, net; parentid::Symbol)
-    if haskey(net.labelparser, tag)
-        extralabels[tag] = net.labelparser[tag](child, net, parentid)
+    if haskey(net.labelparsers, tag)
+        extralabels[tag] = net.labelparsers[tag](child, net, parentid)
     else
         xd = xmldict(child)
         xd isa AbstractString &&

@@ -63,12 +63,12 @@ $(FIELDS)
     const extralabels::LittleDict{Symbol, Any} = LittleDict{Symbol,Any}()
     # Map xml tag symbol to parser callable for built-in labels and extension labels.
     #todo Referplugins!ence to label parser interface.
-    const labelparser::lparserT = lparserT() #LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
+    const labelparsers::lparserT = lparserT() #LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
     """
         Collection that associates a tool name & version with a callable parser.
         The parser turns `<toolspecific name="" version="">` into `ToolInfo` objects.
     """
-    const toolparser::tparserT = tparserT()  #LittleDict{String, LittleDict{String, Any}} =
+    const toolparsers::tparserT = tparserT()  #LittleDict{String, LittleDict{String, Any}} =
                 #LittleDict{String, LittleDict{String, Any}}()
 
     # Collection of filters used by enabling rule.

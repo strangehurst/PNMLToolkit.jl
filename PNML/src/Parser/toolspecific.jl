@@ -5,7 +5,7 @@ $(TYPEDSIGNATURES)
 Return [`ToolInfo`](@ref) with tool & version attributes and content.
 
 The content can be one or more well-formed xml elements.
-Parsed by `net.toolparser[tool][version]` or [`toolspecific_content_fallback`](@ref)
+Parsed by `net.toolparsers[tool][version]` or [`toolspecific_content_fallback`](@ref)
 """
 function parse_toolspecific(node, net::AbstractPnmlNet)
     check_nodename(node, "toolspecific")
@@ -16,9 +16,9 @@ function parse_toolspecific(node, net::AbstractPnmlNet)
     isempty(version) && error("<toolspecific> version attribute cannot be empty string")
 
     # Find parser for tool, version.
-    tool_parser = if haskey(net.toolparser, tool) &&
-                     haskey(net.toolparser[tool], version)
-        net.toolparser[tool][version]
+    tool_parser = if haskey(net.toolparsers, tool) &&
+                     haskey(net.toolparsers[tool], version)
+        net.toolparsers[tool][version]
     else
         toolspecific_content_fallback
     end

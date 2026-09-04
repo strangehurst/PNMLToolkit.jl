@@ -60,8 +60,8 @@ end
 
     @test m isa PnmlModel
     net = PNML.firstnet(m)
-    foreach(println, pairs(net.toolparser)) # ::XMLNode, ::AbstractPnmlNet
-    foreach(println, pairs(net.labelparser)) # ::XMLNode, ::AbstractPnmlNet; Symbol
+    foreach(println, pairs(net.toolparsers)) # ::XMLNode, ::AbstractPnmlNet
+    foreach(println, pairs(net.labelparsers)) # ::XMLNode, ::AbstractPnmlNet; Symbol
     foreach(println, pairs(net.enabled_filters)) # ::Dict, ::Dict, ::AbstractPnmlNet, ::Symbol
 end
 
