@@ -21,7 +21,7 @@ is_enabled(petrinet::AbstractPetriNet, marking) =
 
 
 #^+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-"reachability_graph"
+"reachability graph not implemented"
 function reachability_graph(net)
-    @error "rechability graph" net
+    @error "rechability graph not implemented" net
 end
