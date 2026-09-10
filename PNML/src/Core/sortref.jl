@@ -36,7 +36,6 @@ Moshi.Data.@data SortRefImpl begin
     end
 end
 @assert @isdefined(SortRefImpl) "SortRefImpl should be defined"
-
 @derive SortRefImpl[Show,Hash,Eq]
 
 """
@@ -122,21 +121,11 @@ Check if a value is an `SortRef` vaTyperiant of `ArbitrarySortRef`.
 - `x`: Value to check (for `SortRef` input returns true if `ArbitrarySortRef`, for others returns false).
 
 # Returns
-- `true` if `x` is a `SortRef` with `ArbitrarySortRef` variant, `false` otherwise.
+- `true` if `x` is a `ArbitrarySortRef`, `false` otherwise.
 """
 is_arbitrarysort(x::SortRef) = isa_variant(x, SortRefImpl.ArbitrarySortRef)
 
-function refid_of(s::SortRef)
-    @match s begin
-        SortRefImpl.UserSortRef(; refid) => return refid
-        SortRefImpl.NamedSortRef(; refid) => return refid
-        SortRefImpl.PartitionSortRef(; refid) => return refid
-        SortRefImpl.ProductSortRef(; refid) => return refid
-        SortRefImpl.MultisetSortRef(; refid) => return refid
-        SortRefImpl.ArbitrarySortRef(; refid) => return refid
-        _ => error("no refid match for: $s")
-    end
-end
+refid_of(s::SortRef) = s.refid
 
 """
     to_sort(sortref::SortRef, net::AbstractPnmlNet) -> AbstractSort
