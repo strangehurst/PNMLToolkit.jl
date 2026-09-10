@@ -1259,12 +1259,21 @@ PnmlTupleEx
 
 # <tuple> is an operator.
 # The sort of a tuple is a tuple of its element's sorts (a.k.a ProductSort).
-# Find the ProductSortRef
+#
+# ISO 15909-2:2011 "An operator can be a built-in constant or built-in operator,
+# a multiset operator which among others can construct a multiset from
+# an enumeration of its elements, or a tuple operator.
+# Each operator has a sequence of sorts as its input sorts, and exactly one output sort, which defines its signature."
+# NB: This is all the standard has to say about tuples.
+# It assumes (and stated in earlier versions) that one know tuples from the "environment".
 function expr_sortref(tup::PnmlTupleEx, net)
-    exsort = ProductSort(tuple(expr_sortref.(tup.args, Ref(net))...), net)
+    # tuple operator arguments are terms: mostly variables, useroperators, built-in operator like successor.
+    #
+    outsort = ProductSort(tuple(expr_sortref.(tup.args, Ref(net))...), net)
     for (sortid,ps) in pairs(PNML.productsorts(net))
-        #!@show ps
-        if length(exsort) == length(ps) && PNML.Sorts.equalSorts(net, exsort, ps)
+        # Search product sorts for one that has the same argument sorts.
+        length(outsort) == length(ps) || continue
+         if PNML.Sorts.equalSorts(net, outsort, ps)
             return ProductSortRef(sortid)
         end
     end
