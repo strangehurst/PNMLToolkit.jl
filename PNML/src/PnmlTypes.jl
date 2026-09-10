@@ -197,7 +197,7 @@ const pnmltype_map = Dict{Symbol, AbstractPNTD}(
 """
     all_nettypes([predicate])
 
-Return iterator over [`AbstractPNTD`](@ref) singletons.
+Return iterator over `Symbol`s mapping to [`AbstractPNTD`](@ref) singletons.
 Filtered by a predicate `p` if one is provided.
 """
 all_nettypes() = keys(pnmltype_map)
@@ -224,12 +224,12 @@ function is_discrete(s::Symbol)
     s === :ptnet # || s === :pt_hlpng
 end
 is_discrete(::Val{:pnmlcore}) = true
-is_discrete(::Val{:hlcore}) = false
 is_discrete(::Val{:ptnet}) = true
-is_discrete(::Val{:hlnet}) = false
+is_discrete(::Val{:continuous}) = false
+is_discrete(::Val{:hlcore}) = false
 is_discrete(::Val{:pt_hlpng}) = false
 is_discrete(::Val{:symmetric}) = false
-is_discrete(::Val{:continuous}) = false
+is_discrete(::Val{:hlnet}) = false
 
 "Tokens represented by floating point."
 function is_continuous end
@@ -242,12 +242,12 @@ function is_continuous(s::Symbol)
     s === :continuous
 end
 is_continuous(::Val{:pnmlcore}) = true
-is_continuous(::Val{:hlcore}) = false
 is_continuous(::Val{:ptnet}) = true
-is_continuous(::Val{:hlnet}) = false
+is_continuous(::Val{:continuous}) = true
+is_continuous(::Val{:hlcore}) = false
 is_continuous(::Val{:pt_hlpng}) = false
 is_continuous(::Val{:symmetric}) = false
-is_continuous(::Val{:continuous}) = true
+is_continuous(::Val{:hlnet}) = false
 
 "Tokens represented by multiset (aka bag)."
 function is_highlevel end
@@ -262,39 +262,39 @@ function is_highlevel(s::Symbol)
     s === :symmetric
 end
 is_highlevel(::Val{:pnmlcore}) = true
-is_highlevel(::Val{:hlcore}) = false
 is_highlevel(::Val{:ptnet}) = true
-is_highlevel(::Val{:hlnet}) = false
+is_highlevel(::Val{:continuous}) = false
+is_highlevel(::Val{:hlcore}) = false
 is_highlevel(::Val{:pt_hlpng}) = false
 is_highlevel(::Val{:symmetric}) = false
-is_highlevel(::Val{:continuous}) = false
+is_highlevel(::Val{:hlnet}) = false
 
 "Token identity is collective."
 function is_collective_token end
-is_collective_token(pntd::AbstractPNTD) = is_discrete(pntd) || is_continuous(pntd)
-is_collective_token(s::Symbol) = is_discrete(Val(s)) || is_continuous(Val(s))
+#!is_collective_token(pntd::AbstractPNTD) = is_discrete(pntd) || is_continuous(pntd)
+is_collective_token(s::Symbol) = is_collective_token(Val(s))
 
 is_collective_token(::Val{:pnmlcore}) = true
-is_collective_token(::Val{:hlcore}) = false
 is_collective_token(::Val{:ptnet}) = true
-is_collective_token(::Val{:hlnet}) = false
+is_collective_token(::Val{:continuous}) = true
+is_collective_token(::Val{:hlcore}) = false
 is_collective_token(::Val{:pt_hlpng}) = true
 is_collective_token(::Val{:symmetric}) = false
-is_collective_token(::Val{:continuous}) = true
+is_collective_token(::Val{:hlnet}) = false
 
 
 "Token identity is individual."
 function is_individual_token end
-is_individual_token(pntd::AbstractPNTD) = is_highlevel(pntd)
-is_individual_token(s::Symbol) = is_highlevel(Val(s))
+#!is_individual_token(pntd::AbstractPNTD) = is_highlevel(pntd)
+is_individual_token(s::Symbol) = is_individual_token(Val(s))
 
 is_individual_token(::Val{:pnmlcore}) = false
-is_individual_token(::Val{:hlcore}) = true
 is_individual_token(::Val{:ptnet}) = false
-is_individual_token(::Val{:hlnet}) = true
+is_individual_token(::Val{:continuous}) = false
+is_individual_token(::Val{:hlcore}) = true
 is_individual_token(::Val{:pt_hlpng}) = false
 is_individual_token(::Val{:symmetric}) = true
-is_individual_token(::Val{:continuous}) = false
+is_individual_token(::Val{:hlnet}) = true
 
 
 #-----------------------------------------------------------------------------------------
