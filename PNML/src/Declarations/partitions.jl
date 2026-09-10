@@ -146,7 +146,7 @@ Is the sort at the partition or the element level (1 sort or many sorts?)
 Like [`NamedSort`](@ref), will add an `id` and `name` to a sort,
 may be accessed by `UserSortRef` indirection.
 """
-struct PartitionSort{N <: AbstractPnmlNet} <: SortDeclaration
+@struct_hash_equal struct PartitionSort{N <: AbstractPnmlNet} <: SortDeclaration
     id::Symbol
     name::Union{String, SubString{String}}
     def::SortRef # Refers to an EnumerationSort.
@@ -169,8 +169,9 @@ struct PartitionSort{N <: AbstractPnmlNet} <: SortDeclaration
 end
 
 #TODO also do AbstractSort, another SortDeclaration
-sortdefinition(p::PartitionSort) = sortdefinition(namedsort(p.net, p.def))
-sortelements(p::PartitionSort, ::AbstractPnmlNet) = p.elements
+sortref(p::PartitionSort) = p.def
+sortdefinition(p::PartitionSort) = sortdefinition(namedsort(p.net, sortref(p)))
+sortelements(p::PartitionSort, ::AbstractPnmlNet) = p.elements::Vector{PartitionElement}
 
 # TODO Add Partition/PartitionElement methods here
 # access by partition id, element id

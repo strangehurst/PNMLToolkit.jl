@@ -11,14 +11,14 @@ they just introduce a new symbol.
 
 Like `ArbitraryOperator`, does not have an associated algebra, not usable by `SymmetricNet.`
 """
-struct ArbitrarySort{N <: AbstractPnmlNet} <: SortDeclaration
+@struct_hash_equal struct ArbitrarySort{N <: AbstractPnmlNet} <: SortDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
     net::N
 end
 
 name(a::ArbitrarySort) = a.name
-sortelements(::ArbitrarySort, ::AbstractPnmlNet) = tuple()
+sortelements(::ArbitrarySort, ::AbstractPnmlNet) = tuple(#=empty=#)
 
 function Base.show(io::IO, s::ArbitrarySort)
     print(io, nameof(typeof(s)), "(", repr(pid(s)), ", ", repr(name(s)), ")")
