@@ -215,9 +215,9 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
     # It may have non-ground terms as parameters.
 
     if isnothing(inscription)
-        if is_collective_token(pntd_of(net))
+        if is_collective_token(pntdsym(net))
             inscription = default(Inscription, net)
-        elseif is_individual_token(pntd_of(net))
+        elseif is_individual_token(pntdsym(net))
             # Try to deduce using the adjacent place.
             # NB: adjacent place may have not been parsed yet.
             sr = if has_place(net, source)
