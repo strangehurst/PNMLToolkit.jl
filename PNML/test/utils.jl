@@ -76,6 +76,8 @@ end
     </test>
     """
     @test_call target_modules=t_modules firstchild(node, "a")
+    @show f = firstchild(node, "a")
+    @assert !isnothing(f)
     @test_call EzXML.nodename(firstchild(node, "a"))
     @test EzXML.nodename(firstchild(node, "a")) == "a"
     @test firstchild(node, "a")["name"] == "a1"
@@ -92,7 +94,6 @@ end
 #     @test c() == true
 # end
 
-#println()
 @testset "default inscription $pntd" for pntd in PnmlTypes.all_nettypes()
     net = make_net(pntd, :utils_net)
     # placetype = if is_highlevel(pntd)
