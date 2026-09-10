@@ -124,7 +124,8 @@ end
                                 <integer/>
                                 <integer/>
                         </productsort>""", net, :redundant, "redundant")
-    sort = to_sort(sortref, net)::ProductSort |> sortdefinition
+
+    sort = to_sort(sortref, net)::ProductSort
     @test occursin(r"^ProductSort", sprint(show, sort))
     @test eltype(sort) == Tuple{Int64,Int64} #! TODO XXX
 
@@ -135,7 +136,7 @@ end
                         <usersort declaration="speed"/>
                         <usersort declaration="distance"/>
                         </productsort>""", net, :someproduct, "someproduct")
-    sort = to_sort(sortref, net) |> sortdefinition
+    sort = to_sort(sortref, net)
     @test sort isa ProductSort
     @test occursin(r"^ProductSort", sprint(show, sort))
     @test eltype(sort) == Tuple{Int64,Int64} #! TODO XXX
@@ -154,7 +155,7 @@ end
     sortref = parse_sort(xml"""<multisetsort>
                                 <usersort declaration="duck"/>
                             </multisetsort>""", net, :testduck, "testduck")
-    sort = to_sort(sortref, net) |> sortdefinition
+    sort = to_sort(sortref, net)
     fill_sort_tag!(net, :amultiset, sort) #~ test of method needed here
     @test occursin(r"^MultisetSort", sprint(show, sort))
     @test eltype(sort) == Any
