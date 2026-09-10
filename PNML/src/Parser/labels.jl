@@ -239,8 +239,7 @@ function parse_hlinitialMarking(node::XMLNode, default_sorttype::Maybe{SortType}
         end
         if !equalSorts(net, sortref(default_sorttype), placetype)
             println()
-            @error("$(pntd_of(net)) parse_hlinitialMarking of $parentid " *
-                    "sortref mismatch: $default_sorttype != $placetype",
+            @error("parse_hlinitialMarking of $parentid sort mismatch",
                     default_sorttype, placetype, l)
             println()
         end
@@ -285,7 +284,7 @@ function parse_fifoinitialMarking(node::XMLNode, default_sorttype::Maybe{SortTyp
                 all(is_namedsort, Sorts.sorts(placetype, net))))
         @error(string("$(pntd_of(net)) placetype of $parentid expected to be NamedSortRef",
                       " or product of named sorts, found $placetype"))
-        is_productsort(placetype) && foreach(println, Sorts.sorts(placetype, net))
+        #is_productsort(placetype) && foreach(println, Sorts.sorts(placetype, net))
     end
 
     #^ Do an equalSorts default_sorttype if !nothing.
@@ -333,11 +332,19 @@ function (pmt::ParseMarkingTerm)(marknode::XMLNode, net::AbstractPnmlNet)
     # Here we are parsing a term from XML to a ground term, which must be an operator.
     mark_tj = parse_term(term, net; vars=()) # ParseMarkingTerm
     isempty(mark_tj.vars) || error("unexpected variables in $mark_tj")
-    if isnothing(placetype(pmt))
+    isnothing(placetype(pmt)) &&
         @warn "$(pntd_of(net)) ParseMarkingTerm placetype(pmt) is nothing"
-    elseif !equalSorts(net, mark_tj.ref, placetype(pmt)::SortRef)
-        @warn "$(pntd_of(net)) ParseMarkingTerm sort mismatch" mark_tj.ref placetype(pmt) mark_tj
-    end
+    # mark expression should be a multiset of placetype
+    # ref = mark_tj.ref
+    # if isnothing(placetype(pmt))
+    #     @warn "$(pntd_of(net)) ParseMarkingTerm placetype(pmt) is nothing"
+    # elseif !equalSorts(net, ref, placetype(pmt)::SortRef)
+    #     # Marking expression output sort
+    #     @warn("$(pntd_of(net)) ParseMarkingTerm sort mismatch",
+    #             ref,
+    #             placetype(pmt),
+    #             mark_tj::TermJunk)
+    # end
     return mark_tj
 
     # PnmlMultiset (datastructure) vs UserOperator/NamedOperator (term/expression)
