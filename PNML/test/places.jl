@@ -25,7 +25,7 @@ using .TestUtils
 
     place = parse_place(node, net)
     # @test_opt target_modules=t_modules broken=false parse_place(node, net)
-    @test_call target_modules=t_modules broken=true parse_place(node, net)
+    @test_call target_modules=t_modules broken=false parse_place(node, net)
     @test @inferred(pid(place)) === :place1
     @test @inferred(name(place)) == "with text"
     @test_call initial_marking(place)
