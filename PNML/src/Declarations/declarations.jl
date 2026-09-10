@@ -159,10 +159,23 @@ We use a different type system.
 end
 
 function sortdefinition(namedsort::NamedSort)
-    namedsort.def # Instance of concrete sort.
+    # if namedsort.def isa ProductSort
+    #     sortdefinition(namedsort.def) # tuple of concrete sorts
+    # else
+    #     namedsort.def # Instance of single concrete sort.
+    # end
+    namedsort.def # Instance of single concrete sort.
 end
 
-sortelements(namedsort::NamedSort, net::AbstractPnmlNet) = sortelements(sortdefinition(namedsort), net)
+function sortelements(namedsort::NamedSort, net::AbstractPnmlNet)
+    #@show namedsort
+    sd = sortdefinition(namedsort)
+    if sd isa ProductSort
+        sortelements(sd, net)
+    else
+        sortelements(sd, net)
+    end
+end
 
 Base.eltype(::Type{NamedSort{N, S}}) where {N <: AbstractPnmlNet, S <: AbstractSort} = eltype(S)
 
