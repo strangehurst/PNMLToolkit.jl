@@ -152,7 +152,7 @@ end
 # end
 
 function output_matrix!(omatrix::Matrix{T}, net::AbstractPnmlNet) where T
-    @show T
+    #@show T
     varsub = NamedTuple() #todo! add Symmetric and HL support, variables
     for (p, place_id) in enumerate(place_ids(net))
         for (t, transition_id) in enumerate(transition_ids(net))
@@ -228,7 +228,7 @@ Tuple of Pair(place_id, initial_marking value).
 High-level P/T Nets use cardinality of its multiset place marking value.
 Really, the implementation should be the same as for PTNet.
 
-Other HL Nets use multisets.
+Other HL Nets use multisets.initial_markings(
 """
 function initial_markings end
 

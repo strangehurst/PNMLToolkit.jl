@@ -103,6 +103,12 @@ High-level Nets (SymmetricNet, HLPNG) use individual token identity (colored pet
 There is a multi-sorted algebra definition mechanism defined for HL Nets.
 HL Net Marking values are a ground terms of this multi-sorted algebra.
 
+High-level net marking values are multisets, as are inscription terms.
+PT_HLPNG are restriced to being a collective token net
+by restricting the basis set to a single element, dot.
+
+The basis may be a ProductSort. Then the marking value is a multiset of tuples.
+
 Used to initialize a marking vector that will then be updated by firing a transition.
 """
 (mark::Marking)() = evaluate_mark(mark)
@@ -135,7 +141,7 @@ value_type(::Type{Marking}, ::Val{:symmetric}) = Any
 # Place markings are bags over a basis sort.
 # Place's SortType label wraps that basis sort.
 # Each place has a SortType refering to any non-multiset sort in net's DeclDicts.
-# Symmetric nets restricted to finite sorts. Enumerations, integer ranges.ArcType
+# Symmetric nets restricted to finite sorts. Enumerations, integer ranges. ArcType
 # High level adds sorts of integer, string, list, arbitrary.
 
 #~ Note the close relation of marking value_type to inscription value_type.

@@ -17,10 +17,10 @@ As does `<all>` operator.
 @struct_hash_equal struct PnmlMultiset{T, N <: AbstractPnmlNet} <: AbstractPnmlMultiset #! data type
     basis_ref::SortRef # REFID indirection
     mset::Multiset{T}
-    net::N #! RefValue{<:Any} # = Ref{Any}()
+    net::N
 
-    # function PnmlMultiset{T}(m::Multiset{T}) where {T}
-    #     new{T, typeof(net)}(m, net) #todo assert basis_ref and T match.
+    # function PnmlMultiset{T}(basis, m::Multiset{T}, net::N) where {T, N}
+    #     new{T, typeof(net)}(basis, m, net) #todo assert basis_ref and T match.
     # end
 end
 

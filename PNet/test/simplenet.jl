@@ -283,8 +283,6 @@ end
         </initialMarking>
         """
     end
-    #println()
-    #println(marking)
     str3 = """<?xml version="1.0"?>
     <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
         <net id="net0" type="$pntd">

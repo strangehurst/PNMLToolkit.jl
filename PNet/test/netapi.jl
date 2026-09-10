@@ -47,8 +47,6 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
         </initialMarking>
         """
     end #= if pntd in hl_types =#
-    #println()
-    #println(marking)
     str3 = """<?xml version="1.0"?>
     <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
         <net id="net0" type="$pntd">

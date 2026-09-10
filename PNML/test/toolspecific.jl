@@ -107,7 +107,6 @@ import XMLDict
 
     # @show tooli
 end
-println()
 
 @testset "tool specific info combined" begin
     s = """<place id="place0">
