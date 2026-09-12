@@ -38,5 +38,5 @@ PNML = {path = ".."}
 Aqua = "0.8"
 Compat = "4.18"
 EzXML = "1"
-JET = "0.9, 0.11"
+JET = "0.12"
 XMLDict = "0.4"
