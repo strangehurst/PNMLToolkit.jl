@@ -1,7 +1,6 @@
 using PNML, Test, OrderedCollections, JET, XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
 
 #---------------------------------------------
 # ARC

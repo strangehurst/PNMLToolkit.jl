@@ -11,7 +11,7 @@ using Test
 
 
 #include("TestUtils.jl")
-#using .TestUtils
+##using .TestUtils
 
 # String so that pntd can be embedded in the XML.
 const core_types = ("pnmlcore","ptnet",)

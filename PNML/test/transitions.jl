@@ -1,7 +1,7 @@
 using PNML, Test, JET, XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 #---------------------------------------------
 # TRANSITION

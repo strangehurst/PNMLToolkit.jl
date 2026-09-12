@@ -3,7 +3,7 @@ using EzXML: EzXML
 using XMLDict: XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 # # Conditions are for everybody, but we cannot (feasibily) test high-level
 # @testset "condition $pntd" for pntd in PnmlTypes.all_nettypes(is_highlevel)

@@ -10,18 +10,19 @@ if !haskey(ENV, "COLUMNS")
     ENV["COLUMNS"] = 180
 end
 
-include("TestUtils.jl")
-using .TestUtils
+# include("TestUtils.jl")
+# #using .TestUtils
 
 isempty(ARGS) && push!(ARGS, "ALL")
 "Return true if `ARGS` is empty or one of `y`  and none of `n` is found in `ARGS`."
-select(y::Tuple, n::Tuple=()) = any(∈(ARGS), skipmissing(y)) && !any(∈(ARGS), skipmissing(n))
+function select end
+select(y::Tuple{Vararg{String}}, n::Tuple{Vararg{String}}=()) = any(∈(ARGS), y) && !any(∈(ARGS), n)
 select(y, n) = select(y, tuple(n))
 select(y::AbstractString) = select(tuple(y))
 
 #############################################################################
 @time "TESTS" begin
-@testset verbose=true showtiming=true "PNML.jl" begin
+@testset verbose=true "PNML.jl" begin
     if !isempty(ARGS) && select("NONE")
         return nothing # Have chosen to bail before any tests.
     end

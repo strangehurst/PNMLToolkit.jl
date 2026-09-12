@@ -3,7 +3,7 @@ using EzXML: EzXML
 using XMLDict: XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 println("PRIORITY")
 @testset "get priority label $pntd" for pntd in PnmlTypes.all_nettypes()

@@ -1,7 +1,7 @@
 using PNML, Test, JET
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 @testset "pntd_symbol" begin
     @test_opt PnmlTypes.pntd_symbol("foo")

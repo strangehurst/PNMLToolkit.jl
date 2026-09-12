@@ -1,7 +1,7 @@
 using PNML, JET, Test
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 println("\nPAGES\n")
 

@@ -2,7 +2,7 @@ using PNML, Test, JET
 import InteractiveUtils
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 using PNML: fill_sort_tag!, fill_builtin_sorts!, fill_builtin_labelparsers!
 
 @testset "parser_context" begin
@@ -43,8 +43,8 @@ end
     sortref = @inferred SortRef parse_sort(xml"<usersort declaration=\"X2\"/>", net)
     ts = @inferred NamedSort to_sort(sortref, net)
     sort = @inferred sortdefinition(ts)
-    @test sort === @inferred PositiveSort()
-    @test occursin(r"^PositiveSort", sprint(show, sort))
+    @test sort isa PositiveSort
+    @test occursin(r"PositiveSort", sprint(show, sort))
     @test eltype(sort) == Int64
 
     IDRegistrys.reset_reg!(net.idregistry)

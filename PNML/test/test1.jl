@@ -1,7 +1,7 @@
 using PNML, JET, Test, OrderedCollections
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 println("\n-----------------------------------------")
 println("test1.pnml")

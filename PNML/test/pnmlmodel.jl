@@ -1,7 +1,7 @@
 using PNML, Test, JET
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 function parse_test_label1(node::XMLNode,
                            placetype::SortType,

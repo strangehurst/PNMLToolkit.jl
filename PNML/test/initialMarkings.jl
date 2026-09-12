@@ -1,8 +1,9 @@
 using PNML, Test, JET
-include("TestUtils.jl")
-using .TestUtils, NamedTupleTools, OrderedCollections
+using NamedTupleTools, OrderedCollections
 using EzXML: EzXML
 using XMLDict: XMLDict
+include("TestUtils.jl")
+##using .TestUtils
 
 #------------------------------------------------
 @testset "PT initMarking" begin

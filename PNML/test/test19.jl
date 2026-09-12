@@ -1,7 +1,7 @@
 using PNML, JET, OrderedCollections, Test
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 # from ePNK
 println("'n-----------------------------------------")

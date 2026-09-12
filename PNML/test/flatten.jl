@@ -1,7 +1,7 @@
 using PNML, Test, JET
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 println("FLATTEN")
 @testset "flatten" begin

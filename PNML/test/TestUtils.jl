@@ -1,10 +1,10 @@
 "Utilities shared by SafeTestSets"
-module TestUtils
+#module TestUtils
 using EzXML, Preferences, XMLDict, Reexport, Multisets
 Multisets.set_key_value_show()
 
-@reexport using PNML
-@reexport using PNML: AbstractDeclaration, AbstractOperator, AbstractTerm, AbstractVariable,
+using PNML
+using PNML: AbstractDeclaration, AbstractOperator, AbstractTerm, AbstractVariable,
     AnyElement, BooleanConstant, CONFIG, Coordinate, DeclDicts, DotConstant, DotConstantEx,
     DuplicateIDException, FEConstant, MalformedException, Maybe, MissingIDException,
     NumberConstant, Page, PartitionElement, Place, PnmlConfig, PnmlException, PnmlExpr, PnmlModel,
@@ -23,22 +23,22 @@ Multisets.set_key_value_show()
     transition, transition_idset, transitiondict, transitions, value, value_type,
     zero,
     place_ids, arc_ids, transition_ids, reftransition_ids, refplace_ids
-@reexport using PNML.Sorts
-@reexport using PNML.Labels
-@reexport using PNML.Labels: get_label
-@reexport using PNML.Parser
-@reexport using PNML.Parser: allchildren, anyelement, default, firstchild, parse_arc,
+using PNML.Sorts
+using PNML.Labels
+using PNML.Labels: get_label
+using PNML.Parser
+using PNML.Parser: allchildren, anyelement, default, firstchild, parse_arc,
     parse_declaration!, parse_declarations!, parse_fifoinitialMarking, parse_graphics,
     parse_hlinitialMarking, parse_hlinscription, parse_initialMarking, parse_inscription,
     parse_name, parse_net, parse_page!, parse_place, parse_refPlace, parse_refTransition,
     parse_sort, parse_text, parse_toolspecific, parse_transition, pnmlmodel, to_sort,
     xmldict
-@reexport using PNML.Declarations
-@reexport using PNML.IDRegistrys
-@reexport using PNML.PnmlTypes
-@reexport using PNML.PnmlGraphics
-@reexport using PNML.SortRefImpl
-@reexport using PNML.Expressions
+using PNML.Declarations
+using PNML.IDRegistrys
+using PNML.PnmlTypes
+using PNML.PnmlGraphics
+using PNML.SortRefImpl
+using PNML.Expressions
 #!@reexport using PNML.NetAPI
 #!@reexport using PNML.NetAPI: metagraph, vertex_codes, vertex_labels
 
@@ -83,6 +83,6 @@ function pff(@nospecialize(ft))
     return true
 end
 
-export VERBOSE_PNML, noisy, pff, runopt, t_modules, testshow
-
-end # module TestUtils
+#export VERBOSE_PNML, noisy, pff, runopt, t_modules, testshow
+#
+#end # module TestUtils

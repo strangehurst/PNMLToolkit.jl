@@ -3,7 +3,7 @@ using EzXML: EzXML
 using XMLDict: XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 @testset "type $pntd" for pntd in PnmlTypes.all_nettypes(is_highlevel)
     # Add usersort, namedsort duo as test context.

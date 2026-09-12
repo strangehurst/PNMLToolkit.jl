@@ -4,7 +4,7 @@ using XMLDict: XMLDict
 # todo parse_arctype
 
 include("TestUtils.jl")
-using .TestUtils
+##using .TestUtils
 
 using PNML: is_normal, is_inhibitor, is_read, is_reset
 

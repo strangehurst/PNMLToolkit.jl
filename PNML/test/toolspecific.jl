@@ -2,7 +2,7 @@ using PNML, Test, JET
 using OrderedCollections
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 str1 = (tool="JARP", version="1.2", str = """
 <toolspecific tool="JARP" version="1.2">

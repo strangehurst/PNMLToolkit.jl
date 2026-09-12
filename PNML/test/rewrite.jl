@@ -2,7 +2,7 @@ using PNML, JET
 import Metatheory
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 println("REWRITE")
 # net = make_net(pntd, :fake)

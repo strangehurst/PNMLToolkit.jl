@@ -1,7 +1,7 @@
 using PNML, Test, JET, Logging
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 net = make_net(:pnmlcore, :idregistry_net)
 IDRegistrys.reset_reg!(net.idregistry)

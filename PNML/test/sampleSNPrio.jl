@@ -1,7 +1,7 @@
 using PNML, JET, OrderedCollections, Test
 #
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 # Read a SymmetricNet with partitions & tuples from pnmlframework test file.
 # NB: This model is from part 2 of the ISO 15909 standard as informative.

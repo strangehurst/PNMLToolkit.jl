@@ -8,7 +8,7 @@ using Test
 using XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 @testset "CONFIG" begin
     @show PNML.CONFIG

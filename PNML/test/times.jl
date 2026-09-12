@@ -3,7 +3,7 @@ using EzXML: EzXML
 using XMLDict: XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 # timed petri net is a metamodel
 

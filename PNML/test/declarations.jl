@@ -2,7 +2,7 @@ using PNML, Test, JET
 import InteractiveUtils
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 #!
 #! TODO add tests for variable declarations
@@ -61,10 +61,9 @@ end
         <unknownchild />
     </declaration>
     """
-    println()
     net = make_net(pntd, :namedsorts_net)
     @test_call target_modules=t_modules namedsorts(net)
-    @test_opt target_modules=t_modules function_filter=pff namedsorts(net)
+    @test_opt target_modules=t_modules function_filter=pff broken=false namedsorts(net)
     #@show namedsorts(net)
     #foreach(println, pairs(namedsorts(net)))
     base_decl_length = length(namedsorts(net))
@@ -73,7 +72,6 @@ end
     decl = @test_logs(match_mode=:any, (:warn, r"^ignoring unexpected child"),
             parse_declaration!(net, [node])::Declaration) # Add 3 declarations.
 
-    #println()
     #foreach(println, pairs(namedsorts(net)))
     # declarations in namedsorts twice
     @test length(namedsorts(net)) == base_decl_length + 3

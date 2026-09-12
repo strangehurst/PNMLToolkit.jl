@@ -1,6 +1,6 @@
 using Test
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 using EzXML: EzXML
 using XMLDict: XMLDict
 

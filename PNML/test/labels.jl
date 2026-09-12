@@ -3,7 +3,7 @@ using EzXML: EzXML
 using XMLDict: XMLDict
 
 include("TestUtils.jl")
-using .TestUtils
+#using .TestUtils
 
 @testset "text node" begin
     @test PNML.Parser.parse_text(xml"<text>ready</text>") == "ready"
