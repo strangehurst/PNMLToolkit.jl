@@ -538,8 +538,8 @@ function parse_term(::Val{:tuple}, node::XMLNode, net::AbstractPnmlNet; vars)
     # Look for an existing declaration for prod_sort. Return a NamedSortRef to it in TermJunk.
     # Find matching sort REFID
     sorttag = nothing
-    for (id,ps) in pairs(productsorts(net))
-        if equalSorts(net, ps, prod_sort)
+    for (id,ps::ProductSort) in pairs(productsorts(net))
+        if equalSorts(ps, prod_sort)
             #"Found product sort $id while looking for $prod_sort"
             sorttag = id
             break

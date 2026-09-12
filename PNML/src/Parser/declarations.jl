@@ -554,8 +554,8 @@ function parse_sort(::Val{:productsort}, node::XMLNode, net::AbstractPnmlNet, so
     prod_sort = ProductSort(tuple(sorts...), net)
 
     # See if there exists a matching sort. #! debug?
-    for (id,ps) in pairs(productsorts(net))
-        if equalSorts(net, ps, prod_sort)
+    for (id,ps::ProductSort) in pairs(productsorts(net))
+        if equalSorts(ps, prod_sort)
             @info "Found product sort $id while looking for $prod_sort " *
                     "for sortid=$sort_id name=$name" productsorts(net)
          end

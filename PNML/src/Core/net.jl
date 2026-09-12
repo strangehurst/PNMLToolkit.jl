@@ -3,6 +3,9 @@ const tparserT = LittleDict{String, LittleDict{String, Any}}
 const efilterT = LittleDict{Symbol, Any}
 const lparserT = LittleDict{Symbol, Any}
 
+"""
+Collection of NamedTuples, keys are varable ids, values are binding
+"""
 const substT = Vector{NamedTuple}
 """
 Map variable id to vector of named tuples for substitution value bindings.

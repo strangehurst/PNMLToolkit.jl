@@ -1270,10 +1270,10 @@ function expr_sortref(tup::PnmlTupleEx, net)
     # tuple operator arguments are terms: mostly variables, useroperators, built-in operator like successor.
     #
     outsort = ProductSort(tuple(expr_sortref.(tup.args, Ref(net))...), net)
-    for (sortid,ps) in pairs(PNML.productsorts(net))
+    for (sortid,ps::ProductSort) in pairs(PNML.productsorts(net))
         # Search product sorts for one that has the same argument sorts.
         length(outsort) == length(ps) || continue
-         if PNML.Sorts.equalSorts(net, outsort, ps)
+         if PNML.Sorts.equalSorts(outsort, ps)
             return ProductSortRef(sortid)
         end
     end
