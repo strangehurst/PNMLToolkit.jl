@@ -130,7 +130,7 @@ refid_of(s::SortRef) = s.refid
 """
     to_sort(sortref::SortRef, net::AbstractPnmlNet) -> AbstractSort
 
-Return concrete sort of `net` using the `REFID` in `sr`,
+Return sort matching the `REFID` in `sr`.
 """
 function to_sort(@nospecialize(sr::SortRef), @nospecialize(net::AbstractPnmlNet))
     if is_namedsort(sr)
