@@ -8,6 +8,9 @@ Base.eltype(::Type{<:IntegerSort}) = Int
 (i::IntegerSort)() = 1
 sortelements(::IntegerSort, ::AbstractPnmlNet) = Iterators.countfrom(0, 1) #! infinite, expected use is first
 refid_of(::IntegerSort) = :integer
+function Base.show(io::IO, sort::IntegerSort)
+    print(io, nameof(typeof(sort)), "()")
+end
 
 """
 Built-in sort whose `eltype` is `Int`
@@ -16,6 +19,9 @@ Built-in sort whose `eltype` is `Int`
 Base.eltype(::Type{<:NaturalSort}) = Int # Uint ?
 sortelements(::NaturalSort, ::AbstractPnmlNet) = Iterators.countfrom(0, 1)
 refid_of(::NaturalSort) = :natural
+function Base.show(io::IO, sort::NaturalSort)
+    print(io, nameof(typeof(sort)), "()")
+end
 
 """
 Built-in sort whose `eltype` is `Int`
@@ -24,6 +30,9 @@ Built-in sort whose `eltype` is `Int`
 Base.eltype(::Type{<:PositiveSort}) = Int # Uint ?
 sortelements(::PositiveSort, ::AbstractPnmlNet) = Iterators.countfrom(1, 1)
 refid_of(::PositiveSort) = :positive
+function Base.show(io::IO, sort::PositiveSort)
+    print(io, nameof(typeof(sort)), "()")
+end
 
 """
 Built-in sort whose `eltype` is `Float64`
@@ -32,6 +41,9 @@ Built-in sort whose `eltype` is `Float64`
 Base.eltype(::Type{<:RealSort}) = Float64
 sortelements(::RealSort, ::AbstractPnmlNet) = Iterators.map(x->1.0*x, Iterators.countfrom(0, 1))
 refid_of(::RealSort) = :real
+function Base.show(io::IO, sort::RealSort)
+    print(io, nameof(typeof(sort)), "()")
+end
 
 """
 Built-in sort whose `eltype` is `Nothing`
@@ -41,3 +53,6 @@ Base.eltype(::Type{<:NullSort}) = Nothing
 sortelements(::Type{<:NullSort}, ::AbstractPnmlNet) = tuple() # empty
 sortelements(::NullSort, ::AbstractPnmlNet) = tuple() # empty
 refid_of(::NullSort) = :null
+function Base.show(io::IO, sort::NullSort)
+    print(io, nameof(typeof(sort)), "()")
+end
