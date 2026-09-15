@@ -10,9 +10,9 @@ using XMLDict
 include("TestUtils.jl")
 #using .TestUtils
 
-@testset "CONFIG" begin
+@testset "nettypes" begin
     @show PNML.CONFIG
-    #@SciMLMessage  repr(PNML.CONFIG) PNML.verbose :information :options
+
     @show collect(PnmlTypes.core_nettypes())
     @show collect(PnmlTypes.all_nettypes())
     @show collect(PnmlTypes.all_nettypes(is_highlevel))
@@ -25,6 +25,19 @@ include("TestUtils.jl")
     @show collect(PnmlTypes.all_nettypes(!is_collective_token))
     @show collect(PnmlTypes.all_nettypes(is_individual_token))
     @show collect(PnmlTypes.all_nettypes(!is_individual_token))
+
+    @test Set(PnmlTypes.core_nettypes()) == Set([:pnmlcore, :hlcore, :continuous])
+    @test Set(PnmlTypes.all_nettypes()) == Set([:pnmlcore, :ptnet, :continuous, :hlcore, :pt_hlpng, :symmetric, :hlnet])
+    @test Set(PnmlTypes.all_nettypes(is_highlevel)) == Set([:hlcore, :pt_hlpng, :symmetric, :hlnet])
+    @test Set(PnmlTypes.all_nettypes(!is_highlevel)) == Set([:pnmlcore, :ptnet, :continuous])
+    @test Set(PnmlTypes.all_nettypes(is_discrete)) == Set([:pnmlcore, :ptnet, :pt_hlpng])
+    @test Set(PnmlTypes.all_nettypes(!is_discrete)) == Set([:continuous, :hlcore, :symmetric, :hlnet])
+    @test Set(PnmlTypes.all_nettypes(is_continuous)) == Set([:continuous])
+    @test Set(PnmlTypes.all_nettypes(!is_continuous)) == Set([:pnmlcore, :ptnet, :hlcore, :pt_hlpng, :symmetric, :hlnet])
+    @test Set(PnmlTypes.all_nettypes(is_collective_token)) == Set([:pnmlcore, :ptnet, :continuous, :pt_hlpng])
+    @test Set(PnmlTypes.all_nettypes(!is_collective_token)) == Set([:hlcore, :symmetric, :hlnet])
+    @test Set(PnmlTypes.all_nettypes(is_individual_token)) == Set([:hlcore, :symmetric, :hlnet])
+    @test Set(PnmlTypes.all_nettypes(!is_individual_token)) == Set([:pnmlcore, :ptnet, :continuous, :pt_hlpng])
 end
 
 @testset "pntdsym pntd" for pntd in PnmlTypes.all_nettypes()
