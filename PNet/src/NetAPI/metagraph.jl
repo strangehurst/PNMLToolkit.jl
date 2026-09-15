@@ -8,7 +8,7 @@ function metagraph(net::PnmlNet{P})where {P <: PNMLVariant}
     #! println("\nmetagraph $(pntd_of(net)) $(pid(net))")
 
     if !(narcs(net) > 0 && nplaces(net) > 0 && ntransitions(net) > 0)
-        msg = string("Attempted to create a `MetaGraph` from an incomplete $(pntd_of(net)) graph: ",
+        msg = string("Attempted to create a `MetaGraph` from an incomplete $(pntdsym(net)) graph: ",
                   " net id = ", pid(net),
                   " narcs = ", narcs(net),
                   " nplaces = ", nplaces(net),
