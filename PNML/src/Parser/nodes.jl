@@ -232,7 +232,7 @@ function parse_arc(node::XMLNode, net::AbstractPnmlNet)
             end
             #!@show sr
             inscription = default(Inscription, net, SortType("dummy HIGHLEVEL", sr,  net))
-       else
+        else
             error("unknown token type for pntd $(pntd_of(net))")
         end
     end
@@ -311,20 +311,21 @@ function parse_refTransition(node::XMLNode, net::AbstractPnmlNet)
 end
 
 function default(::Type{<:Marking}, net::AbstractPnmlNet, place::Symbol, placetype::Maybe{SortType}=nothing)
-    pntd = pntd_of(net)
-    ex = if pntd isa AbstractHLPNTD
+    pntd = pntdsym(net)
+    ex = if pntd === :pt_hlpng
+        isnothing(placetype) && @warn "expected placetype for PT_HLPNG, using NamedSortRef(:dot)"
+        Bag(NamedSortRef(:dot), DotConstant(), 0)
+    elseif is_highlevel(pntd)
         isnothing(placetype) &&
              throw(ArgumentError("placetype needed for $pntd"))
-        el = def_sort_element(placetype)
-        #@show placetype  el
-        # the value type of DotSort is Bool <: Number
+        el = def_sort_element(placetype) # el used for its type
         Bag(sortref(placetype), el, 0)
-        # # el used for its type
-    elseif pntd isa AbstractContinuousPNTD
+    elseif is_continuous(pntd)
         NumberEx(NamedSortRef(:real), zero(Float64))
     else
         NumberEx(NamedSortRef(:natural), zero(Int))
     end
+
     Marking(; term = ex, net, place) # not high-level!
 end
 
@@ -336,7 +337,7 @@ end
 function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{SortType}=nothing)
     pntd = pntdsym(net) #pntd_of(net)
     ex = if pntd === :pt_hlpng
-        isnothing(placetype) && @warn "expected placetype for PT_HLPNG, using NamedSortRef(:dot)"
+        #isnothing(placetype) && @warn "expected placetype for PT_HLPNG, using NamedSortRef(:dot)"
         Bag(NamedSortRef(:dot), DotConstant(), 1)
     elseif is_highlevel(pntd)
         isnothing(placetype) &&
