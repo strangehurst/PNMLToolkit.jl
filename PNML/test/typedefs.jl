@@ -75,6 +75,32 @@ end
     @test PnmlTypes.pnmltype(:continuous) === ContinuousNet() # not in standard, collective identity
 end
 
+@testset "pntd2variant" begin
+    @show pntd2variant(:pnmlcore)
+    @show pntd2variant(:ptnet)
+    @show pntd2variant(:continuous)
+    @show pntd2variant(:hlcore)
+    @show pntd2variant(:pt_hlpng)
+    @show pntd2variant(:symmetric)
+    @show pntd2variant(:hlnet)
+
+    @test pntd2variant(:pnmlcore)   <: DiscretePNML
+    @test pntd2variant(:ptnet)      <: DiscretePNML
+    @test pntd2variant(:continuous) <: ContinuousPNML
+    @test pntd2variant(:hlcore)     <: HighLevelPNML
+    @test pntd2variant(:pt_hlpng)   <: DiscretePNML
+    @test pntd2variant(:symmetric)  <: HighLevelPNML
+    @test pntd2variant(:hlnet)      <: HighLevelPNML
+
+    @test pntd2variant(PnmlTypes.pnmltype(:pnmlcore) )  == pntd2variant(:pnmlcore)
+    @test pntd2variant(PnmlTypes.pnmltype(:ptnet))      == pntd2variant(:ptnet)
+    @test pntd2variant(PnmlTypes.pnmltype(:continuous)) == pntd2variant(:continuous)
+    @test pntd2variant(PnmlTypes.pnmltype(:hlcore))     == pntd2variant(:hlcore)
+    @test pntd2variant(PnmlTypes.pnmltype(:pt_hlpng))   == pntd2variant(:pt_hlpng)
+    @test pntd2variant(PnmlTypes.pnmltype(:symmetric))  == pntd2variant(:symmetric)
+    @test pntd2variant(PnmlTypes.pnmltype(:hlnet))      == pntd2variant(:hlnet)
+end
+
 @testset "pnml traits $pntd" for pntd in PnmlTypes.all_nettypes()
     #println("pnml traits $pntd: ", [is_discrete(pntd), is_continuous(pntd), is_highlevel(pntd)])
     @test is_discrete(pntd) isa Bool
