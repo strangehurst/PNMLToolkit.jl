@@ -182,7 +182,9 @@ The key Symbols are the supported kinds of PNML Nets (PNTDs).
 :symmetric
 :continuous
 
-Values are concrete singletons.
+Values are concrete singletons. Useful for dispatch.
+
+See [`PNMLVariant`](@ref)
 """
 const pnmltype_map = Dict{Symbol, AbstractPNTD}(
         :pnmlcore => PnmlCoreNet(),
@@ -221,7 +223,9 @@ is_discrete(::Type{<:AbstractDiscretePNTD}) = true
 
 function is_discrete(s::Symbol)
     s === :pnmlcore ||
-    s === :ptnet # || s === :pt_hlpng
+    s === :ptnet ||
+    s === :pt_hlpng
+    #s === :capacityptnet
 end
 is_discrete(::Val{:pnmlcore}) = true
 is_discrete(::Val{:ptnet}) = true
@@ -269,11 +273,19 @@ is_highlevel(::Val{:pt_hlpng}) = false
 is_highlevel(::Val{:symmetric}) = false
 is_highlevel(::Val{:hlnet}) = false
 
-"Token identity is collective."
-function is_collective_token end
-#!is_collective_token(pntd::AbstractPNTD) = is_discrete(pntd) || is_continuous(pntd)
-is_collective_token(s::Symbol) = is_collective_token(Val(s))
+"""
+    $TYPEDSIGNATURES
 
+ Token identity is collective.
+"""
+function is_collective_token end
+function is_collective_token(s::Symbol)
+    s === :pnmlcore ||
+    s === :ptnet ||
+    s === :continuous ||
+    s === :pt_hlpng
+    # capacityptnet
+end
 is_collective_token(::Val{:pnmlcore}) = true
 is_collective_token(::Val{:ptnet}) = true
 is_collective_token(::Val{:continuous}) = true
@@ -282,12 +294,17 @@ is_collective_token(::Val{:pt_hlpng}) = true
 is_collective_token(::Val{:symmetric}) = false
 is_collective_token(::Val{:hlnet}) = false
 
+"""
+$(TYPEDSIGNATURES)
 
-"Token identity is individual."
+Token identity is individual.
+"""
 function is_individual_token end
-#!is_individual_token(pntd::AbstractPNTD) = is_highlevel(pntd)
-is_individual_token(s::Symbol) = is_individual_token(Val(s))
-
+function is_individual_token(s::Symbol)
+    s === :hlcore ||
+    s === :symmetric ||
+    s ===:hlnet
+end
 is_individual_token(::Val{:pnmlcore}) = false
 is_individual_token(::Val{:ptnet}) = false
 is_individual_token(::Val{:continuous}) = false
@@ -361,6 +378,12 @@ else
 end
 
 
+"""
+    $TYPEDEF
+
+A `PnmlNet` type parameter uses a subtype to specialize: [`DiscretePNML`](@ref),
+[`ContinuousPNML`](@ref), [`HighLevelPNML`](@ref), [`OtherPNML`](@ref).
+"""
 abstract type PNMLVariant end
 
 # a tag known as the vartype
@@ -371,7 +394,7 @@ One of the possible values of the `PnmlNet` `vartype`.
 This variant is a Place Transition Petri net where
 the marking and inscription are restricted to integers.
 
-`pntd_of(net)` is  `AbstractDiscretePNTD` || `PT_HLPNG`.
+`pntd_of(net)` is  `<:AbstractDiscretePNTD` || `PT_HLPNG`.
 """
 abstract type DiscretePNML <: PNMLVariant end
 """
@@ -411,15 +434,7 @@ Deduce `PNMLVariant`.
 """
 function pntd2variant end
 function pntd2variant(s::Symbol)
-    if is_continuous(s)
-        return ContinuousPNML
-    elseif is_discrete(s) # || s === :pt_hlpng
-        return DiscretePNML
-    elseif is_highlevel(s)
-        return HighLevelPNML
-    else
-        return OtherPNML
-    end
+    pntd2variant(pnmltype(s))
 end
 
 function pntd2variant(pntd::AbstractPNTD)
