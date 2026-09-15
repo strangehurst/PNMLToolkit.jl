@@ -7,13 +7,13 @@ using PNML: elabelT, tparserT, efilterT, lparserT, vsubT, varsT, varsetT, substT
 """
     unwrap_pmset(mark) -> Multiset
 
-If marking wraps a PnmlMultiset, extract a singleton.
+If mark is a PnmlMultiset that wraps a PnmlMultiset, extract a singleton.
 """
 function unwrap_pmset(mark)
     if mark isa PnmlMultiset && eltype(mark) <: PnmlMultiset
         single = only(multiset(mark))
-        eltype(single) <: PnmlMultiset &&
-            error("recursive PnmlMultisets not allowed here")
+        single isa PnmlMultiset &&
+            error("recursive PnmlMultisets not allowed here, found $single")
         return single # Replace mark with the wrapped PnmlMultiset's only element.
     end
     return mark # identity function
@@ -60,16 +60,16 @@ function enabled(net::PnmlNet{T}, marking) where {T <: PNMLVariant}
                          " marking $marking")
 
     cnt = count_sorttypes(net)
-    if ER()
-        println()
-        println("found sorttypes");
-        for (i,c) in enumerate(cnt)
-            println(i, ": ", c)
-        end
-        println()
-        @show net.vars net.varsubs
-        @show valtype(net.vars) valtype(net.varsubs)
-    end
+    # if ER()
+    #     println()
+    #     println("found sorttypes");
+    #     for (i,c) in enumerate(cnt)
+    #         println(i, ": ", c)
+    #     end
+    #     println()
+    #     @show net.vars net.varsubs
+    #     @show valtype(net.vars) valtype(net.varsubs)
+    # end
 
     # Transaction id => boolean enabled. Start by assuming all transitions are enabled.
     enabled_dict = enabledT(id=>true for id in PNML.transition_ids(net))
@@ -134,29 +134,16 @@ end
 
 
 """
-    sufficient_tokens!(mark_dict, net::AbstractPnmlNet, transition_id, vars, varsubs)
+$(TYPEDSIGNATURES)
 
 Return enabled state of transition by testing that all its input places have enough tokens
-and trasnsition guard is true.
+and transition guard is true.
 """
-function sufficient_tokens! end
-
-function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet{T}, transition_id) where {T <: PNMLVariant}
-    ER()&& print("#-- sufficient_tokens! ",
-                     "$(pntd_of(net)) $(pid(net)) $transition_id = ")
-    # There are no varibles possible here and the guard is `true`.
-    # Evaluate preset inscription expressions, compare to mark value.
-    s = all(skipmissing(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
-                                         for place_id in preset(net, transition_id)))
-    s = coalesce(s, false)
-    ER()&& println(s)
-    return s
-end
-
-function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet{HighLevelPNML}, transition_id)
+function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id)
     ER()&& println("#-- sufficient_tokens! ",
                     "$(pntd_of(net)) $(pid(net)) $transition_id")
-    s = if net.type === :pt_hlpng
+    s = if is_collective_token(pntdsym(net)) ||
+            pntdsym(net) === :pt_hlpng
         # There are no variables possible here and the guard is `true`.
         # Evaluate preset inscription expressions, compare to mark value.
         all(skipmissing(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
@@ -167,6 +154,7 @@ function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet{HighLevelPNML}
         sufficient_tokens2!(mark_dict, net,  transition_id,
                                 tr_vars, tr_varsubs)
     end
+    ER()&& println("#-- sufficient_tokens! return: ", s)
     return coalesce(s, false)
 end
 
