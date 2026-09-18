@@ -384,12 +384,11 @@ methods(PNML.Labels.get_toolinfo) # hide
 
 ## Type Lookup
 
-Petri Net Graph Object Types are parameterized by [Label Types](@ref).
 What labels are "allowed" (syntax vs. semantics vs. schema vs. standard)
 is parameterized on the PNTD (Petri Net Type Definition).
 
 See [`PnmlNet`](@ref)s & [`AbstractPnmlObject`](@ref)s, and
- [`PnmlTypes`](@ref) for details of the singleton types used.
+ [AbstractPNTD](@ref PNML.PnmlTypes.AbstractPNTD) for details of the singleton types used.
 
 ### Value Types
 

@@ -25,8 +25,7 @@ There are multiple kinds of nets supported by PNML.jl differing by (among other 
 the kind on number they use:
   - discrete,
   - continuous,
-  - and multi-sorted algebra
-See [PnmlType - Petri Net Type Definition](@ref) for the full hierarchy.
+  - and multi-sorted algebra.
 
 This means there are at least 3 sets of default value types.
 We use the pntd [AbstractPNTD](@ref PNML.PnmlTypes.AbstractPNTD) as a trait to determine the default types/values.
