@@ -5,7 +5,7 @@ Built-in sort whose `eltype` is `Bool`, the smallest Integer subtype that can re
 @struct_hash_equal struct DotSort <: AbstractSort
 end
 
-Base.eltype(::Type{<:DotSort}) = Bool # What would be iterated over. See `sortelements`.
+Base.eltype(::Type{<:DotSort}) = Int # What would be iterated over. See `sortelements`.
 sortelements(::DotSort, ::AbstractPnmlNet) = tuple(DotConstant()) # DotConstant is an AbstractOperator
 
 function Base.show(io::IO, sort::DotSort)

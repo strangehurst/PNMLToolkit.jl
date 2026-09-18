@@ -52,7 +52,7 @@ end
     sort = to_sort(sortref, net)::NamedSort |> sortdefinition
     @test sort === DotSort() # not a built-in
     @test occursin(r"^DotSort", sprint(show, sort))
-    @test eltype(sort) == Bool
+    @test eltype(sort) == Int
 
     IDRegistrys.reset_reg!(net.idregistry)
     sortref = parse_sort(xml"<bool/>", net)
