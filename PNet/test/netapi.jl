@@ -21,11 +21,13 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
 @warn "hl nets do not currently do linear algebra! 'fire' will error."
 
 @testset "firing rule: $pntd" for pntd in tuple(core_types..., ex_types..., hl_types...)
-    if pntd in hl_types
+    if pntd in ("hlcore","symmetric", "hlnet")
+        @warn "firing of $pntd not implemented"
+    elseif pntd in hl_types
         #^ Only PT_HLPNG supported here
         marking = """
         <hlinitialMarking>
-            <text>1</text>
+            <text>1'dot</text>
             <structure>
                 <numberof>
                     <subterm><numberconstant value="1"><positive/></numberconstant></subterm>
@@ -85,17 +87,21 @@ const hl_types = ("pt_hlpng",) #"hlcore","symmetric") #,"hlnet",)
     </pnml>
     """
 
+    #println("==========================================================================")
+    #println("==========================================================================")
+    #println("==========================================================================")
+    #println("==========================================================================")
     model = pnmlmodel(xmlnode(str3))
     anet = PNML.firstnet(model)
     #@show summary(anet)
-    #@show mg
 
     m₀ = PNML.initial_markings(anet)
+    #@show m₀
     #println("imatrix")
     imatrix  = PNML.incidence_matrix(anet) # Matrix of PnmlMultiset
     #println("enabled_vec $pntd")
     enabled_vec  = PNML.enabled(anet, m₀)
-    #~ @show pntd m₀ imatrix enabled_vec #typeof(e)
+    #@show pntd m₀ imatrix enabled_vec #typeof(e)
     # 3 representations of the enabled vector.
     @test enabled_vec == Bool[1,0,0,0]
     @test enabled_vec == [true,false,false,false]

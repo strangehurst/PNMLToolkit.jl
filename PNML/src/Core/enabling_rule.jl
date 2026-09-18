@@ -1,6 +1,6 @@
 # Enabling Rule
 "Debug print switch for enabline rule."
-ER() = true
+ER() = false
 using PNML: elabelT, tparserT, efilterT, lparserT, vsubT, varsT, varsetT, substT
 
 
@@ -69,7 +69,7 @@ const enabledT = OrderedDict{Symbol, Bool}
 function enabled(net::PnmlNet{T}, marking) where {T <: PNMLVariant}
     ER()&& println("\n#-- enabled ", pntdsym(net), " id ", pid(net))
 
-    @show typeof(marking)
+    #@show typeof(marking)
     if is_individual_token(pntd_of(net))
         foreach(println ∘ typeof, marking)
     end
@@ -144,8 +144,8 @@ and transition guard is true.
 function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id)
     ER()&& println("#-- sufficient_tokens! ",
                     "$(pntd_of(net)) $(pid(net)) $transition_id")
-    @show pntdsym(net)
-    @show is_collective_token(pntdsym(net))
+    #@show pntdsym(net)
+    #@show is_collective_token(pntdsym(net))
     s = if is_collective_token(pntdsym(net))
         # There are no variables possible here and the guard is `true`.
         # Evaluate preset inscription expressions, compare to mark value.
@@ -302,7 +302,7 @@ function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef, mark::Multise
         # Examine `mark`, look for values matching varible declaration sort.
         # `indx` are the tuple elements that are expected to match if a `ProductSort`.
         for (element, multiplicity) in pairs(mark)
-            @show typeof(element) element multiplicity
+            #@show typeof(element) element multiplicity
             #! arc_binding_set counts possible substitutions in source place's marking.
             # Multiple of same variable in arc inscription expression means
             # `arc_binding_sets` only includes values of mark elements with
@@ -383,8 +383,8 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
     if isempty(tr_vars) # 0-ary operators or constants
         # PT_HLPNG will have no vars
         eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
-        @show inscription_val = inscription_value(a, NamedTuple())
-        @show mark = unwrap_pmset(mark)
+        inscription_val = inscription_value(a, NamedTuple())
+        mark = unwrap_pmset(mark)
         return issubset(inscription_val, mark)
    else
         # Use the transition-level variable substitution binding map `tr_var_binding_set`.
@@ -406,8 +406,8 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
             # Check guard condition expression that may contain variables.
             # Must be evaluated for each candidate_parms.
             eval(toexpr(cond_term, tr_vsub, net)) || continue #! XXX CACHE eval
-            @show inscription_val = inscription_value(a, tr_vsub) # bag
-            @show mark = unwrap_pmset(mark)
+            inscription_val = inscription_value(a, tr_vsub) # bag
+            mark = unwrap_pmset(mark)
             issubset(inscription_val, mark) || continue # not a valid substitution
             push!(tr_varsubs, tr_vsub)
         end

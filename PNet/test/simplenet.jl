@@ -235,14 +235,14 @@ end
 
         for (i, t) in enumerate(PNML.transitions(net))
             @show PNML.rate_value(t)
-            @show [pid(p) for (j,p) in enumerate(PNML.places(net))]
+            @show [pid(p) for (_,p) in enumerate(PNML.places(net))]
             @show collect(PNML.preset(net, pid(t)))
             @show collect(PNML.postset(net, pid(t)))
-            for (j,p) in enumerate(PNML.places(net))
+            for (_,p) in enumerate(PNML.places(net))
                 @show collect(PNML.preset(net, pid(p)))
                 @show collect(PNML.postset(net, pid(p)))
             end
-            @show [pid(p) for (j,p) in enumerate(PNML.places(net)) if pid(p) in PNML.preset(net, pid(t))]
+            @show [pid(p) for (_,p) in enumerate(PNML.places(net)) if pid(p) in PNML.preset(net, pid(t))]
             rate_vals[i] = PNML.rate_value(t) * prod(initial_marking(p) ^ input[i, j]
                 for (j,p) in enumerate(PNML.places(net)) if pid(p) in PNML.preset(net, pid(t)))
         end

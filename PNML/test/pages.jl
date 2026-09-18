@@ -180,9 +180,9 @@ end
 
 @testset "lookup types $pntd" for pntd in PnmlTypes.all_nettypes()
     if is_highlevel(pntd)
-        @show pntd
-        @show value_type(Inscription, pnmltype_map[pntd])
-        @show value_type(Marking, pnmltype_map[pntd])
+        #@show pntd
+        #@show value_type(Inscription, pnmltype_map[pntd])
+        #@show value_type(Marking, pnmltype_map[pntd])
         @test value_type(Inscription, pnmltype_map[pntd]) == value_type(Marking, pnmltype_map[pntd])
     else
         @test value_type(Inscription, pnmltype_map[pntd]) <: Number

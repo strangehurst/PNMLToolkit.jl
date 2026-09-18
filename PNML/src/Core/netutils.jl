@@ -216,7 +216,7 @@ Symmetric nets restricts multisets of finite enumerations, and thus easier to de
 function incidence_matrix end
 
 function incidence_matrix(net::AbstractPnmlNet)
-    @show net.varsubs net.vars
+    #@show net.varsubs net.vars
     return output_matrix(net) - input_matrix(net)
 end
 
@@ -235,13 +235,13 @@ function initial_markings end
 function initial_markings(net::PnmlNet{DiscretePNML})
     return if net.type === :pt_hlpng
         # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
-        println("\n#### initial_markings DiscretePNML && :pt_hlpng")
-        for p::Place in PNML.places(net)
-            @show pid(p)
-            @show p.initialMarking
-            @show initial_marking(p)
-            @show cardinality(initial_marking(p))
-        end
+        # println("\n#### initial_markings DiscretePNML && :pt_hlpng")
+        # for p::Place in PNML.places(net)
+        #     @show pid(p)
+        #     @show p.initialMarking
+        #     @show initial_marking(p)
+        #     @show cardinality(initial_marking(p))
+        # end
 
         Int[PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
     else
@@ -255,7 +255,7 @@ function initial_markings(net::PnmlNet{ContinuousPNML})
 end
 function initial_markings(net::PnmlNet{HighLevelPNML})
     return if net.type === :pt_hlpng
-        println("\n#### initial_markings HighLevelPNML && :pt_hlpng")
+        # println("\n#### initial_markings HighLevelPNML && :pt_hlpng")
         # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
         Int[PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
     else

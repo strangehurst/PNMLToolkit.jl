@@ -137,13 +137,13 @@ Then any contents of the sorts are compared semantically.
 """
 function equalSorts end
 function equalSorts(a::T, b::T) where {T <: AbstractSort}
-    println("equalSorts AbstractSorts $a $b")
+    #println("equalSorts AbstractSorts $a $b")
     (a == b)::Bool
 end
 function equalSorts(a::AbstractSort, b::AbstractSort)
     asort = unwrap_namedsort(a)
     bsort = unwrap_namedsort(b)
-    @show asort bsort
+    #@show asort bsort
     return if typeof(asort) == typeof(bsort)
         equalSorts(asort, bsort)::Bool
     else
@@ -153,7 +153,7 @@ end
 
 function equalSorts(a::ProductSort{PN, N}, b::ProductSort{PN, N},
                     ) where {PN <: AbstractPnmlNet, N <: Integer}
-    println("equalSorts ProductSorts $a $b")
+    #println("equalSorts ProductSorts $a $b")
     if length(a) == length(b)
         return all(equalSorts(a.net, x, y) for (x,y) in zip(sorts(a), sorts(b)))
     end
@@ -163,7 +163,7 @@ end
 function equalSorts(net::AbstractPnmlNet, a::SortRef, b::SortRef)
     # variant type and refid are the same.
     a == b  && return true
-    @warn "equalSorts $a, $b"
+    #@warn "equalSorts $a, $b"
 
     # namedsort holds concrete sort objects (no nested named sorts allowed by construction).
     # productsort holds sortrefs to named and builtin sorts.
@@ -192,7 +192,7 @@ function equalSorts(net::AbstractPnmlNet, a::SortRef, b::SortRef)
     # Compare concrete sort definitions for structural equality.
     asort = unwrap(net, a)
     bsort = unwrap(net, b)
-    @show asort bsort
+    #@show asort bsort
     return equalSorts(asort, bsort)
 end
 
