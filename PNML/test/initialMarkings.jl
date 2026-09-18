@@ -21,10 +21,10 @@ include("TestUtils.jl")
             </unknown>
         </initialMarking>
         """)
-
+        #PNML.PnmlTypes.pnmltype_map[pntd]
         net = make_net(pntd, :pt_initmark)
         placetype = SortType("$pntd initMarking",
-            sortref(value_type(Marking, Val(pntd)))::SortRef,
+            sortref(value_type(Marking, pntd_of(net)))::SortRef,
             nothing, nothing, net)
 
         # Parse ignoring unexpected child
@@ -63,7 +63,7 @@ include("TestUtils.jl")
 
         net = make_net(pntd, :pt_initmark)
         placetype = SortType("$pntd initMarking",
-            sortref(value_type(Marking, Val(pntd)))::SortRef,
+            sortref(value_type(Marking, pntd_of(net)))::SortRef,
             nothing, nothing, net)
 
         # Parse ignoring unexpected child

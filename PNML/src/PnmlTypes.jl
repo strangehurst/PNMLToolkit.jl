@@ -227,13 +227,6 @@ function is_discrete(s::Symbol)
     s === :pt_hlpng
     #s === :capacityptnet
 end
-is_discrete(::Val{:pnmlcore}) = true
-is_discrete(::Val{:ptnet}) = true
-is_discrete(::Val{:continuous}) = false
-is_discrete(::Val{:hlcore}) = false
-is_discrete(::Val{:pt_hlpng}) = false
-is_discrete(::Val{:symmetric}) = false
-is_discrete(::Val{:hlnet}) = false
 
 "Tokens represented by floating point."
 function is_continuous end
@@ -245,13 +238,6 @@ is_continuous(::Type{<:AbstractContinuousPNTD}) = true
 function is_continuous(s::Symbol)
     s === :continuous
 end
-is_continuous(::Val{:pnmlcore}) = true
-is_continuous(::Val{:ptnet}) = true
-is_continuous(::Val{:continuous}) = true
-is_continuous(::Val{:hlcore}) = false
-is_continuous(::Val{:pt_hlpng}) = false
-is_continuous(::Val{:symmetric}) = false
-is_continuous(::Val{:hlnet}) = false
 
 "Tokens represented by multiset (aka bag)."
 function is_highlevel end
@@ -259,19 +245,13 @@ is_highlevel(::AbstractPNTD) = false
 is_highlevel(::AbstractHLPNTD) = true
 is_highlevel(::Type{<:AbstractPNTD}) = false
 is_highlevel(::Type{<:AbstractHLPNTD}) = true
+
 function is_highlevel(s::Symbol)
     s === :hlcore ||
     s === :pt_hlpng ||
     s === :hlnet ||
     s === :symmetric
 end
-is_highlevel(::Val{:pnmlcore}) = true
-is_highlevel(::Val{:ptnet}) = true
-is_highlevel(::Val{:continuous}) = false
-is_highlevel(::Val{:hlcore}) = false
-is_highlevel(::Val{:pt_hlpng}) = false
-is_highlevel(::Val{:symmetric}) = false
-is_highlevel(::Val{:hlnet}) = false
 
 """
     $TYPEDSIGNATURES
@@ -279,6 +259,13 @@ is_highlevel(::Val{:hlnet}) = false
  Token identity is collective.
 """
 function is_collective_token end
+is_collective_token(::AbstractPNTD) = true
+is_collective_token(::PT_HLPNG) = true
+is_collective_token(::AbstractHLPNTD) = false
+is_collective_token(::Type{<:AbstractPNTD}) = true
+is_collective_token(::Type{<:PT_HLPNG}) = true
+is_collective_token(::Type{<:AbstractHLPNTD}) = false
+
 function is_collective_token(s::Symbol)
     s === :pnmlcore ||
     s === :ptnet ||
@@ -286,13 +273,6 @@ function is_collective_token(s::Symbol)
     s === :pt_hlpng
     # capacityptnet
 end
-is_collective_token(::Val{:pnmlcore}) = true
-is_collective_token(::Val{:ptnet}) = true
-is_collective_token(::Val{:continuous}) = true
-is_collective_token(::Val{:hlcore}) = false
-is_collective_token(::Val{:pt_hlpng}) = true
-is_collective_token(::Val{:symmetric}) = false
-is_collective_token(::Val{:hlnet}) = false
 
 """
 $(TYPEDSIGNATURES)
@@ -300,19 +280,18 @@ $(TYPEDSIGNATURES)
 Token identity is individual.
 """
 function is_individual_token end
+is_individual_token(::AbstractPNTD) = false
+is_individual_token(::PT_HLPNG) = false
+is_individual_token(::AbstractHLPNTD) = true
+is_individual_token(::Type{<:AbstractPNTD}) = false
+is_individual_token(::Type{<:PT_HLPNG}) = false
+is_individual_token(::Type{<:AbstractHLPNTD}) = true
+
 function is_individual_token(s::Symbol)
     s === :hlcore ||
     s === :symmetric ||
     s ===:hlnet
 end
-is_individual_token(::Val{:pnmlcore}) = false
-is_individual_token(::Val{:ptnet}) = false
-is_individual_token(::Val{:continuous}) = false
-is_individual_token(::Val{:hlcore}) = true
-is_individual_token(::Val{:pt_hlpng}) = false
-is_individual_token(::Val{:symmetric}) = true
-is_individual_token(::Val{:hlnet}) = true
-
 
 #-----------------------------------------------------------------------------------------
 """

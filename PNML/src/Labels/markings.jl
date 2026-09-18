@@ -127,17 +127,44 @@ function Base.show(io::IO, mark::Marking)
 end
 
 #--------------------------------------------------------------------------------------
-# is_collective_token
-value_type(::Type{Marking}, ::Val{:pnmlcore}) = Int
-value_type(::Type{Marking}, ::Val{:ptnet}) = Int
-value_type(::Type{Marking}, ::Val{:continuous}) = Float64
-value_type(::Type{Marking}, ::Val{:pt_hlpng}) = Int
-# For rest of is_highlevel is_individual_token is true.
-# Each place and adjacent arcs' inscriptions have the same basis sort (SortType label).
-# Any basis sort except MultisetSort.
-value_type(::Type{Marking}, ::Val{:hlcore}) = Any
-value_type(::Type{Marking}, ::Val{:hlnet}) = Any
-value_type(::Type{Marking}, ::Val{:symmetric}) = Any
+const markvT = Union{Symbol, Tuple{Vararg{Symbol}}}
+value_type(::Type{Marking}, ::AbstractPNTD) = eltype(PositiveSort) #::Int
+value_type(::Type{Marking}, ::AbstractContinuousPNTD) = eltype(RealSort) #::Float64
+value_type(::Type{Marking}, ::PT_HLPNG) = eltype(DotSort) # Bool is a Number
+function value_type(::Type{Marking}, ::SymmetricNet)
+    #! XXX See the count method in enable_rule.jl
+    Multisets.Multiset{markvT}
+end
+function value_type(::Type{Marking}, ::AbstractHLPNTD)
+    Any
+end
+
+function value_type(::Type{Marking}, s::Symbol)
+    if s === :pnmlcore || s === :ptnet
+        eltype(PositiveSort)
+    elseif s === :continuous
+        eltype(RealSort)
+    elseif s === :pt_hlpng
+        eltype(DotSort)
+    elseif is_highlevel(s)
+        @outline(s, @error("value_type(::Type{Inscription}, $s) undefined. Using DotSort.")) #! XXX TODO XXX
+        eltype(DotSort) #! XXX TODO XXX
+    else
+        error("not a valid PNTD symbol: $s")
+    end
+end
+
+# # is_collective_token
+# value_type(::Type{Marking}, ::Val{:pnmlcore}) = Int
+# value_type(::Type{Marking}, ::Val{:ptnet}) = Int
+# value_type(::Type{Marking}, ::Val{:continuous}) = Float64
+# value_type(::Type{Marking}, ::Val{:pt_hlpng}) = Int
+# # For rest of is_highlevel is_individual_token is true.
+# # Each place and adjacent arcs' inscriptions have the same basis sort (SortType label).
+# # Any basis sort except MultisetSort.
+# value_type(::Type{Marking}, ::Val{:hlcore}) = Any
+# value_type(::Type{Marking}, ::Val{:hlnet}) = Any
+# value_type(::Type{Marking}, ::Val{:symmetric}) = Any
 # Place markings are bags over a basis sort.
 # Place's SortType label wraps that basis sort.
 # Each place has a SortType refering to any non-multiset sort in net's DeclDicts.

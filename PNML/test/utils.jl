@@ -41,17 +41,17 @@ include("TestUtils.jl")
 end
 
 @testset "pntdsym pntd" for pntd in PnmlTypes.all_nettypes()
-    let v = Val(pntd)
+    let v = PNML.PnmlTypes.pnmltype_map[pntd]
         for pred in (is_discrete, is_continuous, is_highlevel, is_individual_token, is_collective_token)
             @test pred(v) isa Bool
-            @test_call pred(Val(pntd))
-            @test_opt pred(Val(pntd))
+            @test_call pred(v)
+            @test_opt pred(v)
         end
     end
     for pred in (is_individual_token, is_collective_token)
         @test pred(pntd) isa Bool
         @test_call pred(pntd)
-        #@test_opt pred(pntd)
+        @test_opt pred(pntd)
     end
 end
 # @testset "add_nettype" begin

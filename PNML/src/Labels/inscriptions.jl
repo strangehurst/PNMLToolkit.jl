@@ -71,9 +71,12 @@ end
 value_type(::Type{Inscription}, ::AbstractPNTD) = eltype(PositiveSort) #::Int
 value_type(::Type{Inscription}, ::AbstractContinuousPNTD) = eltype(RealSort) #::Float64
 value_type(::Type{Inscription}, ::PT_HLPNG) = eltype(DotSort)
-function value_type(::Type{Inscription}, pntd::AbstractHLPNTD)
-    @outline(pntd, @error("value_type(::Type{Inscription}, $pntd) undefined. Using Any.")) #! XXX TODO XXX
-    Any # eltype(DotSort) #! XXX TODO XXX
+function value_type(::Type{Inscription}, ::SymmetricNet)
+    #! XXX See the count method in enable_rule.jl
+    Multisets.Multiset{Union{Symbol, Tuple{Vararg{Symbol}}}}
+end
+function value_type(::Type{Inscription}, ::AbstractHLPNTD)
+    Any
 end
 
 function value_type(::Type{Inscription}, s::Symbol)
@@ -90,15 +93,15 @@ function value_type(::Type{Inscription}, s::Symbol)
         error("not a valid PNTD symbol: $s")
     end
 end
-# is_collective_token
-value_type(::Type{Inscription}, ::Val{:pnmlcore}) = eltype(PositiveSort)
-value_type(::Type{Inscription}, ::Val{:ptnet}) = eltype(PositiveSort)
-# dot2int used to produce value.
-value_type(::Type{Inscription}, ::Val{:pt_hlpng}) = Int
-value_type(::Type{Inscription}, ::Val{:continuous}) = eltype(RealSort)
-# For rest of is_highlevel is_individual_token is true.
-# Each place and adjacent arcs' inscriptions have the same basis sort (SortType label).
-# Any basis sort except MultisetSort.
-value_type(::Type{Inscription}, ::Val{:hlcore}) = Any
-value_type(::Type{Inscription}, ::Val{:hlnet}) = Any
-value_type(::Type{Inscription}, ::Val{:symmetric}) = Any
+# # is_collective_token
+# value_type(::Type{Inscription}, ::Val{:pnmlcore}) = eltype(PositiveSort)
+# value_type(::Type{Inscription}, ::Val{:ptnet}) = eltype(PositiveSort)
+# # dot2int used to produce value.
+# value_type(::Type{Inscription}, ::Val{:pt_hlpng}) = Int
+# value_type(::Type{Inscription}, ::Val{:continuous}) = eltype(RealSort)
+# # For rest of is_highlevel is_individual_token is true.
+# # Each place and adjacent arcs' inscriptions have the same basis sort (SortType label).
+# # Any basis sort except MultisetSort.
+# value_type(::Type{Inscription}, ::Val{:hlcore}) = Any
+# value_type(::Type{Inscription}, ::Val{:hlnet}) = Any
+# value_type(::Type{Inscription}, ::Val{:symmetric}) = Any

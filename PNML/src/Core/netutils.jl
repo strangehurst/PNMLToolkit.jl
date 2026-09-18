@@ -88,7 +88,7 @@ Return matrix of proper type and shape, fill using `input_matrix!`
 function input_matrix end
 
 function input_matrix(net::PnmlNet{T}) where {T <: PNMLVariant}
-    ivt = value_type(Inscription, Val(pntdsym(net)))
+    ivt = value_type(Inscription, pntd_of(net))
     imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
     return input_matrix!(imatrix, net)
 end
@@ -99,7 +99,7 @@ end
 #         imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
 #         return input_matrix!(imatrix, net)
 #     else
-#         ivt = value_type(Inscription, Val(pntdsym(net)))
+#         ivt = value_type(Inscription, pntdsym(net))
 #         imatrix = Matrix{ivt}(undef, ntransitions(net), nplaces(net))
 #         return input_matrix!(imatrix, net)
 #     end
@@ -134,7 +134,7 @@ Return matrix of proper type and shape, fill using `output_matrix!`
 """
 function output_matrix end
 function output_matrix(net::PnmlNet{T}) where {T <: PNMLVariant}
-    valT = value_type(Inscription, Val(pntdsym(net)))
+    valT = value_type(Inscription, pntd_of(net))
     omatrix = Matrix{valT}(undef, ntransitions(net), nplaces(net))
     return output_matrix!(omatrix, net)
 end
@@ -233,18 +233,37 @@ Other HL Nets use multisets.initial_markings(
 function initial_markings end
 
 function initial_markings(net::PnmlNet{DiscretePNML})
-    [initial_marking(p)::value_type(Marking, Val(pntdsym(net))) for p in PNML.places(net)]
+    return if net.type === :pt_hlpng
+        # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
+        println("\n#### initial_markings DiscretePNML && :pt_hlpng")
+        for p::Place in PNML.places(net)
+            @show pid(p)
+            @show p.initialMarking
+            @show initial_marking(p)
+            @show cardinality(initial_marking(p))
+        end
+
+        Int[PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
+    else
+        vT = value_type(Marking, pntd_of(net))
+        vT[initial_marking(p)::value_type(Marking, pntd_of(net)) for p in PNML.places(net)]
+    end
 end
 function initial_markings(net::PnmlNet{ContinuousPNML})
-    [initial_marking(p)::value_type(Marking, Val(pntdsym(net))) for p in PNML.places(net)]
+    vT = value_type(Marking, pntd_of(net))
+    vT[initial_marking(p)::value_type(Marking, pntd_of(net)) for p in PNML.places(net)]
 end
 function initial_markings(net::PnmlNet{HighLevelPNML})
     return if net.type === :pt_hlpng
+        println("\n#### initial_markings HighLevelPNML && :pt_hlpng")
         # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
-        [PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
+        Int[PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
     else
         #! XXX Other HL nets need it to be treated as multiset, not simple numbers! XXX
         # Evaluate the ground term expression into a multiset.
+        # Basis sort is finite. May be a ProductSort.
+        # Symbols are FEConstant operators (a.k.a. comments).
+        # Expect Vector{Multiset{Union{Symbol, Tuple{Vararg{Symbol}}}}}
         [(multiset ∘ initial_marking)(p) for p in PNML.places(net)]
     end
     #! FIFO places use queues, will co-exist with multisets from regular HL places.

@@ -73,13 +73,14 @@ net = firstnet(model)
 @test_logs sprint(println, PNML.allpages(net))
 verify_sets(net)
 
+using PNML.PnmlTypes: pnmltype_map
 @testset "by pntd $pntd" for pntd in PnmlTypes.core_nettypes()
     # For each Type that has a value_type(::Type{t}), ::Val{Symbol}) method.
     for ot in (PNML.Coordinate, Inscription, PNML.Labels.Condition, Marking,
                 Priority, Rate, PNML.Labels.Time)
-        @test_opt value_type(ot, Val(pntd))
-        #!@test_opt function_filter=pff target_modules=t_modules value_type(ot, Val(pntd))
-        @test_call value_type(ot, Val(pntd))
+        @test_opt value_type(ot, pnmltype_map[pntd])
+        #!@test_opt function_filter=pff target_modules=t_modules value_type(ot, pnmltype_map[pntd])
+        @test_call value_type(ot, pnmltype_map[pntd])
     end
 
     # default test is not page specific
@@ -180,14 +181,14 @@ end
 @testset "lookup types $pntd" for pntd in PnmlTypes.all_nettypes()
     if is_highlevel(pntd)
         @show pntd
-        @show value_type(Inscription, Val(pntd))
-        @show value_type(Marking, Val(pntd))
-        @test value_type(Inscription, Val(pntd)) == value_type(Marking, Val(pntd))
+        @show value_type(Inscription, pnmltype_map[pntd])
+        @show value_type(Marking, pnmltype_map[pntd])
+        @test value_type(Inscription, pnmltype_map[pntd]) == value_type(Marking, pnmltype_map[pntd])
     else
-        @test value_type(Inscription, Val(pntd)) <: Number
-        @test value_type(Marking, Val(pntd)) <: Number
-        @test value_type(Inscription, Val(pntd)) == value_type(Marking, Val(pntd))
+        @test value_type(Inscription, pnmltype_map[pntd]) <: Number
+        @test value_type(Marking, pnmltype_map[pntd]) <: Number
+        @test value_type(Inscription, pnmltype_map[pntd]) == value_type(Marking, pnmltype_map[pntd])
     end
-    @test value_type(PNML.Labels.Condition, Val(pntd)) <: Bool
-    @test value_type(Rate, Val(pntd)) <: Float64
+    @test value_type(PNML.Labels.Condition, pnmltype_map[pntd]) <: Bool
+    @test value_type(Rate, pnmltype_map[pntd]) <: Float64
 end
