@@ -73,7 +73,15 @@ SortType(s::AbstractString, sort::SortRef, net) = SortType(; text=s, sort, net)
 text(t::SortType) = isnothing(t.text) ? "" : t.text::String
 sortref(t::SortType) = t.sort
 refid_of(t::SortType) = refid_of(sortref(t))::Symbol
-sortelements(t::SortType, net::AbstractPnmlNet) = sortelements(sortdefinition(namedsort(net, sortref(t))), net)
+
+sortelements(t::SortType, net::AbstractPnmlNet) = sortelements(sortref(t), net)
+    #println("sortelements $t")
+    #@show sortref(t)
+    # sortelements(sortref(t), net)
+    # @show namedsort(net, sortref(t))
+    # @show sortdefinition(namedsort(net, sortref(t)))
+    # sortelements(sortdefinition(namedsort(net, sortref(t))), net)
+# end
 
 function Base.show(io::IO, st::SortType)
     print(io, indent(io), "SortType(")

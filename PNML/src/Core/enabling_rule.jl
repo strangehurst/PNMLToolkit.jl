@@ -30,12 +30,25 @@ function labeled_places(net::AbstractPnmlNet, markings, ::Type{T}) where {T}
     #Pair[k=>v for (k,v::T) in zip(map(pid, places(net)), markings)]
     #foreach(println, zip(map(pid, places(net)), markings))
 
-    Pair[k=>v for (k,v::T) in zip(map(pid, places(net)), markings)]
+    Pair[k=>v for (k, v) in zip(map(pid, places(net)), markings)]
 end
 
 "Return multiset used to count place sorttypes of a net."
-function count_sorttypes(net)
-    Multiset([(to_sort(net) ∘ sortref)(p) for p in places(net)])
+function count_sorttypes(net::PnmlNet)
+    #Multiset([(to_sort(net) ∘ sortref)(p) for p in places(net)])
+    # if to_sort is a ProductSort, unwrap to tuple
+    m = Multiset()
+    for p::Place in places(net)
+        sref = sortref(p)
+        us = unwrap_namedsort(to_sort(sref, net))
+        if us isa ProductSort
+            ts = tuple(((unwrap_namedsort ∘ to_sort(net)).(sorts(us)))...)
+            push!(m, ts)
+        else
+            push!(m, us)
+        end
+    end
+    return m
 end
 
 """
@@ -53,23 +66,21 @@ function enabled end
 
 const enabledT = OrderedDict{Symbol, Bool}
 
-
 function enabled(net::PnmlNet{T}, marking) where {T <: PNMLVariant}
-    ER()&& println("\n#-- enabled $(pntdsym(net)) net",
-                         " id $(pid(net))",
-                         " marking $marking")
+    ER()&& println("\n#-- enabled ", pntdsym(net), " id ", pid(net))
+
+    @show typeof(marking)
+    if is_individual_token(pntd_of(net))
+        foreach(println ∘ typeof, marking)
+    end
 
     cnt = count_sorttypes(net)
-    # if ER()
-    #     println()
-    #     println("found sorttypes");
-    #     for (i,c) in enumerate(cnt)
-    #         println(i, ": ", c)
-    #     end
-    #     println()
-    #     @show net.vars net.varsubs
-    #     @show valtype(net.vars) valtype(net.varsubs)
-    # end
+    if ER()
+        println("found sorttypes");
+        for (i,c) in enumerate(cnt)
+            println(i, ": ", c)
+        end
+    end
 
     # Transaction id => boolean enabled. Start by assuming all transitions are enabled.
     enabled_dict = enabledT(id=>true for id in PNML.transition_ids(net))
@@ -77,21 +88,12 @@ function enabled(net::PnmlNet{T}, marking) where {T <: PNMLVariant}
     # dictionary with key of place id, value of its marking value (from marking vector)
     # Place sorttypes may be different. All marks are Multisets of sorttype.
     ER()&& @show T
-    vT = if T <: HighLevelPNML && pntdsym(net) !== :pt_hlpng
-        if ER()
-            for sorttype in keys(cnt)
-                println()
-                @show sorttype
-                println("  typeof ", typeof(sorttype))
-                println("  sortdefinition  ", sortdefinition(sorttype))
-                println("  eltype ", eltype(sorttype))
-            end
-            println()
-        end
-        Union{eltype.(keys(cnt))...}
-    else
-        value_type(Marking, Val(pntdsym(net)))
-    end
+    vT = value_type(Marking, pntd_of(net))
+    # if T <: HighLevelPNML && pntdsym(net) !== :pt_hlpng
+    #     Union{Symbol, Tuple{Vararg{Symbol}}}
+    # else
+    #     value_type(Marking, pntd_of(net))
+    # end
     ER()&& @show vT
 
     ER()&& @show labeled_places(net, marking, vT)
@@ -102,7 +104,7 @@ function enabled(net::PnmlNet{T}, marking) where {T <: PNMLVariant}
         transition_id = pid(tr)
         if ER()
             let t = term(condition(transition(net, transition_id)))
-                println("\ntransition_id $transition_id = ", t)
+                println("\ntr::Unionansition_id $transition_id = ", t)
             end
             for pl in preset(net, transition_id)
                 let a = arc(net, pl, transition_id)::Arc
@@ -142,12 +144,20 @@ and transition guard is true.
 function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id)
     ER()&& println("#-- sufficient_tokens! ",
                     "$(pntd_of(net)) $(pid(net)) $transition_id")
-    s = if is_collective_token(pntdsym(net)) ||
-            pntdsym(net) === :pt_hlpng
+    @show pntdsym(net)
+    @show is_collective_token(pntdsym(net))
+    s = if is_collective_token(pntdsym(net))
         # There are no variables possible here and the guard is `true`.
         # Evaluate preset inscription expressions, compare to mark value.
-        all(skipmissing(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
-                                for place_id in preset(net, transition_id)))
+        if pntdsym(net) === :pt_hlpng
+            all(mark_dict[place_id] >= cardinality(inscription(arc(net, place_id, transition_id))())
+                    for place_id in preset(net, transition_id))
+        else
+            all(mark_dict[place_id] >= inscription(arc(net, place_id, transition_id))()
+                    for place_id in preset(net, transition_id))
+        end
+        # all(skipmissing(mark_dict[place_id]skipmissing( >= inscription(arc(net, place_id, transition_id))()
+        #                         for place_id in preset(net, transition_id)))
     else
         tr_vars = haskey(net.vars, transition_id) ? net.vars[transition_id] : varsetT()
         tr_varsubs = haskey(net.varsubs, transition_id) ? net.varsubs[transition_id] : substT()
@@ -292,7 +302,7 @@ function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef, mark::Multise
         # Examine `mark`, look for values matching varible declaration sort.
         # `indx` are the tuple elements that are expected to match if a `ProductSort`.
         for (element, multiplicity) in pairs(mark)
-            #@show typeof(element) element multiplicity
+            @show typeof(element) element multiplicity
             #! arc_binding_set counts possible substitutions in source place's marking.
             # Multiple of same variable in arc inscription expression means
             # `arc_binding_sets` only includes values of mark elements with
