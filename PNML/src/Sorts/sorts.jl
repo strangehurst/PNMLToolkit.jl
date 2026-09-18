@@ -48,9 +48,7 @@ Wrap a SortRef. Warning: do not cause recursive multiset Sorts.
 
     function MultisetSort(b::SortRef, net::AbstractPnmlNet)
         if is_multisetsort(b) ||
-           (is_namedsort(b) &&
-                isa(sortdefinition(namedsort(net, b)), MultisetSort))
-
+                    (is_namedsort(b) && sortdefinition(namedsort(net, b)) isa MultisetSort)
             throw(PNML.MalformedException("basis cannot be MultisetSort, found $b"))
         end
         new(b)
@@ -206,10 +204,23 @@ function unwrap(net::AbstractPnmlNet, sortref::SortRef)
         unwrap_namedsort(s)
     end
 end
-function unwrap_namedsort(s)
-    if s isa PNML.Declarations.NamedSort
-        sortdefinition(s)
+
+"""
+If `a` is a `NamedSortRef` return its `sortdefinition`, otherwise return `a`.
+"""
+function unwrap_namedsort(a::SortRef, net::AbstractPnmlNet)
+    if is_namedsort(a)
+        sortdefinition(namedsort(net, a))
     else
-        s
+        a
+    end
+end
+unwrap_namedsort(net::AbstractPnmlNet) = Fix2(unwrap_namedsort, net)
+
+function unwrap_namedsort(a)
+    if a isa PNML.Declarations.NamedSort
+        sortdefinition(a)
+    else
+        a
     end
 end

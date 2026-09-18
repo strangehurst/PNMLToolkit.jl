@@ -35,7 +35,7 @@ module Sorts
 #import AutoHashEquals: @auto_hash_equals
 import Base: eltype
 import PNML: basis, inc_indent, indent, refid_of, sortdefinition, sortelements,
-    sortref, unwrap_namedsort
+    sortref
 import StructEquality: @struct_hash_equal
 
 using Base: Fix2, length
@@ -52,7 +52,7 @@ using PNML: AbstractSort, DotConstant, inc_indent, indent, is_multisetsort,
 export AbstractSort, BoolSort, CyclicEnumerationSort, DotSort, EnumerationSort,
     FiniteEnumerationSort, FiniteIntRangeSort, IntegerSort, ListSort, MultisetSort,
     NaturalSort, NumberSort, PositiveSort, ProductSort, RealSort, StringSort, equalSorts,
-    sorts
+    sorts, unwrap_namedsort
 
 include("sorts.jl")
 include("dots.jl")

@@ -239,7 +239,6 @@ function verify!(errors::Vector{String}, dd::DeclDicts, verbose::Bool, net::Abst
     return errors
 end
 
-
 function show_sorts(dd::DeclDicts)
     println("show_sorts")
     #@show _sort_dictionaries()
@@ -251,8 +250,3 @@ function show_sorts(dd::DeclDicts)
     end
     println()
 end
-
-"""
-If `a` is a `NamedSortRef` return its `sortdefinition`, otherwise return `a`.
-"""
-unwrap_namedsort(a::SortRef, net) = is_namedsort(a) ? sortdefinition(namedsort(net, a)) : a
