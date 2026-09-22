@@ -4,7 +4,7 @@
 Builtin operator that has arity=0 means the same result every time, a constant.
 Restricted to NumberSorts, those `Sort`s whose `eltype` isa `Number`.
 """
-struct NumberConstant{T<:Number} <: AbstractOperator
+struct NumberConstant{T<:Number} <: ConstantOperator #AbstractOperator
     value::T
     sort::SortRef # value isa eltype(to_sort(sort, net), verified by parser.
     # Constant operators are 0-arity by definition. Parameter vector not used here.
@@ -32,7 +32,7 @@ Finite enumeration constant and its containing sort.
     fec() === :anID
     fec.name = "somevalue"
 """
-struct FEConstant <: AbstractOperator
+struct FEConstant <: ConstantOperator #AbstractOperator
     id::Symbol # ID is unique within net.
     name::Union{String, SubString{String}} # Must name be unique within a sort?
     ref::SortRef # of contining partition, enumeration, (or partitionelement?) sort.
@@ -63,7 +63,7 @@ end
     $(TYPEDEF)
 Must refer to a value between the start and end of the respective `FiniteIntRangeSort`.
 """
-struct FiniteIntRangeConstant{T<:Integer} <: AbstractOperator
+struct FiniteIntRangeConstant{T<:Integer} <: ConstantOperator #AbstractOperator
     value::T
     sort::SortRef
     #TODO! Assert that T is a sort eltype.
@@ -85,7 +85,7 @@ value(c::FiniteIntRangeConstant) = c.value
 The only element of `DotSort` is `DotConstant`.
 This is a 0-arity opertor term that evaluates to `1`.
 """
-struct DotConstant <: AbstractOperator
+struct DotConstant <: ConstantOperator #AbstractOperator
 end
 
 sortref(::DotConstant) = UserSortRef(:dot)
@@ -108,7 +108,7 @@ Examples
     c() == true
 ```
 """
-struct BooleanConstant <: AbstractOperator
+struct BooleanConstant <: ConstantOperator #AbstractOperator
     value::Bool
 end
 

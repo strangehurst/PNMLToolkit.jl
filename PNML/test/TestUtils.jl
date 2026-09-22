@@ -4,7 +4,7 @@ using EzXML, Preferences, XMLDict, Reexport, Multisets
 Multisets.set_key_value_show()
 
 using PNML
-using PNML: AbstractDeclaration, AbstractOperator, AbstractTerm, AbstractVariable,
+using PNML: AbstractDeclaration, AbstractOperator, ConstantOperator, AbstractTerm, AbstractVariable,
     AnyElement, BooleanConstant, CONFIG, Coordinate, DeclDicts, DotConstant, DotConstantEx,
     DuplicateIDException, FEConstant, MalformedException, Maybe, MissingIDException,
     NumberConstant, Page, PartitionElement, Place, PnmlConfig, PnmlException, PnmlExpr, PnmlModel,

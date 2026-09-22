@@ -200,6 +200,8 @@ Operators are part of the high-level pnml many-sorted algebra.
 See [`NamedOperator`](@ref) and [`ArbitraryOperator`](@ref).
 """
 abstract type AbstractOperator <: AbstractTerm end
+abstract type ConstantOperator <: AbstractOperator end
+
 
 # Expect each operator instance to have fields:
 # - expression (PnmlExpr <: TermInterfce) that evaluates to an instance of output sort.
