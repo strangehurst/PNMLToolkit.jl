@@ -60,36 +60,34 @@ function (op::Operator)(#= parameters? =#)
     return out
 end
 
-# Like Metatheory.@matchable
-TermInterface.isexpr(op::Operator)    = true
-TermInterface.iscall(op::Operator)    = true
-TermInterface.head(op::Operator)      = Operator #! A constructor
-TermInterface.operation(op::Operator) = TermInterface.head(op)
-TermInterface.children(op::Operator)  = nothing #getfield.((op,), ($(QuoteNode.(fields)...),))
-TermInterface.arguments(op::Operator) = TermInterface.children(op)
-TermInterface.arity(op::Operator)     = length(inputs(op))
-TermInterface.metadata(op::Operator)  = metadata(op)
+# # Like Metatheory.@matchable
+# TermInterface.isexpr(op::Operator)    = true
+# TermInterface.iscall(op::Operator)    = true
+# TermInterface.head(op::Operator)      = Operator #! A constructor
+# TermInterface.operation(op::Operator) = TermInterface.head(op)
+# TermInterface.children(op::Operator)  = nothing #getfield.((op,), ($(QuoteNode.(fields)...),))
+# TermInterface.arguments(op::Operator) = TermInterface.children(op)
+# TermInterface.arity(op::Operator)     = length(inputs(op))
+# TermInterface.metadata(op::Operator)  = metadata(op)
 
-# maketerm is used to rewrite terms of the inexprs.
-function TermInterface.maketerm(::Type{Operator}, head, children, metadata)
-    head(children...)
-end
+# # maketerm is used to rewrite terms of the inexprs.
+# function TermInterface.maketerm(::Type{Operator}, head, children, metadata)
+#     head(children...)
+# end
 
+# TermInterface.isexpr(op::Operator)    = true
+# TermInterface.iscall(op::Operator)    = true # users promise that this is only called if isexpr is true.
+# TermInterface.head(op::Operator)      = tag(op)
+# TermInterface.children(op::Operator)  = inputs(op)
+# TermInterface.operation(op::Operator) = op.func
+# TermInterface.arguments(op::Operator) = inputs(op)
+# TermInterface.arity(op::Operator)     = length(inputs(op))
+# TermInterface.metadata(op::Operator)  = nothing
 
-#=
-TermInterface.isexpr(op::Operator)    = true
-TermInterface.iscall(op::Operator)    = true # users promise that this is only called if isexpr is true.
-TermInterface.head(op::Operator)      = tag(op)
-TermInterface.children(op::Operator)  = inputs(op)
-TermInterface.operation(op::Operator) = op.func
-TermInterface.arguments(op::Operator) = inputs(op)
-TermInterface.arity(op::Operator)     = length(inputs(op))
-TermInterface.metadata(op::Operator)  = nothing
+# function TermInterface.maketerm(::Type{Operator}, operation, arguments, metadata)
+#     Operator(iscall, operation, arguments...; metadata)
+# end
 
-function TermInterface.maketerm(::Type{Operator}, operation, arguments, metadata)
-    Operator(iscall, operation, arguments...; metadata)
-end
-=#
 
 function Base.show(io::IO, t::Operator)
     print(io, nameof(typeof(t)), "(")
@@ -298,7 +296,7 @@ function (uo::UserOperator)(parameters...) # TODO add variables
         @outline(operator_id, op, result, @warn "found operator $operator_id" op result)
         return result
     end
-    @outline(operator_id, error("found NO operator $operator_id"))
+    error("found NO operator $operator_id")
 end
 
 basis(uo::UserOperator)  = basis(operator(uo.net, uo.declaration))
