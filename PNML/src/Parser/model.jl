@@ -185,8 +185,15 @@ function parse_net(net_node::XMLNode; pntd_override::Maybe{String} = nothing, kw
             unexpected_label!(net.extralabels, child, Symbol(tag), net; parentid=netid)
         end
     end
-
-    # TODO make a CONFIG option to enable
+    PNML.count_sorttypes!(net)
+    if D()
+        println("found ", length(keys(net.scnt)),
+                " sorttypes for ", nplaces(net), " places");
+        for (i,c) in enumerate(keys(net.scnt))
+            println(i, ": ", c)
+        end
+    end
+    # TODO make a CONFIG option to enable verify
     verify(net, false) # CONFIG.verbose)
 
     #~ --------------------------------------------------------------

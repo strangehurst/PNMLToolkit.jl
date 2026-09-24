@@ -4,11 +4,37 @@ const efilterT = LittleDict{Symbol, Any}
 const lparserT = LittleDict{Symbol, Any}
 
 """
-Collection of NamedTuples, keys are varable ids, values are binding
+Collection of Pairs place_id => value.
+
+Variable id maps to name and sort.
+Substitution values come from a place's current marking multiset.
+
+Substution applies to all of transition preset places,
+so we attach the place_id to the value to allow removal if this substitution is used.
+
+Duplicate variables in an expression mean the
+multiplicity of value in place's marking multiset is >1.
+
+Expressions are arc inscriptions and transition guards.
+Inscription expressions reference one place.
+Guard expressions may reference all preset places.
+
+A substitution uses the same value for all variable instances,
+even when they come from separate places.
+
+Should there be a pair for each variable instance when place multiplicity >1?
+Or do we query the multiplicity?
+
 """
-const substT = Vector{NamedTuple}
+const substT = Vector{Pair{Symbol, Any #=variable_sort_eltype=#}}
+#const substT = Multiset{Pair{Symbol, variable_sort_eltype}}
+#const substT = Pair{Symbol, Multiset{variable_sort_eltype}}
+
 """
-Map variable id to vector of named tuples for substitution value bindings.
+Map variable id to multiset of substitution value bindings.
+
+variable_id -> place_id => value
+
 """
 const vsubT = LittleDict{Symbol, substT}
 
@@ -65,7 +91,7 @@ $(FIELDS)
     # Zero or more extra PNML Labels may be attched to net.
     const extralabels::LittleDict{Symbol, Any} = LittleDict{Symbol,Any}()
     # Map xml tag symbol to parser callable for built-in labels and extension labels.
-    #todo Referplugins!ence to label parser interface.
+    #todo Reference to label parser interface.
     const labelparsers::lparserT = lparserT() #LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
     """
         Collection that associates a tool name & version with a callable parser.
@@ -82,10 +108,29 @@ $(FIELDS)
     const vars::varsT = varsT() #LittleDict{Symbol, Set{Symbol}} = LittleDict{Symbol, Set{Symbol}}()
 
     # keys are transition ids, values are vectors of substution namedtuples
-    "Cache of variable substitutons for this transition"
+    "Cache of variable substitutons for this transition."
     const varsubs::vsubT = vsubT() # = LittleDict{Symbol, Vector{NamedTuple}} = LittleDict{Symbol, Vector{NamedTuple}}()
 
+    "Count of sorttypes if the net."
+    scnt::Multiset{Any} = Multiset{Any}()
+
 end #= mutable struct PnmlNet =#
+
+"Fill multiset used to count place sorttypes of a net."
+function count_sorttypes!(net::PnmlNet)
+    for p::Place in places(net)
+        sref = sortref(p)
+        us = unwrap_namedsort(to_sort(sref, net))
+        if us isa ProductSort
+            ts = tuple(((unwrap_namedsort ∘ to_sort(net)).(sorts(us)))...)
+            push!(net.scnt, ts)
+        else
+            push!(net.scnt, us)
+        end
+    end
+    return net.scnt
+end
+
 "Iterate enable filters"
 function filters(net::PnmlNet{T}) where {T <: PNMLVariant}
     # @show net.enabled_filters
