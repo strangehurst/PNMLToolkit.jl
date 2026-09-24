@@ -245,8 +245,21 @@ UserOperatorEx
 
 
 function toexpr(op::UserOperatorEx, varsub::NamedTuple, net)
-    #@warn "toexpr(op::UserOperatorEx, varsub::NamedTuple)" op varsub operator(net, op.refid)
-    Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #TODO! ass varsub
+    # @warn("toexpr(op::UserOperatorEx, varsub::NamedTuple)",
+    #         op,
+    #         varsub,
+    #         operator(net, op.refid))
+    # Lookup operator
+    o = operator(net, op.refid)
+    # named or builtin operator. FEConstant are constant functors.
+    if o isa ConstantOperator
+        #@warn op o()
+        QuoteNode(o())
+    else
+        #! what about parameters and variabe substitutions
+        :(o($varsub))
+    end
+    #!Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #TODO! ass varsub
 end
 
 function expr_sortref(o::UserOperatorEx, net)
@@ -318,11 +331,25 @@ function toexpr(b::Bag, varsub::NamedTuple, net)
     #@show b varsub Expr(:parameters, Expr(:kw,:net, net))
     #^ Warning: b.element can be: `PnmlMultiset`, `tuple`
     #^ tuples are elements of a `ProductSort`
-    Expr(:call, pnmlmultiset, # pnmlmultiset(bag.basis, bag.element, bag.multi; net=net)
-        Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
-        b.basis,
-        toexpr(b.element, varsub, net),
-        toexpr(b.multi, varsub, net))
+    #@warn b
+    #@warn b.element
+    #@warn b.multi
+    if PNML.is_productsort(sortref(b))
+        e = toexpr(b.element, varsub, net)
+        m = toexpr(b.multi, varsub, net)
+        #@warn "product sort" e m
+        Expr(:call, pnmlmultiset, # pnmlmultiset(bag.basis, bag.element, bag.multi; net=net)
+            Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
+            b.basis,
+            toexpr(b.element, varsub, net),
+            toexpr(b.multi, varsub, net))
+    else
+       Expr(:call, pnmlmultiset, # pnmlmultiset(bag.basis, bag.element, bag.multi; net=net)
+            Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
+            b.basis,
+            toexpr(b.element, varsub, net),
+            toexpr(b.multi, varsub, net))
+    end
 end
 
 function Base.show(io::IO, x::Bag)
@@ -395,12 +422,8 @@ end
 
 ###################################################################################
 #& Multiset Operator
-# struct All  <: PnmlExpr# #! :all is a literal, ground term, parsed as Bag expression
-#     sort::REFID
-# end
-# struct Empty  <: PnmlExpr #! :empty is a literal, ground term, parsed as Bag expression
-#     sort::REFID
-# end
+# @matchable struct All  <: PnmlExpr# #! :all is a literal, ground term, parsed as Bag expression
+# @matchable struct Empty  <: PnmlExpr #! :empty is a literal, ground term, parsed as Bag expression
 
 #"Multiset add: Bag × Bag -> PnmlMultiset"
 @matchable struct Add <: PnmlExpr #^ multiset add uses `+` operator.
@@ -420,6 +443,8 @@ expr_sortref(a::Add, net) = expr_sortref(first(a.args), net)::SortRef
 
 function toexpr(op::Add, varsub::NamedTuple, net)
     @assert length(op.args) >= 2
+    #foreach(println, op.args)
+    #@warn op.args
     # Expr(:call, sum, [eval(toexpr(arg, varsub, net)) for arg in op.args])
     #! is eval needed here? YES
     :(sum(eval(toexpr(arg, $varsub, $net)) for arg in $(op.args))) # creates PnmlMultiset
@@ -1253,7 +1278,7 @@ Each tuple element will have the same sort as the corresponding product sort.
 
 NB: ISO 15909 Standard considers Tuple to be an Operator.
 
-`toexpr` returns `Expr` that calls #! TBD
+`toexpr` returns `Expr` that calls tuple#! TBD
 """
 PnmlTupleEx
 
@@ -1296,7 +1321,7 @@ function toexpr(op::PnmlTupleEx, varsub::NamedTuple, net)
     # args = if all(Fix2(isa, Symbol), op.args)
     #     map(vexp -> feconstant(vexp.refid), op.args)
 
-    args = op.args
+    #args = op.args
     # if all(Fix2(isa, VariableEx), op.args)
     #     # toexpr is to QuoteNode holding REFID.
     #     map(vexp -> feconstant(vexp.refid), op.args)
@@ -1305,10 +1330,15 @@ function toexpr(op::PnmlTupleEx, varsub::NamedTuple, net)
     # end
     # @show args
     # PnmlTuple{psorts}(x...)
-    Expr(:call, tuple, toexpr.(args, Ref(varsub), Ref(net))...)
+    #@warn op
+    args = [(eval ∘ toexpr)(arg, varsub, net) for arg in op.args]
+    #@warn args
+    #println("\n-----------------------------")
+   :(tuple(($args)...))
 end
+ # :(sum(eval(toexpr(arg, $varsub, $net)) for arg in $(op.args))) # creates PnmlMultiset
 
-# #? Would this be a candidate for rewriting?
+# ? Would this be a candidate for rewriting?
 # _deref_variable(v::Any) = identity(v) # Bet that it is an operator  expression -> FEConstant!
 # _deref_variable(vexp::VariableEx) = feconstant(net, vexp.refid)
 
