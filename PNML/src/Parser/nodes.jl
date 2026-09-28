@@ -330,13 +330,13 @@ function default(::Type{<:Marking}, net::AbstractPnmlNet, place::Symbol, placety
 end
 
 function default(::Type{<:Labels.Condition}, net::AbstractPnmlNet)
-    Labels.Condition(BooleanEx(BooleanConstant(true)), net)
+    Labels.Condition(; term=BooleanEx(BooleanConstant(true)), net)
 end
 
 # placetype is needed for SymmetricNet and HLPNG
 function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{SortType}=nothing)
     pntd = pntdsym(net) #pntd_of(net)
-    ex = if pntd === :pt_hlpng
+    term = if pntd === :pt_hlpng
         #isnothing(placetype) && @warn "expected placetype for PT_HLPNG, using NamedSortRef(:dot)"
         Bag(NamedSortRef(:dot), DotConstant(), 1)
     elseif is_highlevel(pntd)
@@ -349,5 +349,6 @@ function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{S
     else
         NumberEx(NamedSortRef(:positive), one(Int))
     end
-    Inscription(nothing, ex, nothing, nothing, REFID[], net)
+    #@warn "default inscription" ex find_vars(ex)
+    Inscription(; term, net)
 end

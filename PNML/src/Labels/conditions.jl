@@ -8,22 +8,21 @@ There may be other things evaluating to boolean used to determine transition fir
 including: priority labels, inhibitor arc, place capacity labels, time/delay labels.
 ```
 """
-@struct_hash_equal struct Condition{N <: AbstractPnmlNet, T<:PnmlExpr} <: HLAnnotation
-    text::Maybe{String}
+@struct_hash_equal @kwdef struct Condition{N <: AbstractPnmlNet, T<:PnmlExpr} <: HLAnnotation
+    text::Maybe{String} = nothing
     term::T # duck-typed AbstractBoolExpr
     # color function: uses term and args, Built/JITed
-    graphics::Maybe{Graphics} #TODO switch order of graphics, toolinfos everywhere!
-    toolspecinfos::Maybe{Vector{ToolInfo}}
-    vars::Vector{REFID} #! XXX DOCUMENT ME XXX
+    graphics::Maybe{Graphics} = nothing
+    toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
     net::N
 end
 
 Condition(b::Bool, net::AbstractPnmlNet) = Condition(BooleanConstant(b), net)
-Condition(c::BooleanConstant, net::AbstractPnmlNet) = Condition(BooleanEx(c), net)
-Condition(expr::BooleanEx, net::AbstractPnmlNet) =
-    Condition(nothing, expr, nothing, nothing, REFID[], net)
-Condition(text::AbstractString, expr::BooleanEx, net::AbstractPnmlNet) =
-    Condition(text, expr, nothing, nothing, REFID[], net)
+Condition(c::BooleanConstant, net::AbstractPnmlNet) = Condition(; term=BooleanEx(c), net)
+# Condition(expr::BooleanEx, net::AbstractPnmlNet) =
+#     Condition(nothing, expr, nothing, nothing, net)
+# Condition(text::AbstractString, term::BooleanEx, net::AbstractPnmlNet) =
+#     Condition(; text, term, nothing, nothing, net)
 
 Base.eltype(::Condition) = Bool
 Base.eltype(::Type{<:Condition}) = Bool
@@ -41,8 +40,9 @@ term(c::Condition) = c.term #todo! pnml variables
 
 Return iterable collection of `Symbol`s.
 """
-variables(c::Condition) = c.vars
-
+function variables(c::Condition)
+    find_vars(term(c)) # c.vars
+end
 """
     (c::Condition)(args) -> Bool
 

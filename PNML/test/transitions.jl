@@ -24,7 +24,7 @@ include("TestUtils.jl")
     @test name(trans) == "Some transition"
     #@show condition(trans)()
     @test condition(trans)() isa Bool
-    @test isempty(PNML.Labels.variables(condition(trans))::Vector{Symbol})
+    @test isempty(PNML.Labels.variables(condition(trans)))
 
     node = xml"""<transition id ="t1"> <condition><text>test w/o structure</text></condition></transition>"""
     @test_throws PNML.MalformedException parse_transition(node, net)

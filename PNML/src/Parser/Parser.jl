@@ -52,7 +52,7 @@ using PNML: AnyElement, BooleanConstant, CONFIG, Coordinate, D, DeclDicts, DotCo
     pnmlmultiset, pntd_of, productsort, productsorts,
     refplace_idset, refplacedict, reftransition_idset, reftransitiondict, registry_of,
     to_sort, toolinfos, transition_idset, transitiondict, value_type, variabledecl,
-    variabledecls, verify
+    variabledecls, verify, BagvarT
 using SciMLPublic: @public
 using TermInterface
 

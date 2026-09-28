@@ -7,12 +7,12 @@ Labels an Arc with a expression term .
 `Inscription(t::PnmlExpr)()` is a functor evaluating the expression and
 returns a value of the `eltype` of sort of inscription.
 """
-struct Inscription{N <: AbstractPnmlNet, T <: PnmlExpr} <: HLAnnotation
-    text::Maybe{String}
+@kwdef struct Inscription{N <: AbstractPnmlNet, T <: PnmlExpr} <: HLAnnotation
+    text::Maybe{String} = nothing
     term::T # expression whose output sort is the same as adjacent place's sorttype.
-    graphics::Maybe{Graphics}
-    toolspecinfos::Maybe{Vector{ToolInfo}}
-    vars::Vector{Symbol}
+    graphics::Maybe{Graphics} = nothing
+    toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
+    #vars::Vector{Symbol}
     net::N
 end
 
@@ -29,7 +29,9 @@ end
 
 Return iterable collection of `Symbol`s.
 """
-variables(inscription::Inscription) = inscription.vars
+function variables(inscription::Inscription)
+    find_vars(term(inscription)) # inscription.vars
+end
 
 function Base.show(io::IO, inscription::Inscription)
     print(io, "Inscription(")

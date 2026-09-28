@@ -182,11 +182,11 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::PnmlNet{P
     l = parse_label_content(node, parse_structure, net)::NamedTuple
     if !isnothing(l.exp) # There was a <structure> tag. #todo+
         @warn "$nn place $parentid <structure> element in $(pntd_of(net)) net; parsed as $(l.exp)"
+        @assert isempty(find_vars(l.exp)) # All markings are ground terms.
     end
     if isnothing(l.text) # Expected for non-HL values if there is an <initialMarking>.
         @warn "$nn place $parentid <text> element expected for $(pntd_of(net)) net"
     end
-    @assert isempty(l.vars) # All markings are ground terms.
     placeS = to_sort(sortref(placetype), net)
     placeT = eltype(placeS)::Type{<:Number}
     valueT = value_type(Marking, pntd_of(net))::Type{<:Number}
@@ -330,8 +330,9 @@ function (pmt::ParseMarkingTerm)(marknode::XMLNode, net::AbstractPnmlNet)
     term = EzXML.firstelement(marknode) # ignore any others
 
     # Here we are parsing a term from XML to a ground term, which must be an operator.
-    mark_tj = parse_term(term, net; vars=()) # ParseMarkingTerm
-    isempty(mark_tj.vars) || error("unexpected variables in $mark_tj")
+    mark_tj = parse_term(term, net; vars=BagvarT()) # ParseMarkingTerm
+    isempty(find_vars(mark_tj.exp)) ||
+        error("unexpected variables in $mark_tj")
     isnothing(placetype(pmt)) &&
         @warn "$(pntd_of(net)) ParseMarkingTerm placetype(pmt) is nothing"
     # mark expression should be a multiset of placetype
@@ -385,7 +386,8 @@ function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net:
         value = one(value_type(Inscription, pntd_of(net)))
     end
     term = NumberEx(sortref(value), value)
-    Inscription(nothing, term, graphics, toolspecinfos, REFID[], net)
+    @warn "parse_inscription" term find_vars(term)
+    Inscription(; term, graphics, toolspecinfos, net)
 end
 
 """
@@ -397,7 +399,9 @@ function parse_hlinscription(node::XMLNode, source::Symbol, target::Symbol, net:
                                 parentid::Symbol)
     check_nodename(node, "hlinscription")
     l = parse_label_content(node, ParseInscriptionTerm(source, target), net)::NamedTuple
-    Inscription(l.text, l.exp, l.graphics, l.toolspecinfos, REFID[l.vars...], net)
+    @warn "parse_hlinscription" l find_vars(l.exp::PnmlExpr)
+    #pnmlexpr_string(l.exp::PnmlExpr)
+    Inscription(; l.text, term=l.exp, l.graphics, l.toolspecinfos, net)
 end
 
 """
@@ -440,8 +444,11 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
 
     EzXML.haselement(node) ||
         error("missing inscription term of arc $(source(pit)) -> $(target(pit))")
-    tj = parse_term(EzXML.firstelement(node), net; vars=()) # ParseInscriptionTerm
-
+    tj = parse_term(EzXML.firstelement(node), net; vars=BagvarT()) # ParseInscriptionTerm
+    if !isempty(find_vars(tj.exp))
+        @warn "ParseInscriptionTerm" tj find_vars(tj.exp)
+        #pnmlexpr_string(tj.exp)
+    end
     if !equalSorts(net, tj.ref, placesort)
         @error("arc $(source(pit)) -> $(target(pit)) inscription term sort mismatch: $(tj.ref) != $placesort",
                 tj, adjacentplace)
@@ -513,7 +520,7 @@ function parse_condition(node::XMLNode, net::AbstractPnmlNet; parentid)
     l = parse_label_content(node, parse_condition_term, net)::NamedTuple
     isnothing(l.exp) &&
         throw(MalformedException("$parentid missing condition term in $l"))
-    PNML.Labels.Condition(l.text, l.exp, l.graphics, l.toolspecinfos, REFID[l.vars...], net)
+    PNML.Labels.Condition(; l.text, term=l.exp, l.graphics, l.toolspecinfos, net)
 end
 
 """
@@ -526,7 +533,7 @@ will have a structure element containing a term.
 function parse_condition_term(cnode::XMLNode, net::AbstractPnmlNet)
     check_nodename(cnode, "structure")
     if EzXML.haselement(cnode)
-        return parse_term(EzXML.firstelement(cnode), net; vars=()) # parse_condition_term
+        return parse_term(EzXML.firstelement(cnode), net; vars=BagvarT()) # parse_condition_term
     end
     throw(ArgumentError("missing condition term in <structure>"))
 end
@@ -544,7 +551,7 @@ Non-high-level net places are expecting a numeric sort: eltype(sort) <: Number.
 function parse_sorttype(node::XMLNode, net::AbstractPnmlNet; parentid)
     check_nodename(node, "type")
     l = parse_label_content(node, parse_sorttype_term, net)::NamedTuple
-    @assert isempty(l.vars) # No variables as sort is not a term.
+    @assert !isnothing(l.exp) && isempty(find_vars(l.exp)) # No variables as sort is not a term.
     # High-level nets expected to have a sorttype defined or be inferred from initial marking value.
     sort=l.sort::SortRef
     SortType(; l.text, sort, l.graphics, l.toolspecinfos, net)
@@ -572,7 +579,8 @@ function parse_sorttype_term(typenode::XMLNode, net::AbstractPnmlNet)
     sort_type = parse_sort(sort_node, net, nothing, "")#::SortRef
     is_multisetsort(sort_type) &&
         error("multiset sort not allowed for place <type>")
-    return TermJunk(SortRefEx(sort_type), sort_type, ()) # Not a term; has no variables.
+    return TermJunk(SortRefEx(sort_type),
+                              sort_type) # Not a term; has no variables.
 end
 
 """
