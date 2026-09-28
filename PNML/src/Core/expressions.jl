@@ -4,16 +4,18 @@ Expressions Module
 module Expressions
 
 import Metatheory
-import Multisets: Multiset
-import PNML: PNML, basis, sortref, toexpr
+import Multisets
+import PNML: basis, sortref, toexpr
 
 using Base: Fix2
 using DocStringExtensions
 using Metatheory: @matchable
+using Multisets: Multiset
 using PNML
 using PNML: AbstractPnmlMultiset, BooleanConstant, DotConstant, FEConstant, FiniteIntRangeConstant,
     NumberConstant, PnmlExpr, PnmlMultiset, ProductSort, feconstant, mcontains, multiset, operator,
-    partitionsort, pnmlmultiset, value, variabledecl, VariableDeclaration
+    partitionsort, pnmlmultiset, value, variabledecl, VariableDeclaration,
+    elabelT, tparserT, efilterT, lparserT, vsubT, varsT, BagvarT, substT
 
 using TermInterface
 
@@ -28,7 +30,8 @@ export Add, Addition, And, Append, Bag, BooleanEx, Cardinality, CardinalityOf, C
     PartitionElementOf, PartitionGreaterThan, PartitionLessThan, PnmlTupleEx,
     Predecessor, ScalarProduct, SortRefEx, StringGreaterThan, StringGreaterThanOrEqual,
     StringLength, StringLessThan, StringLessThanOrEqual, Sublist, SubstringEx, Subtract,
-    Subtraction, Successor, UserOperatorEx, VariableEx
+    Subtraction, Successor, UserOperatorEx, VariableEx,
+    find_vars, find_vars!, pnmlexpr_string
 
 """
 TermInterface boolean expression types.
@@ -169,6 +172,35 @@ end
 
 =#
 
+"""
+Return string representation of PnmlExpr.
+"""
+pnmlexpr_string(e::PnmlExpr) = sprint(show, pnmlexpr_string(e, 0))
+
+function pnmlexpr_string(e::PnmlExpr, level::Int)
+    println(e)
+    level = level + 1
+    for field in fieldnames(typeof(e))
+        f = getproperty(e, field)
+        print("    "^level, field, " ")
+        if f isa PnmlExpr
+            if f isa VariableEx
+                print(f.refid)
+            else
+                pnmlexpr_string(f, level)
+            end
+        else
+            println(f, " ::", typeof(f))
+            # if field is iterable, print each
+            if f isa Union{Vector, Tuple}
+                for x in f
+                    print("    "^(level+1))
+                    pnmlexpr_string(x, level+1)
+                end
+            end
+        end
+    end
+ end
 
 ###################################################################################
 # Expression holding a SortRef
@@ -310,7 +342,7 @@ end
     #     new(b, x, m)
     # end h
 end
-"""
+"""@matchable
     Bag{E <: Any, M <: Any}
 
 Wraps a `basis`, `element` and `multi`.
@@ -1399,4 +1431,34 @@ function substitute(expr::PnmlExpr, var::NamedTuple)
         expr #~ not a call, leave it alone
     end
 end
+
+"""
+$(TYPEDSIGNATURES)
+Return a Multiset counting the variables in a `PnmlExpr`.
+"""
+function find_vars(expr::PnmlExpr)
+    vars = BagvarT()
+    find_vars!(vars, expr)
+end
+"""
+$(TYPEDSIGNATURES)
+Fill a Multiset by counting the variables in a `PnmlExpr`.
+"""
+function find_vars!(vars::BagvarT, expr::PnmlExpr)
+    if expr isa VariableEx
+        push!(vars, expr.refid)
+    elseif expr isa PnmlTupleEx
+        for y in expr.args
+            find_vars!(vars, y)
+        end
+    else
+        for x in arguments(expr)
+            if x isa PnmlExpr
+                x isa PnmlExpr && find_vars!(vars, x)
+            end
+        end
+    end
+    return vars
+end
+
 end # module Expressons
