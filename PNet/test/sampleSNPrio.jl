@@ -25,11 +25,6 @@ Multisets.set_key_value_show()
     # @test vertex_labels(n) isa AbstractDict
     # PNML.show_sorts(n)
     #@show PNML.elabelT PNML.tparserT PNML.efilterT PNML.lparserT
-    println()
-    @show PNML.vsubT
-    println()
-    @show PNML.varsT
-    println()
 
     # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
     #     @test_throws ArgumentError PNML.metagraph(n)

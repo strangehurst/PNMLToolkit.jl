@@ -27,10 +27,8 @@
 						<finiteenumeration>
 							<feconstant id="indexId" name="index.html" />
 							<feconstant id="emacsId" name="emacs" />
-							<feconstant id="articleId"
-								name="article.tex" />
-							<feconstant id="etc-passwdId"
-								name="etc/passwd" />
+							<feconstant id="articleId" name="article.tex" />
+							<feconstant id="etc-passwdId" name="etc/passwd" />
 						</finiteenumeration>
 					</namedsort>
 					<partition id="accessrightId" name="AccessRight">
