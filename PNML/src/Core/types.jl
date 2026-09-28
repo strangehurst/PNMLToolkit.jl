@@ -259,3 +259,58 @@ TermInterface expression types.
 abstract type PnmlExpr end
 
 abstract type AbstractPnmlMultiset end
+
+const elabelT =  LittleDict{Symbol, Any}
+const tparserT = LittleDict{String, LittleDict{String, Any}}
+const efilterT = LittleDict{Symbol, Any}
+const lparserT = LittleDict{Symbol, Any}
+
+"""
+Collection of Pairs place_id => value.
+
+Variable id maps to name and sort.
+Substitution values come from a place's current marking multiset.
+
+Substution applies to all of transition preset places,
+so we attach the place_id to the value to allow removal if this substitution is used.
+
+Duplicate variables in an expression mean the
+multiplicity of value in place's marking multiset is >1.
+
+Expressions are arc inscriptions and transition guards.
+Inscription expressions reference one place.
+Guard expressions may reference all preset places.
+
+A substitution uses the same value for all variable instances,
+even when they come from separate places.
+
+Should there be a pair for each variable instance when place multiplicity >1?
+Or do we query the multiplicity?
+
+"""
+const substT = Vector{Pair{Symbol, Any #=variable_sort_eltype=#}}
+#const substT = Multiset{Pair{Symbol, variable_sort_eltype}}
+#const substT = Pair{Symbol, Multiset{variable_sort_eltype}}
+
+"""
+Map variable id to multiset of substitution value bindings.
+
+variable_id -> place_id => value
+
+"""
+const vsubT = LittleDict{Symbol, substT}
+
+"""
+Use a multiset to count the id symbols of one or more expressions.
+Multiplicity is the maximum how many times a variable appears in a single inscription or condition.
+"""
+const BagvarT = Multisets.Multiset{Symbol}
+
+"""
+Map transition id to bag of variable ids found in expressions.
+
+
+"""
+const varsT = LittleDict{Symbol, BagvarT}
+
+public elabelT, tparserT, efilterT, lparserT, vsubT, varsT, BagvarT, substT
