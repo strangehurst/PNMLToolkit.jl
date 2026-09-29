@@ -47,8 +47,6 @@ Return vector of booleans where `true` means the matching transition
 is enabled at current `marking`. Has the same order as the `transitions` dictionary.
 Used in the firing rule.
 
-Update net's vars and varsubs for each transition.
-
 $(METHODLIST)
 """
 function enabled end
@@ -56,28 +54,33 @@ function enabled end
 function enabled(net::PnmlNet{T}, marking::Vector) where {T <: PNMLVariant}
     ER()&& println("\n#-- enabled ", pntdsym(net), " id ", pid(net))
 
-    #@show PNML.vsubT; println()
-    #@show PNML.varsT; println()
-    #@show substT; println()
-    #@show BagvarT; println()
+    if ER()
+        @show PNML.vsubT; println()
+        @show PNML.varsT; println()
+        @show substT; println()
+        @show BagvarT; println()
 
-    #@show typeof(marking)
-    #println()
-
-    if is_individual_token(pntd_of(net))
-        foreach(println ∘ typeof, marking)
+        @show typeof(marking)
+        if is_individual_token(pntd_of(net))
+            foreach(println ∘ typeof, marking)
+        end
+        println()
     end
-
     # Start by assuming all transitions are enabled.
     enabled_dict = OrderedDict{Symbol, Bool}(id=>true for id in PNML.transition_ids(net))
+    ER()&& @show typeof(enabled_dict)
     # dictionary with key of place id, value of its marking value (from marking vector)
     # Place sorttypes may be different. All marks are Multisets of sorttype.
     ER()&& @show T
     vT = value_type(Marking, pntd_of(net))
     ER()&& @show vT
 
+    # See count_sorttypes! and keys(net.scnt)
+    ER()&& println("place sorttypes ", [typeof(k) for k in keys(net.scnt)])
+
     mark_dict = OrderedDict{Symbol, Any}(labeled_places(net, marking, vT))
     ER()&& @show typeof(mark_dict)
+    ER()&& foreach(println ∘ typeof, values(mark_dict))
     ER()&& @show typeof(net.varsubs)
     for tr in transitions(net)
         transition_id = pid(tr)
@@ -119,7 +122,7 @@ $(TYPEDSIGNATURES)
 Return enabled state of transition by testing that all its input places have enough tokens
 and transition guard is true.
 """
-function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id)
+function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id::Symbol)
     ER()&& println("#-- sufficient_tokens! ",
                     "$(pntd_of(net)) $(pid(net)) $transition_id")
 
@@ -135,8 +138,8 @@ function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id
         end
     else
         # Individual tokens: symmetric, hlpng
-        # Uses per transition fields of net.vars, net.varsubs
-        tr_vars = haskey(net.vars, transition_id) ? net.vars[transition_id] : BagvarT()
+        #@show
+        tr_vars = vars(net, transition_id)::BagvarT
         tr_varsubs = haskey(net.varsubs, transition_id) ? net.varsubs[transition_id] : substT()
         sufficient_tokens2!(mark_dict, net,  transition_id,
                                 tr_vars, tr_varsubs)
@@ -224,21 +227,22 @@ function get_variable_substitutions!(binding_sets::substT, net::PnmlNet{T}, tran
     return true # enabled, binding_sets is valid
 end
 
-# Process preset arcs of a transition.
+# Process preset arcs and condition of a transition.
 function vars(net, transition_id)
-    tr_vars = varsT() # Keys are variable ids.
+    tr_vars = BagvarT() # Count uses of each variable in inscription expressions.
     for place_id in preset(net, transition_id)
         ar = arc(net, place_id, transition_id)::Maybe{Arc}
-        # It is possible that a transition has no preset. # TODO! Are edge transitions useful?
+        # Is it possible that a transition has no preset? # TODO!
         isnothing(ar) && error("did not find arc: $place_id -> $transition_id")
-        # Count uses of each variable found in inscription expressions.
-        vs = BagvarT()
         arc_vars = Multiset(PNML.Labels.variables(PNML.inscription(ar))...)
         #! Do we want union or disjoint union
-        isempty(arc_vars) ||
-            union!(tr_vars, keys(arc_vars)) #^ Cache variable ids.
-   end
-   return tr_vars
+        if !isempty(arc_vars)
+            tr_vars = union(tr_vars, arc_vars)
+        end
+    end
+    tr_vars = union(tr_vars,
+        PNML.Labels.variables(condition(transition(net, transition_id))))
+  return tr_vars #^ Cache variable ids?
 end
 """
     get_arc_var_binding_sets!(arc_vars, placesort, mark, net) -> Bool, BindingT
@@ -366,7 +370,7 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond_term, a::Arc,
     ER()&& @show tr_var_binding_set
     ER()&& @show tr_varsubs
     ER()&& println()
-    ER()&& @show net.vars net.varsubs
+    #!ER()&& @show net.vars net.varsubs
     ER()&& println()
     ER()&& @show mark cond_term a
     ER()&& println()

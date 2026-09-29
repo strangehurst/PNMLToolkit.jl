@@ -102,12 +102,11 @@ end
     parse_label_content(node::XMLNode, termparser, net) -> NamedTuple
 
 Parse top-level label  `node` using a `termparser` callable applied to a `<structure>` element
-Return named tuple of: text, exp, sort, graphics, toolspecinfos, vars
+Return named tuple of: text, exp, sort, graphics, toolspecinfos
 
 Top-level labels are attached to nodes, such as: marking, inscription, condition.
 Each having a `termparser`.
 
-Returns vars, a tuple of PNML variable REFIDs.
 Used in the muti-sorted algebra of High-level nets.
 """
 function parse_label_content(node::XMLNode, @nospecialize(termparser), net::AbstractPnmlNet)
@@ -116,7 +115,6 @@ function parse_label_content(node::XMLNode, @nospecialize(termparser), net::Abst
     text::Maybe{Union{String,SubString{String}}} = nothing
     exp::Maybe{PnmlExpr} = nothing # Filled by `termparser`.
     ref::Maybe{SortRef} = nothing # Filled by `termparser`.
-    vars = () # Will be replaced/updated by `termparer`.
     graphics::Maybe{Graphics} = nothing
     toolspecinfos::Maybe{Vector{ToolInfo}} = nothing
 
@@ -125,7 +123,7 @@ function parse_label_content(node::XMLNode, @nospecialize(termparser), net::Abst
         if tag == "text"
             text = parse_text(child)
         elseif tag == "structure"
-            (; exp, ref, vars) = termparser(child, net)::TermJunk #collects variables
+            (; exp, ref) = termparser(child, net)::TermJunk #collects variables
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -136,8 +134,8 @@ function parse_label_content(node::XMLNode, @nospecialize(termparser), net::Abst
     end
     isnothing(exp) && isnothing(text) &&
         error("$(pntd_of(net)) parse_label_content missing <structure> and <text> for $(EzXML.nodename(node)), one or both is expected")
-    #D()&& @info "parse_label_content", text, exp, ref, graphics, toolspecinfos, vars
-    return (; text, exp, sort=ref, graphics, toolspecinfos, vars)
+    #D()&& @info "parse_label_content", text, exp, ref, graphics, toolspecinfos
+    return (; text, exp, sort=ref, graphics, toolspecinfos)
 end
 
 
@@ -330,7 +328,7 @@ function (pmt::ParseMarkingTerm)(marknode::XMLNode, net::AbstractPnmlNet)
     term = EzXML.firstelement(marknode) # ignore any others
 
     # Here we are parsing a term from XML to a ground term, which must be an operator.
-    mark_tj = parse_term(term, net; vars=BagvarT()) # ParseMarkingTerm
+    mark_tj = parse_term(term, net) # ParseMarkingTerm
     isempty(find_vars(mark_tj.exp)) ||
         error("unexpected variables in $mark_tj")
     isnothing(placetype(pmt)) &&
@@ -386,7 +384,7 @@ function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net:
         value = one(value_type(Inscription, pntd_of(net)))
     end
     term = NumberEx(sortref(value), value)
-    @warn "parse_inscription" term find_vars(term)
+    #@warn "parse_inscription" term find_vars(term)
     Inscription(; term, graphics, toolspecinfos, net)
 end
 
@@ -399,7 +397,7 @@ function parse_hlinscription(node::XMLNode, source::Symbol, target::Symbol, net:
                                 parentid::Symbol)
     check_nodename(node, "hlinscription")
     l = parse_label_content(node, ParseInscriptionTerm(source, target), net)::NamedTuple
-    @warn "parse_hlinscription" l find_vars(l.exp::PnmlExpr)
+    #@warn "parse_hlinscription" l find_vars(l.exp::PnmlExpr)
     #pnmlexpr_string(l.exp::PnmlExpr)
     Inscription(; l.text, term=l.exp, l.graphics, l.toolspecinfos, net)
 end
@@ -444,11 +442,11 @@ function (pit::ParseInscriptionTerm)(node::XMLNode, net::AbstractPnmlNet)
 
     EzXML.haselement(node) ||
         error("missing inscription term of arc $(source(pit)) -> $(target(pit))")
-    tj = parse_term(EzXML.firstelement(node), net; vars=BagvarT()) # ParseInscriptionTerm
-    if !isempty(find_vars(tj.exp))
-        @warn "ParseInscriptionTerm" tj find_vars(tj.exp)
-        #pnmlexpr_string(tj.exp)
-    end
+    tj = parse_term(EzXML.firstelement(node), net) # ParseInscriptionTerm
+    # if !isempty(find_vars(tj.exp))
+    #     @warn "ParseInscriptionTerm" tj find_vars(tj.exp)
+    #     #pnmlexpr_string(tj.exp)
+    # end
     if !equalSorts(net, tj.ref, placesort)
         @error("arc $(source(pit)) -> $(target(pit)) inscription term sort mismatch: $(tj.ref) != $placesort",
                 tj, adjacentplace)
@@ -533,7 +531,7 @@ will have a structure element containing a term.
 function parse_condition_term(cnode::XMLNode, net::AbstractPnmlNet)
     check_nodename(cnode, "structure")
     if EzXML.haselement(cnode)
-        return parse_term(EzXML.firstelement(cnode), net; vars=BagvarT()) # parse_condition_term
+        return parse_term(EzXML.firstelement(cnode), net) # parse_condition_term
     end
     throw(ArgumentError("missing condition term in <structure>"))
 end

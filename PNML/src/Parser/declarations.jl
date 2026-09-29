@@ -184,7 +184,7 @@ function parse_namedoperator(node::XMLNode, net::AbstractPnmlNet)
         ERR_MSG ="<namedoperator name=$name id=$operator_id> does not have a <def> element"
         throw(MalformedException(ERR_MSG))
     end
-    definition_tj = parse_term(EzXML.firstelement(dnode), net; vars=BagvarT())::TermJunk
+    definition_tj = parse_term(EzXML.firstelement(dnode), net)::TermJunk
 
     @outline(@warn "operators are a work in progress")
     NamedOperator(operator_id, name, parameters, definition_tj.exp::PnmlExpr, net)
