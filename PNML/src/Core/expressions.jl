@@ -458,8 +458,8 @@ end
 # @matchable struct Empty  <: PnmlExpr #! :empty is a literal, ground term, parsed as Bag expression
 
 #"Multiset add: Bag × Bag -> PnmlMultiset"
-@matchable struct Add <: PnmlExpr #^ multiset add uses `+` operator.
-    args::Vector{Bag} # >=2 =
+@matchable struct Add{T <:PnmlExpr} <: PnmlExpr #^ multiset add uses `+` operator.
+    args::Vector{T} # >=2 =
 end
 """
     Add
@@ -468,6 +468,8 @@ Multiset addition. Wraps `args::Vector{Bag}``
 `toexpr` returns `Expr` calling `sum`.
 """
 Add
+
+#Add(x::Bag) = Add([x])
 
 basis(a::Add) = basis(first(a.args))
 sortref(a::Add) = sortref(first(a.args))
