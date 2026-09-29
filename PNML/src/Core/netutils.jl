@@ -216,33 +216,29 @@ Symmetric nets restricts multisets of finite enumerations, and thus easier to de
 function incidence_matrix end
 
 function incidence_matrix(net::AbstractPnmlNet)
-    #@show net.varsubs net.vars
     return output_matrix(net) - input_matrix(net)
 end
 
 """
     $TYPEDSIGNATURES
 
-Tuple of Pair(place_id, initial_marking value).
+Return vector of Pair(place_id, initial_marking value).
 
-High-level P/T Nets use cardinality of its multiset place marking value.
-Really, the implementation should be the same as for PTNet.
+Place-transition nets use Numbers as marking value.
+High-level P/T Nets use cardinality of its multiset place as marking value.
+Other HL Nets use multisets as initial_markings value.
 
-Other HL Nets use multisets.initial_markings(
+The values are the result of evaluating the marking expression.
+Collective token values are Numbers.
+Individual token values are multisets over some set.
+SymmetricNets use finite sets of integers and FEConstants.
+HLPNG removes restrictions on the set members.
 """
 function initial_markings end
 
 function initial_markings(net::PnmlNet{DiscretePNML})
     return if net.type === :pt_hlpng
         # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
-        # println("\n#### initial_markings DiscretePNML && :pt_hlpng")
-        # for p::Place in PNML.places(net)
-        #     @show pid(p)
-        #     @show p.initialMarking
-        #     @show initial_marking(p)
-        #     @show cardinality(initial_marking(p))
-        # end
-
         Int[PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
     else
         vT = value_type(Marking, pntd_of(net))
@@ -259,13 +255,29 @@ function initial_markings(net::PnmlNet{HighLevelPNML})
         # PT_HLPNG multisets of dotconstants map well to integer via cardinality.
         Int[PNML.cardinality(initial_marking(p)::PnmlMultiset) for p in PNML.places(net)]
     else
-        #! XXX Other HL nets need it to be treated as multiset, not simple numbers! XXX
+        #! token values for :symmetric, :hlpng are multisets, not simple numbers!
         # Evaluate the ground term expression into a multiset.
-        # Basis sort is finite. May be a ProductSort.
-        # Symbols are FEConstant operators (a.k.a. comments).
-        # Expect Vector{Multiset{Union{Symbol, Tuple{Vararg{Symbol}}}}}
+        # Basis sort of :symmetric is finite. May be a ProductSort.
+        # Multiset of FEConstant, Int (from finite integer range, a finite set).
+        # Multiset{Union{FEConstant, Int, Tuple{Vararg{Union{FEConstant, Int}}}}}
+        # Multiset{Union{Symbol, Int, Tuple{Vararg{Union{Symbol,Int}}}}} where the symbol is a FEConstant's value (could be a string).
+        # vT = Union{Multiset{Symbol}, Multiset{FEConstant}, Multiset{Int},
+        #            Multiset{Tuple{Vararg{Symbol}}},
+        #            Multiset{Tuple{Vararg{FEConstant}}},
+        #            Multiset{Tuple{Vararg{Int}}}}
+        # vT = Multiset{Any}
+        # println()
+        # for p in PNML.places(net)
+        #     println(p)
+        #     println(initial_marking(p))
+        #     println((multiset ∘ initial_marking)(p))
+        #     println()
+        # end
+
         [(multiset ∘ initial_marking)(p) for p in PNML.places(net)]
-    end
+        # LoadError: MethodError: no method matching
+        # Multisets.Multiset{Union{Int64, Symbol, Tuple{Vararg{Union{Int64, Symbol}}}}}(::Multisets.Multiset{Symbol})
+   end
     #! FIFO places use queues, will co-exist with multisets from regular HL places.
     # Use <fifoinitialMarking><structure><makelist> expression for initial queue contents.
     # DataStructures.Queue{sorttype} will be an element in the marking vector.
