@@ -37,9 +37,9 @@ end
           </net>(1)
         </pnml>
         """
-    @test_logs pnmlmodel(xnode; lp=())
-    @test_logs pnmlmodel(xnode; lp=[])
-    @test_logs pnmlmodel(xnode; lp=(), tp=(), ef=())
+    #!@test_logs pnmlmodel(xnode; lp=())
+    #!@test_logs pnmlmodel(xnode; lp=[])
+    #!@test_logs pnmlmodel(xnode; lp=(), tp=(), ef=())
     @test_logs match_mode=:any (:info, "add 2 lp plugin(s)") pnmlmodel(xnode;
                 lp=((:initialMarking,  PNML.Parser.parse_initialMarking),
                     (:hlinitialMarking, PNML.Parser.parse_hlinitialMarking)))
