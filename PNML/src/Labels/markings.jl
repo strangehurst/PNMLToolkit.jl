@@ -105,14 +105,18 @@ HL Net Marking values are a ground terms of this multi-sorted algebra.
 
 High-level net marking values are multisets, as are inscription terms.
 PT_HLPNG are restriced to being a collective token net
-by restricting the basis set to a single element, dot.
+by limiting the basis set to a single element, dot.
 
 The basis may be a ProductSort. Then the marking value is a multiset of tuples.
 
 Used to initialize a marking vector that will then be updated by firing a transition.
 """
 (mark::Marking)() = evaluate_mark(mark)
-@memoize function evaluate_mark(mark::Marking)
+#@memoize
+function evaluate_mark(mark::Marking)
+    #println()
+    #@warn "evaluate_mark" term(mark) #toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net)
+    #println(); flush(stdout)
     eval(toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net))
 end
 
