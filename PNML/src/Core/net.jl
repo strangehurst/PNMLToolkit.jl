@@ -43,31 +43,31 @@ $(FIELDS)
     const extralabels::LittleDict{Symbol, Any} = LittleDict{Symbol,Any}()
     # Map xml tag symbol to parser callable for built-in labels and extension labels.
     #todo Reference to label parser interface.
-    const labelparsers::lparserT = lparserT() #LittleDict{Symbol, Any} =  LittleDict{Symbol, Any}()
+    const labelparsers::lparserT = lparserT()
     """
         Collection that associates a tool name & version with a callable parser.
         The parser turns `<toolspecific name="" version="">` into `ToolInfo` objects.
     """
-    const toolparsers::tparserT = tparserT()  #LittleDict{String, LittleDict{String, Any}} =
+    const toolparsers::tparserT = tparserT()
                 #LittleDict{String, LittleDict{String, Any}}()
 
     # Collection of filters used by enabling rule.
-    const enabled_filters::efilterT = efilterT() #LittleDict{Symbol, Any} = LittleDict{Symbol, Any}()
+    const enabled_filters::efilterT = efilterT()
 
     # keys are transition ids, values are sets of variable ids
     "Cache of variable ids used by expressions related to the transition."
-    const vars::varsT = varsT() #LittleDict{Symbol, Set{Symbol}} = LittleDict{Symbol, Set{Symbol}}()
+    const vars::varsT = varsT()
 
     # keys are transition ids, values are vectors of substution namedtuples
     "Cache of variable substitutons for this transition."
-    const varsubs::vsubT = vsubT() # = LittleDict{Symbol, Vector{NamedTuple}} = LittleDict{Symbol, Vector{NamedTuple}}()
+    const varsubs::vsubT = vsubT()
 
     "Count of sorttypes if the net."
     scnt::Multiset{Any} = Multiset{Any}()
 
 end #= mutable struct PnmlNet =#
 
-"Fill multiset used to count place sorttypes of a net."
+"Fill multiset counter of place sorttypes in a net."
 function count_sorttypes!(net::PnmlNet)
     for p::Place in places(net)
         sref = sortref(p)

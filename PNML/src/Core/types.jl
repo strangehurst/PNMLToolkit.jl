@@ -266,20 +266,21 @@ const efilterT = LittleDict{Symbol, Any}
 const lparserT = LittleDict{Symbol, Any}
 
 """
-Collection of Pairs place_id => value.
+Collection of Pairs `place_id => value`.
 
-Variable id maps to name and sort.
+Variable id maps to declaration name and sort.
 Substitution values come from a place's current marking multiset.
 
 Substution applies to all of transition preset places,
 so we attach the place_id to the value to allow removal if this substitution is used.
+Here 'used' means preset inscription term is a multiset of input place marking sort.
 
 Duplicate variables in an expression mean the
 multiplicity of value in place's marking multiset is >1.
 
 Expressions are arc inscriptions and transition guards.
-Inscription expressions reference one place.
-Guard expressions may reference all preset places.
+Inscription expressions reference one place. Variables must have proper sort.
+Guard expressions may reference all preset places. Only those with matching sorts apply.
 
 A substitution uses the same value for all variable instances,
 even when they come from separate places.
