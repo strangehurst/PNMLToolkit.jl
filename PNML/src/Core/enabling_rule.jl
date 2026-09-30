@@ -1,6 +1,6 @@
 # Enabling Rule
 "Debug print switch for enabline rule."
-ER() = false
+ER() = true
 using PNML: elabelT, tparserT, efilterT, lparserT, vsubT, varsT, BagvarT, substT
 
 """
@@ -29,15 +29,10 @@ end
 """
 $(TYPEDSIGNATURES)
 
-Return Vector of place_id=>marking_value of that pace.
-`T` is the basis sort of multiset.
+Return Vector of `place_id=>marking_value` of that pace.
 """
-function labeled_places(net::AbstractPnmlNet, markings, ::Type{T}) where {T}
-    #@show typeof(markings)
-    #Pair[k=>v for (k,v::T) in zip(map(pid, places(net)), markings)]
-    #foreach(println, zip(map(pid, places(net)), markings))
-
-    Pair[k=>v for (k, v) in zip(map(pid, places(net)), markings)]
+function labeled_places(net::AbstractPnmlNet, markings)
+    Pair{Symbol,Any}[k=>v for (k, v) in zip(map(pid, places(net)), markings)]
 end
 
 """
@@ -59,34 +54,27 @@ function enabled(net::PnmlNet{T}, marking::Vector) where {T <: PNMLVariant}
         @show PNML.varsT; println()
         @show substT; println()
         @show BagvarT; println()
+        @show typeof(net.varsubs); println()
+    end
 
-        @show typeof(marking)
-        if is_individual_token(pntd_of(net))
-            foreach(println ∘ typeof, marking)
-        end
+    #~ Map of transition_id to its marking value.
+    mark_dict = OrderedDict{Symbol, Any}(labeled_places(net, marking))
+    # Place sorttypes may be different. All marks are Multisets of sorttype.
+    # See count_sorttypes! and keys(net.scnt)
+    if ER()
+        println("place sorttypes ", typeof.(keys(net.scnt)))
+        @show typeof(mark_dict)
+        foreach(println ∘ typeof, values(mark_dict))
         println()
     end
-    # Start by assuming all transitions are enabled.
+
+    #~ Start by assuming all transitions are enabled.
     enabled_dict = OrderedDict{Symbol, Bool}(id=>true for id in PNML.transition_ids(net))
-    ER()&& @show typeof(enabled_dict)
-    # dictionary with key of place id, value of its marking value (from marking vector)
-    # Place sorttypes may be different. All marks are Multisets of sorttype.
-    ER()&& @show T
-    vT = value_type(Marking, pntd_of(net))
-    ER()&& @show vT
-
-    # See count_sorttypes! and keys(net.scnt)
-    ER()&& println("place sorttypes ", [typeof(k) for k in keys(net.scnt)])
-
-    mark_dict = OrderedDict{Symbol, Any}(labeled_places(net, marking, vT))
-    ER()&& @show typeof(mark_dict)
-    ER()&& foreach(println ∘ typeof, values(mark_dict))
-    ER()&& @show typeof(net.varsubs)
     for tr in transitions(net)
         transition_id = pid(tr)
         if ER()
             let t = term(condition(transition(net, transition_id)))
-                println("\ntransition_id $transition_id = ", t)
+                println("\ntransition $transition_id = ", t)
             end
             for pl in preset(net, transition_id)
                 let a = arc(net, pl, transition_id)::Arc
@@ -96,14 +84,11 @@ function enabled(net::PnmlNet{T}, marking::Vector) where {T <: PNMLVariant}
             end
             println()
         end
-        #~ Clear any cached varsubs for transition.
-        haskey(net.varsubs, transition_id) && empty!(net.varsubs[transition_id])
 
         #~ Sufficent tokens and guard.
-        # Build varsubs while accessing token sufficency part of enabling rule.
+        # Build net.varsubs while accessing token sufficency part of enabling rule.
         enabled_dict[transition_id] &= sufficient_tokens!(mark_dict, net, transition_id)
         enabled_dict[transition_id] || continue
-        # transition_guard evaluated as part of sufficient_tokens!
 
         #~ Enable filters.
         ER()&& println("filters")
@@ -125,6 +110,8 @@ and transition guard is true.
 function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id::Symbol)
     ER()&& println("#-- sufficient_tokens! ",
                     "$(pntd_of(net)) $(pid(net)) $transition_id")
+    #~ Clear any cached varsubs for transition.
+    haskey(net.varsubs, transition_id) && empty!(net.varsubs[transition_id])
 
     # Evaluate preset inscriptions expression's, compare each to adjacent place's mark's value.
     s = if is_collective_token(pntdsym(net))
@@ -138,14 +125,21 @@ function sufficient_tokens!(mark_dict::AbstractDict, net::PnmlNet, transition_id
         end
     else
         # Individual tokens: symmetric, hlpng
-        #@show
-        tr_vars = vars(net, transition_id)::BagvarT
-        tr_varsubs = haskey(net.varsubs, transition_id) ? net.varsubs[transition_id] : substT()
-        sufficient_tokens2!(mark_dict, net,  transition_id,
-                                tr_vars, tr_varsubs)
+        #!
+        #! Construct a context object
+        #!
+        erc = ERContext(; tr_vars = transition_vars(net, transition_id)::BagvarT,
+                          tr_varsubs = haskey(net.varsubs, transition_id) ? net.varsubs[transition_id] : substT() )
+        @warn "sufficent_tokens!" erc
+        sufficient_tokens2!(mark_dict, net,  transition_id, erc)
     end
     ER()&& println("#-- sufficient_tokens! return: ", s)
     return coalesce(s, false)
+end
+
+@kwdef struct ERContext
+    tr_vars::BagvarT
+    tr_varsubs::substT
 end
 
 """
@@ -154,28 +148,23 @@ $(TYPEDSIGNATURES)
 Handle transition guards
 """
 function sufficient_tokens2!(mark_dict::AbstractDict, net::PnmlNet{HighLevelPNML}, transition_id,
-                            tr_vars::BagvarT,
-                            tr_varsubs::substT) #! XXX
+                            erc::ERContext)
     ER()&& println("#-- sufficient_tokens2! $(pntd_of(net))",
                 " $(pid(net))",
                 " $transition_id)")
     # During enabling rule, tr_var_binding_set maps variable to a set of elements.
     tr_var_binding_set = substT()
-    #~ marking = PnmlMultiset{B, T}(Multiset(T() => 1)) singleton
-    # varsub maps a variable to 1 element value of multiset(marking[transition_id])
-    # when enabling/firing transition.
-    # Multiset type set from first use
 
-    # Get transition variable substitution binding setfrom preset arcs.
+    # Get transition variable substitution binding set from preset arcs.
     # Update vars.
     if !get_variable_substitutions!(tr_var_binding_set, net, transition_id,
-                                tr_vars, mark_dict)
+                                erc.tr_vars, mark_dict)
         ER() && println("#-- sufficient_tokens2! $(pntd_of(net))",
                 " $(pid(net))",
                 " $transition_id = false")
        return false # no substution found
     end
-    ER()&& @show tr_var_binding_set tr_vars
+    ER()&& @error tr_var_binding_set erc.tr_vars
     #^--------------------------------------------------------------------------------
     #& XXX variable substitutions fully specified by preset of transition XXX
     #& tr.vars is complete. tr_var_binding_set has valid substitutions for all variables.
@@ -200,20 +189,21 @@ end
  - tr_vars variable ids of transition
  - mark_dict
 
-Return enabled state after update of `tr_vars`  and `binding_sets`.
+Return enabled state after update of `binding_sets`.
 """
-function get_variable_substitutions!(binding_sets::substT, net::PnmlNet{T}, transition_id,
-                                     tr_vars::BagvarT, mark_dict) where {T <: PNMLVariant}
+function get_variable_substitutions!(binding_sets::substT, net::PnmlNet, transition_id,
+                                     tr_vars::BagvarT, mark_dict)
     ER()&& println("#-- get_variable_substitutions! $(pntd_of(net)) $(pid(net)) ", transition_id)
-    ER()&& @show typeof(binding_sets) typeof(tr_vars) typeof(mark_dict)
+    ER()&& @show binding_sets tr_vars
     for place_id in preset(net, transition_id)
         ar = arc(net, place_id, transition_id)::Maybe{Arc}
         isnothing(ar) && error("did not find arc: $place_id -> $transition_id")
 
         # Count uses of variables. Keys are variable ids.
-        arc_vars = Multiset(PNML.Labels.variables(PNML.inscription(ar))...)
+        arc_vars = PNML.Labels.variables(PNML.inscription(ar))
+        ER()&& @warn "get_variable_substitutions!" tr_vars arc_vars
         isempty(arc_vars) ||
-            union!(tr_vars, keys(arc_vars)) #^ Cache variable ids.
+            @assert issubset(arc_vars, tr_vars)
 
         place_sort = sortref(place(net, place_id))
         mark = unwrap_pmset(mark_dict[place_id])
@@ -227,22 +217,26 @@ function get_variable_substitutions!(binding_sets::substT, net::PnmlNet{T}, tran
     return true # enabled, binding_sets is valid
 end
 
-# Process preset arcs and condition of a transition.
-function vars(net, transition_id)
+"""
+$(TYPEDSIGNATURES)
+Return `BagvarT` counting variables in preset arc inscriptions and condition of a transition.
+"""
+function transition_vars(net, transition_id)
     tr_vars = BagvarT() # Count uses of each variable in inscription expressions.
     for place_id in preset(net, transition_id)
         ar = arc(net, place_id, transition_id)::Maybe{Arc}
         # Is it possible that a transition has no preset? # TODO!
         isnothing(ar) && error("did not find arc: $place_id -> $transition_id")
         arc_vars = Multiset(PNML.Labels.variables(PNML.inscription(ar))...)
-        #! Do we want union or disjoint union
+        #ER()&& @warn arc_vars
         if !isempty(arc_vars)
             tr_vars = union(tr_vars, arc_vars)
         end
     end
     tr_vars = union(tr_vars,
         PNML.Labels.variables(condition(transition(net, transition_id))))
-  return tr_vars #^ Cache variable ids?
+    #@show tr_vars
+    return tr_vars
 end
 """
     get_arc_var_binding_sets!(arc_vars, placesort, mark, net) -> Bool, BindingT
@@ -280,7 +274,7 @@ end
 function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef, mark::Multiset,
                            net::PnmlNet{HighLevelPNML})
    # mark is a
-    ER()&& println("#-- get_arc_vbs_impl! mark = ", mark)
+    ER()&& println("\n#-- get_arc_vbs_impl! mark = ", mark)
 
     # Start with empty substution set for each variable.
     # Use multiset as a binding set counter.
@@ -321,6 +315,7 @@ function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef, mark::Multise
             return false, arc_binding_sets # A variable has no substitution.
         end
     end
+    @warn "get_arc_vbs_impl!" arc_binding_sets
     return true, arc_binding_sets # No variables or all of them have at least 1 substution.
 end
 
@@ -417,7 +412,9 @@ Collect variable bindings, intersecting among arc's sets.
 Return enabled status of false if any variable does not have a substitution.
 """
 function accum_var_binding_sets!(tr_binding_sets::substT, arc_binding_sets)
-    ER()&& println("#-- accum_var_binding_sets!")
+    ER()&& println("\n#-- accum_var_binding_sets!")
+    @show typeof(tr_binding_sets) typeof(arc_binding_sets)
+    @show tr_binding_sets arc_binding_sets
     for v in keys(arc_binding_sets)
         @assert !isempty(arc_binding_sets[v])
         if !haskey(tr_binding_sets, v)

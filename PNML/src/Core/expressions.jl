@@ -31,7 +31,7 @@ export Add, Addition, And, Append, Bag, BooleanEx, Cardinality, CardinalityOf, C
     Predecessor, ScalarProduct, SortRefEx, StringGreaterThan, StringGreaterThanOrEqual,
     StringLength, StringLessThan, StringLessThanOrEqual, Sublist, SubstringEx, Subtract,
     Subtraction, Successor, UserOperatorEx, VariableEx,
-    find_vars, find_vars!, pnmlexpr_string
+    find_vars, pnmlexpr_string
 
 """
 TermInterface boolean expression types.
@@ -1436,27 +1436,20 @@ end
 
 """
 $(TYPEDSIGNATURES)
-Return a Multiset counting the variables in a `PnmlExpr`.
+Return a Multiset by counting the variables in a `PnmlExpr`.
 """
 function find_vars(expr::PnmlExpr)
     vars = BagvarT()
-    find_vars!(vars, expr)
-end
-"""
-$(TYPEDSIGNATURES)
-Fill a Multiset by counting the variables in a `PnmlExpr`.
-"""
-function find_vars!(vars::BagvarT, expr::PnmlExpr)
     if expr isa VariableEx
         push!(vars, expr.refid)
     elseif expr isa PnmlTupleEx
         for y in expr.args
-            find_vars!(vars, y)
+            vars = union(vars, find_vars(y))
         end
     else
         for x in arguments(expr)
             if x isa PnmlExpr
-                x isa PnmlExpr && find_vars!(vars, x)
+                vars = union(vars, find_vars(x))
             end
         end
     end
