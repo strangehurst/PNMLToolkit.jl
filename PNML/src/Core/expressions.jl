@@ -231,14 +231,18 @@ end
 
 Wraps a variable id.
 `toexpr` uses id to access value in `varsub`, returns Union{Expr, QuoteNode}.
-A Symbol value is interprted to be an operator id.
+A Symbol value is interperted to be an operator id.
 """
 VariableEx
 
 function toexpr(op::VariableEx, varsub::NamedTuple, net)
     # `op` holds `refid`,  a key into a `VariableDeclaration` dictionary.
     vdecl = variabledecl(net, op.refid)::VariableDeclaration
+    # @warn "toexpr VariableEx" op varsub vdecl
+    @assert op.refid == vdecl.id
+    @assert haskey(varsub, op.refid)
     vsub = varsub[op.refid]
+    # @show vsub
     if vsub isa Symbol
         # `vsub` is id symbol of a place marking => value of marking
         # vdecl.sort is return type of 0-arity operator
@@ -367,9 +371,6 @@ function toexpr(b::Bag, varsub::NamedTuple, net)
     #@warn b.element
     #@warn b.multi
     if PNML.is_productsort(sortref(b))
-        e = toexpr(b.element, varsub, net)
-        m = toexpr(b.multi, varsub, net)
-        #@warn "product sort" e m
         Expr(:call, pnmlmultiset, # pnmlmultiset(bag.basis, bag.element, bag.multi; net=net)
             Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
             b.basis,
@@ -1073,15 +1074,16 @@ PartitionElementOf
 expr_sortref(a::PartitionElementOf, net) = sortref(partitionsort(net, a.refpartition))::SortRef
 
 function partitionelementof_impl(fec::FEConstant, refpart, net)
-    @warn "peo_impl" fec refpart PNML.pid(net)
+    #@warn "peo_impl" fec refpart PNML.pid(net)
     p = partitionsort(net, refpart)
     isnothing(p) &&
         throw(ArgumentError("did not find PartitionSort with id $refpart"))
     return let fec_val = fec()
-        partition_element = findfirst(Fix2(PNML.Declarations.contains, fec_val),
-                                      PNML.Declarations.sortelements(p, net))
+        partition_element = first(Iterators.filter(Fix2(PNML.Declarations.contains, fec_val),
+                                      PNML.Declarations.sortelements(p, net)))
         isnothing(partition_element) &&
             throw(ArgumentError("fec value $fec_val not in PartitionSort $refpart"))
+        #@show partition_element
         partition_element::PNML.Declarations.PartitionElement
     end
 end
