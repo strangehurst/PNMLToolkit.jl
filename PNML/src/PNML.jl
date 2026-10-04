@@ -90,6 +90,8 @@ end
 
 include("PnmlTypes.jl")
 using .PnmlTypes
+import .PnmlTypes: is_collective_token, is_continuous, is_discrete, is_highlevel, is_individual_token
+
 include("IDRegistrys.jl")
 using .IDRegistrys
 

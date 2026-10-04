@@ -9,7 +9,7 @@ current `marking` vector.
 Return `marking + incidence * enabled_vector`, a new marking vector.
 """
 function fire2(C, net::PnmlNet, marking)
-    if is_collective_token(pntd_of(net))
+    if is_collective_token(net)
         muladd(permutedims(C), enabled(net, marking), marking)
     else
         error("firing $(pntdsym(net)) not implemented")

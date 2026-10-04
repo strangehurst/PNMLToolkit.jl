@@ -36,7 +36,7 @@ function metagraph(net::PnmlNet{P})where {P <: PNMLVariant}
 
     #todo weight function for MetaGraph
     weight_function, default_weight =
-        if is_collective_token(pntdsym(net))
+        if is_collective_token(net)
             # No variable substitutions here.
             tuple(a -> inscription(a)(NamedTuple()),
                 PNML.Parser.default(PNML.Inscription, net))

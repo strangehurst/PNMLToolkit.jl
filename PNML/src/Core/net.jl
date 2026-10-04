@@ -71,7 +71,7 @@ end #= mutable struct PnmlNet =#
 function count_sorttypes!(net::PnmlNet)
     for p::Place in places(net)
         sref = sortref(p)
-        us = unwrap_namedsort(to_sort(sref, net))
+        us = unwrap_namedsort(net, sref)
         if us isa ProductSort
             ts = tuple(((unwrap_namedsort ∘ to_sort(net)).(sorts(us)))...)
             push!(net.scnt, ts)
@@ -124,6 +124,12 @@ function pntdsym(net::AbstractPnmlNet)
     error("expected PnmlNet found $(typeof(net))")
 end
 pntd_of(net::AbstractPnmlNet) = pnmltype(net.type)
+
+is_collective_token(net::PnmlNet) = is_collective_token(pntd_of(net))
+is_continuous(net::PnmlNet) = is_continuous(pntd_of(net))
+is_discrete(net::PnmlNet)  = is_discrete(pntd_of(net))
+is_highlevel(net::PnmlNet)  = is_highlevel(pntd_of(net))
+is_individual_token(net::PnmlNet) = is_individual_token(pntd_of(net))
 
 "Return IDRegistry of a PnmlNet."
 registry_of(net::PnmlNet) = net.idregistry
