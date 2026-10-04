@@ -236,10 +236,8 @@ function parse_hlinitialMarking(node::XMLNode, default_sorttype::Maybe{SortType}
                     "expected to be NamedSortRef, found $default_sorttype")
         end
         if !equalSorts(net, sortref(default_sorttype), placetype)
-            println()
             @error("parse_hlinitialMarking of $parentid sort mismatch",
                     default_sorttype, placetype, l)
-            println()
         end
     end
 
@@ -292,11 +290,9 @@ function parse_fifoinitialMarking(node::XMLNode, default_sorttype::Maybe{SortTyp
                     ", found $default_sorttype")
         end
         if !equalSorts(net, sortref(default_sorttype), placetype)
-            println()
             @error(string("$(pntd_of(net)) parse_fifoinitialMarking of $parentid",
                           " sortref mismatch: $default_sorttype != $placetype"),
                     default_sorttype, placetype, l)
-            println()
         end
     end
 
@@ -590,7 +586,7 @@ function parse_structure(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "structure")
     @warn "parse_structure is not implemented for $(pntd_of(net)) " xmldict(node)
     #error("parse_structure is not implemented for $(pntd_of(net))")
-    return TermJunk(SortRefEx(UserSortRef(:int)), UserSortRef(:int), ())
+    return TermJunk(SortRefEx(UserSortRef(:int)), UserSortRef(:int))
 end
 
 """
