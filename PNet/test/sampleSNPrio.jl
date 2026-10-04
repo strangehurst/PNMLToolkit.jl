@@ -35,8 +35,10 @@ Multisets.set_key_value_show()
     #TODO more tests
     @show m₀ = initial_markings(n)
     @show e = enabled(n, m₀)
-    @show C  = PNML.incidence_matrix(n) # Matrix of PnmlMultiset
-    @show m₁ = fire2(C, n, m₀)
+    @test_broken any(e)
+    #! incidence matrix, input matrix, output matrix do not handle variables. WILL ERROR!
+    #@show C  = PNML.incidence_matrix(n) # Matrix of PnmlMultiset
+    #@show m₁ = fire2(C, n, m₀)
     #@test PNML.verify(net, true)
 end
 
@@ -47,6 +49,9 @@ println("Sudoku-COL-BN01.pnml")
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #first(PNML.nets(model)))
     n = first(PNML.nets(model))::PnmlNet
+    @show m₀ = initial_markings(n)
+    @show e = enabled(n, m₀)
+    @show any(e)
     # @test vertex_codes(n) isa AbstractDict
     # @test vertex_labels(n) isa AbstractDict
     # if !(narcs(n) > 0 && nplaces(n) > 0 && ntransitions(n) > 0)
