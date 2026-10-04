@@ -143,7 +143,6 @@ end
 function equalSorts(a::AbstractSort, b::AbstractSort)
     asort = unwrap_namedsort(a)
     bsort = unwrap_namedsort(b)
-    #@show asort bsort
     return if typeof(asort) == typeof(bsort)
         equalSorts(asort, bsort)::Bool
     else
@@ -151,9 +150,8 @@ function equalSorts(a::AbstractSort, b::AbstractSort)
     end
 end
 
-function equalSorts(a::ProductSort{PN, N}, b::ProductSort{PN, N},
-                    ) where {PN <: AbstractPnmlNet, N <: Integer}
-    #println("equalSorts ProductSorts $a $b")
+# Of same net and with number in product.
+function equalSorts(a::ProductSort{PN, N}, b::ProductSort{PN, N}) where {PN <: AbstractPnmlNet, N <: Integer}
     if length(a) == length(b)
         return all(equalSorts(a.net, x, y) for (x,y) in zip(sorts(a), sorts(b)))
     end
@@ -168,35 +166,14 @@ function equalSorts(net::AbstractPnmlNet, a::SortRef, b::SortRef)
     # namedsort holds concrete sort objects (no nested named sorts allowed by construction).
     # productsort holds sortrefs to named and builtin sorts.
 
-    # asort = if is_namedsort(a)
-    #     sortdefinition(namedsort(net, a))
-    #     # Not another NamedSort.
-    # else
-    #     s = to_sort(a, net)
-    #     if s isa PNML.Declarations.NamedSort # May be a NamedSort,
-    #         sortdefinition(s)
-    #     else
-    #         s
-    #     end
-    # end
-    # bsort = if is_namedsort(b)
-    #     sortdefinition(namedsort(net, b))
-    # else
-    #     s = to_sort(b, net)
-    #     if s isa PNML.Declarations.NamedSort
-    #         sortdefinition(s)
-    #     else
-    #         b
-    #     end
-    # end
     # Compare concrete sort definitions for structural equality.
-    asort = unwrap(net, a)
-    bsort = unwrap(net, b)
+    asort = unwrap_namedsort(net, a)
+    bsort = unwrap_namedsort(net, b)
     #@show asort bsort
     return equalSorts(asort, bsort)
 end
 
-function unwrap(net::AbstractPnmlNet, sortref::SortRef)
+function unwrap_namedsort(net::AbstractPnmlNet, sortref::SortRef)
     if is_namedsort(sortref)
         sortdefinition(namedsort(net, sortref))
     else
@@ -208,16 +185,11 @@ end
 """
 If `a` is a `NamedSortRef` return its `sortdefinition`, otherwise return `a`.
 """
-function unwrap_namedsort(a::SortRef, net::AbstractPnmlNet)
-    if is_namedsort(a)
-        sortdefinition(namedsort(net, a))
-    else
-        a
-    end
-end
-unwrap_namedsort(net::AbstractPnmlNet) = Fix2(unwrap_namedsort, net)
+function unwrap_namedsort end
 
-function unwrap_namedsort(a)
+#unwrap_namedsort(net::AbstractPnmlNet) = Fix2(unwrap_namedsort, net)
+
+function unwrap_namedsort(a::AbstractSort)
     if a isa PNML.Declarations.NamedSort
         sortdefinition(a)
     else
