@@ -34,7 +34,7 @@ using PNML: is_normal, is_inhibitor, is_read, is_reset
 
     @test pid(a) === :a1
     @test name(a) == ""
-    @test inscription(a)(NamedTuple()) == 1
+    @test PNML.inscription_value(a, NamedTuple()) == 1
 end
 
 @testset "arctype is empty" begin

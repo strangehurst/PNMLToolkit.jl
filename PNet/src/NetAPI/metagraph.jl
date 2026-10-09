@@ -38,7 +38,7 @@ function metagraph(net::PnmlNet{P})where {P <: PNMLVariant}
     weight_function, default_weight =
         if is_collective_token(net)
             # No variable substitutions here.
-            tuple(a -> inscription(a)(NamedTuple()),
+            tuple(a -> inscription_value(a, NamedTuple()),
                 PNML.Parser.default(PNML.Inscription, net))
         else
             #!@error "graph edge weight function of multiset in $(pntd_of(net)) $(pid(net))"

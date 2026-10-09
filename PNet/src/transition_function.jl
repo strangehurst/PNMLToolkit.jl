@@ -106,7 +106,7 @@ function in_inscriptions(net::AbstractPnmlNet, transitionid)
         a = PNML.arc(net, placeid, transitionid)::Union{Arc, Nothing}
         isnothing(a) &&
             error("did not locate in arc $placeid -> $transitionid $placeid")
-        PNML.source(a) => PNML.inscription(a)(NamedTuple())
+        PNML.source(a) => PNML.inscription_value(a, NamedTuple())
     end
 end
 
@@ -121,7 +121,7 @@ function out_inscriptions(net::AbstractPnmlNet, transitionid)
         a = PNML.arc(net, transitionid, placeid)::Union{Arc, Nothing}
         isnothing(a) &&
             error("did not locate out arc $transitionid -> $placeid")
-        PNML.target(a) => PNML.inscription(a)(NamedTuple())
+        PNML.target(a) => PNML.inscription_value(a, NamedTuple())
     end
 end
 

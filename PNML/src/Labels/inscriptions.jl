@@ -20,9 +20,10 @@ term(i::Inscription) = i.term
 sortref(i::Inscription) = expr_sortref(term(i), i.net)::SortRef
 
 #todo @memoize Dict function evaluate(inscription::Inscription, varsub)
-function (inscription::Inscription)(varsub::NamedTuple = NamedTuple())
-    eval(toexpr(term(inscription), varsub, inscription.net))
-end
+# function (inscription::Inscription)(varsub::NamedTuple = NamedTuple())
+#     t = PNML.Expressions.substitute(term(inscription), varsub,)
+#     eval(t, varsub, inscription.net)
+# end
 
 """
     $(TYPEDSIGNATURES)

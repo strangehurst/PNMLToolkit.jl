@@ -108,7 +108,7 @@ const str1 = """
         @test pid(a) === a.id
                     @test @inferred(PNML.source(a)) !== nothing
         @test @inferred(PNML.target(a)) !== nothing
-        @test @inferred(Number, inscription(a)(NamedTuple())) !== nothing
+        @test @inferred(Number, PNML.inscription_value(a, NamedTuple())) !== nothing
     end
 
     # PetriNet-only methods.

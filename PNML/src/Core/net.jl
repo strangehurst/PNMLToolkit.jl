@@ -242,13 +242,13 @@ Return iterator over REFID => inscription(arc) pairs of `net`. This is the same 
 function inscriptions end
 function inscriptions(net::AbstractPnmlNet)
     # empty varible substitutions
-    Iterators.map((arc_id, a) -> arc_id => inscription(a)(NamedTuple()), pairs(arcdict(net)))
+    Iterators.map((arc_id, a) -> arc_id => inscription_value(a, NamedTuple()), pairs(arcdict(net)))
 end
 
 function inscriptions(net::PnmlNet{HighLevelPNML}) #TODO! non-ground terms for HL
     @error "high level net $(pid(net)) needs variable substitution"
     varsubs = NamedTuple()
-    Iterators.map((arc_id, a) -> arc_id => inscription(a)(varsubs), pairs(arcdict(net)))
+    Iterators.map((arc_id, a) -> arc_id => inscription_value(a, varsubs), pairs(arcdict(net)))
 end
 
 """
@@ -434,11 +434,13 @@ end
 
 # No indent here.
 function Base.show(io::IO, net::PnmlNet)
+    limit = get(io, :limit, true)::Bool
     print(io, indent(io), typeof(net), "(", )
     print(io, repr(pid(net)), ", ")
     print(io, repr(name(net)), ", ")
     print(io, repr(pntdsym(net)), ", ")
     iio = inc_indent(io)
+    #iio = IOContext(iio, :limit => true)
     println(io)
 
     print(io, "Pages = ", collect(keys(pagedict(net))))
@@ -446,38 +448,40 @@ function Base.show(io::IO, net::PnmlNet)
         print(iio, '\n', indent(iio))
         println(iio, page)
     end
-    println(io)
-    println(io, "Declarations = ", repr(decldict(net)))
-    println(io, toolinfos(net))
-    println(io, extralabels(net))
+    if !limit
+        println(io)
+        println(io, "Declarations = ", repr(decldict(net)))
+        println(io, toolinfos(net))
+        println(io, extralabels(net))
 
-    println(io, "Arcs:")
-    foreach(arcs(net)) do a
-        println(io, a)
-    end
-    foreach(arc_ids(net)) do id
-        println(io, id)
-    end
-    println(io, "Places:")
-    foreach(places(net)) do p
-        println(io, p)
-    end
-    foreach(place_ids(net)) do p
-        show(io, p); println(io)
-    end
-    println(io, "Transitions:")
-    foreach(transitions(net)) do t
-        println(io, t)
-    end
+        println(io, "Arcs:")
+        foreach(arcs(net)) do a
+            println(io, a)
+        end
+        foreach(arc_ids(net)) do id
+            println(io, id)
+        end
+        println(io, "Places:")
+        foreach(places(net)) do p
+            println(io, p)
+        end
+        foreach(place_ids(net)) do p
+            show(io, p); println(io)
+        end
+        println(io, "Transitions:")
+        foreach(transitions(net)) do t
+            println(io, t)
+        end
 
-    println(io, "Reference Places:")
-    foreach(refplaces(net)) do rp
-        println(io, rp)
-    end
+        println(io, "Reference Places:")
+        foreach(refplaces(net)) do rp
+            println(io, rp)
+        end
 
-    println(io, "Reference Transitions:")
-    foreach(reftransitions(net)) do rt
-        println(io, rt)
+        println(io, "Reference Transitions:")
+        foreach(reftransitions(net)) do rt
+            println(io, rt)
+        end
     end
 end
 

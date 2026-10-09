@@ -94,11 +94,15 @@ println("\nARC\n")
     @test name(a) == "Some arc"
     @test PNML.CONFIG.omit_graphics || has_graphics(a)
     @test_call inscription(a)
-    #@show a inscription(a)(NamedTuple())
-    if is_highlevel(pntdsym(net)) # assumes storttype of dot
-        @test cardinality(inscription(a)(NamedTuple())) == 6
+    ival = PNML.inscription_value(a, NamedTuple())
+    if is_highlevel(net) # assumes sorttype of dot
+        if pntdsym(net) === :pt_hlpng
+            @test cardinality(ival) == 6
+        else
+            # # :symmetric, :hlpng
+        end
     else
-        @test inscription(a)(NamedTuple()) == 6
+        @test ival == 6
     end
     @test has_tools(a) == true
 end

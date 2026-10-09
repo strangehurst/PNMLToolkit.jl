@@ -50,8 +50,19 @@ function inscription_value(::PT_HLPNG, a::Arc, varsub)
 end
 # HighLevelPNML
 function inscription_value(::AbstractHLPNTD, a::Arc, varsub)
-    val = eval(toexpr(term(inscription(a)), varsub, a.net))
-    return cardinality(val)
+    @show term(inscription(a))
+    @show t = substitute(term(inscription(a)), varsub, a.net)
+    e = toexpr(t, varsub, a.net)
+    @show e typeof(e)
+    val = eval(e) #toexpr(term(inscription(a)), varsub, a.net))
+    @warn "inscription_value" t val
+    if val isa PnmlMultiset
+        return multiset(val)
+    elseif val isa Tuple
+        return multiset.(val)
+    else
+        return val
+    end
 end
 
 
