@@ -33,7 +33,7 @@ Notes:
 module Sorts
 
 #import AutoHashEquals: @auto_hash_equals
-import Base: eltype
+import Base: eltype, convert
 import PNML: basis, inc_indent, indent, refid_of, sortdefinition, sortelements,
     sortref
 import StructEquality: @struct_hash_equal

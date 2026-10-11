@@ -200,21 +200,26 @@ and duck-typed `AbstractTerm` for its body.
 struct NamedOperator{N <: AbstractPnmlNet, T} <: OperatorDeclaration
     id::Symbol
     name::Union{String,SubString{String}}
-    parameter::Vector{VariableDeclaration{N}} # constants,variables with inferred sorts #TODO XXX
+    parameters::Vector{VariableDeclaration{N}} # constants,variables with inferred sorts #TODO XXX
     def::T # expression  terms (with inferred output sort)
     net::N
 end
 
-# Empty parameter vector. Default to return sort of dots.
+# Empty parameters vector. Default to return sort of dots.
 NamedOperator(id::Symbol, str::AbstractString, net::AbstractPnmlNet) =
     NamedOperator(id, str, VariableDeclaration{typeof(net)}[], DotConstant(), net)
 
-parameters(no::NamedOperator) = no.parameter
+parameters(no::NamedOperator) = no.parameters
 
 #todo @memoize Dict function evaluate(no::NamedOperator, vars)
-(no::NamedOperator)(vars) = eval(toexpr(no.def, vars, no.net))(parameters(no))
+(no::NamedOperator)(vars) = invoke_namedop(no, vars)
+function invoke_namedop(no::NamedOperator, vars)
+    e = PNML.Expressions.substitute(no.def, vars, no.net)
+    f = eval(toexpr(e, vars, no.net))
+    f(parameters(no)...)
+end
 
 function Base.show(io::IO, op::NamedOperator)
     print(io, nameof(typeof(op)), "(", repr(op.id), ", ", repr(op.name), ", ",
-            op.parameter, ", ", op.def,  ")")
+            op.parameters, ", ", op.def,  ")")
 end

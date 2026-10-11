@@ -183,8 +183,6 @@ function parse_term(::Val{:variable}, node::XMLNode, net::AbstractPnmlNet)
     #^ Done inside `<declaration>`
     var_ex = VariableEx(Symbol(attribute(node, "refvariable")))
     usort = sortref(variabledecl(net, var_ex.refid))
-    # vars will be the keys of a NamedTuple of substitutions &
-    # the keys into the declaration dictionary of variable declarations.
     return TermJunk(var_ex, usort)
 end
 
@@ -561,12 +559,13 @@ function parse_term(::Val{:tuple}, node::XMLNode, net::AbstractPnmlNet)
         # Add `prod_sort` to the dictionary using an invented key.
         # Concatenate member sort ids to create a key for the product sort.
         sorttag = string("ProductSort_",
-            join(Iterators.map(refid_of, expr_sortref.(sts, Ref(net))), "_")) |> Symbol
+            join(Iterators.map(refid_of, expr_sortref.(sts, Ref(net))),
+                 "_")) |> Symbol
 
         fill_sort_tag!(net, sorttag, prod_sort)
         @assert productsorts(net)[sorttag] == prod_sort
 
-        # Make a named sort to store the product sort object. `id`
+        # Make a named sort to store the product sort object.
         namedsorts(net)[sorttag] = NamedSort(sorttag, string(sorttag), prod_sort, net)
         make_sortref(net, productsorts, prod_sort, "product", sorttag, "")
     else

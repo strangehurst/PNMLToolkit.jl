@@ -136,7 +136,11 @@ function output_matrix end
 function output_matrix(net::PnmlNet{T}) where {T <: PNMLVariant}
     valT = value_type(Inscription, pntd_of(net))
     omatrix = Matrix{valT}(undef, ntransitions(net), nplaces(net))
-    return output_matrix!(omatrix, net)
+    if is_collective_token(net)
+        return output_matrix!(omatrix, net)
+    else
+        return omatrix #! empty matrix
+    end
 end
 # function output_matrix(net::PnmlNet{HighLevelPNML})
 #     if net.type === :pt_hlpng
@@ -152,7 +156,7 @@ end
 # end
 
 function output_matrix!(omatrix::Matrix{T}, net::AbstractPnmlNet) where T
-    #@show T
+    @show T
     varsub = NamedTuple() #todo! add Symmetric and HL support, variables
     for (p, place_id) in enumerate(place_ids(net))
         for (t, transition_id) in enumerate(transition_ids(net))
@@ -265,19 +269,22 @@ function initial_markings(net::PnmlNet{HighLevelPNML})
         #            Multiset{Tuple{Vararg{Symbol}}},
         #            Multiset{Tuple{Vararg{FEConstant}}},
         #            Multiset{Tuple{Vararg{Int}}}}
-        # vT = Multiset{Any}
-        # println()
-        # for p in PNML.places(net)
-        #     println(p)
-        #     println(initial_marking(p))
-        #     println((multiset ∘ initial_marking)(p))
-        #     println()
-        # end
 
-        [(multiset ∘ initial_marking)(p) for p in PNML.places(net)]
+        ivec = Any[]
+        for p in PNML.places(net)
+            @show p imark = initial_marking(p)
+            if imark isa PnmlMultiset
+                @show imark = multiset(imark)
+            elseif imark isa Tuple
+                @show imark = multiset.(imark)
+            end
+            push!(ivec, imark)
+        end
+        @show ivec
+        # [(multiset ∘ initial_marking)(p) for p in PNML.places(net)]
         # LoadError: MethodError: no method matching
         # Multisets.Multiset{Union{Int64, Symbol, Tuple{Vararg{Union{Int64, Symbol}}}}}(::Multisets.Multiset{Symbol})
-   end
+    end
     #! FIFO places use queues, will co-exist with multisets from regular HL places.
     # Use <fifoinitialMarking><structure><makelist> expression for initial queue contents.
     # DataStructures.Queue{sorttype} will be an element in the marking vector.

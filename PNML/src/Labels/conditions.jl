@@ -49,19 +49,24 @@ end
 Use `args`, a dictionary of variable substitutions into the expression to return a Bool.
 """
 (c::Condition)(varsub::NamedTuple=NamedTuple()) = begin
-    # `varsub` maps a variable REFID symbol to an element of the basis sort of marking multiset.
-    # It will be a "consistent substitution"
-    # Markings are ground terms, can be fully evaluated here. In fact, here we are operating
-    # on a marking vector. This vector starts with the initial_marking expression's value.
-    return cond_implementation(c, varsub)
+    # `varsub` maps a variable REFID symbols to values.
+    # Variable REFID is the key a variabledecl that provides a name and sortref.
+    # Sortref of variabledecl and sorttype of place will be consistent when:
+    #  - they are equalSorts.
+    #  - place sorttype is a ProductSort and one of its element sorts are equalSorts with variable.
+    #    NB: Can variable value be a multiset
+    # It will be a "consistent substitution" when the value is legal.ArcType
+    return eval_cond_term(c, varsub)
 end
 
 # color function?
 #todo @memoize Dict function evaluate(c::Condition, varsub)::eltype(c)
-function cond_implementation(c::Condition, varsub::NamedTuple)
+function eval_cond_term(c::Condition, varsub::NamedTuple)
     # BooleanEx is a literal. AbstractBoolExpr <: PnmlExpr can be non-literal (non-ground term).
     isa(term(c), BooleanEx) || @warn term(c) varsub  #! debug
-    eval(toexpr(term(c), varsub, c.net))::eltype(c) # Bool isa Number
+    t = substitute(term(c), varsub, c.net)::PnmlExpr
+    @warn t
+    eval(toexpr(t, varsub, c.net))::eltype(c) # Bool isa Number
 end
 
 

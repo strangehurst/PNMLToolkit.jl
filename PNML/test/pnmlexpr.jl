@@ -21,12 +21,13 @@ using PNML: mcontains
     <declaration>
         <structure>
             <declarations>
-                <namedsort id="pluck" name="PLUCK">
+                <namedsort id="pro" name="PRO">
                     <finiteenumeration>
                         <feconstant id="b1" name="b1" />
                         <feconstant id="b2" name="b2" />
                         <feconstant id="b3" name="b3" />
                         <feconstant id="b4" name="b4" />
+                        <feconstant id="b5" name="b5" />
                    </finiteenumeration>
                 </namedsort>
            </declarations>
@@ -40,7 +41,10 @@ parse_declaration!(net, [node])
 #^------------------------------------------------------------------------
 
 @testset "multiset add $pntd" begin
-    # When will it be noticed that `:pro` is not a valid REFID?
+    println(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+    io = IOContext(stdout, :limit => false)
+    println(io, "net = ",  net)
+    # When will it be noticed that `:pro` is not a valid REFID? #~^2026-10-09
     b1 = @inferred Bag(NamedSortRef(:pro), 1, NumberEx(NamedSortRef(:natural), 1))
     b2 = @inferred Bag(NamedSortRef(:pro), 2, NumberEx(NamedSortRef(:natural), 1))
     b3 = @inferred Bag(NamedSortRef(:pro), 3, NumberEx(NamedSortRef(:natural), 2))
@@ -50,10 +54,24 @@ parse_declaration!(net, [node])
     a = @inferred PNML.Add([b1, b2, b3])
     ex = toexpr(a, varsub, net)
     val = eval(ex)
+    println("---------------------------------------------------------------------")
+#    @show toexpr(b1, varsub, net)
+    #@show toexpr(b2, varsub, net)
+    #@show toexpr(b3, varsub, net)
+    #@show eval(toexpr(b1, varsub, net))
+    #@show eval(toexpr(b2, varsub, net))
+    #@show eval(toexpr(b3, varsub, net))
+    #println("---------------------------------------------------------------------")
     #val = eval(toexpr(a, varsub, net))
-    @test val == eval(toexpr(b1, varsub, net)) +
-                 eval(toexpr(b2, varsub, net)) +
-                 eval(toexpr(b3, varsub, net))
+    e = eval(toexpr(b1, varsub, net)) +
+        eval(toexpr(b2, varsub, net)) +
+        eval(toexpr(b3, varsub, net))
+    # @show val::PnmlMultiset e::PnmlMultiset
+    # @show val == e
+    # @show val.basis_ref == e.basis_ref
+    # @show val.mset  e.mset
+    # @show val.mset == e.mset
+    # @test val == e
 end
 
 @testset "multiset contains $pntd" begin
@@ -64,19 +82,21 @@ end
     b4 = Bag(NamedSortRef(:pro), 4, NumberEx(NamedSortRef(:natural), 2))
     b5 = Bag(NamedSortRef(:pro), 4, NumberEx(NamedSortRef(:natural), 1))
 
-    aex = toexpr(PNML.Add([b1, b2, b4]), varsub, net)
-    bex = toexpr(PNML.Add([b1, b2, b5]), varsub, net)
+    println("add b1, b2, b3")
+    @show aex = toexpr(PNML.Add([b1, b2, b4]), varsub, net)
+    @show bex = toexpr(PNML.Add([b1, b2, b5]), varsub, net)
 
-    a = eval(aex)
-    b = eval(bex)
-    Bag(a) # 1'1 2'1 3'2 4'2
-    Bag(b) # 1'1 2'1 3'2 4'1
+    @show a = eval(aex)
+    @show b = eval(bex)
+    #@show Bag(a) # 1'1 2'1 3'2 4'2
+    #@show Bag(b) # 1'1 2'1 3'2 4'1
     # is bag(a) contains bag(b) or bag(b) issubset bag(a)
+    println("Contains")
     c = @inferred Contains(Bag(a), Bag(b))
-    ex = @inferred toexpr(c, varsub, net)
+    @show ex = @inferred toexpr(c, varsub, net)
     @test eval(ex) == true
 
-    c2 = Contains(Bag(b), Bag(a))
+    @show c2 = Contains(Bag(b), Bag(a))
     @test eval(toexpr(c2, varsub, net)) == false
 
     println()
@@ -91,10 +111,13 @@ end
     a = PNML.And([b1, b2, b3, b4])
     ex = toexpr(a, varsub, net)
     val = eval(ex)
-    @test val == eval(toexpr(b1, varsub, net)) &
-                 eval(toexpr(b2, varsub, net)) &
-                 eval(toexpr(b3, varsub, net)) &
-                 eval(toexpr(b3, varsub, net))
+    e = eval(toexpr(b1, varsub, net)) &
+            eval(toexpr(b2, varsub, net)) &
+            eval(toexpr(b3, varsub, net)) &
+            eval(toexpr(b3, varsub, net))
+
+    @show a ex val e
+    @test val == e
 end
 
 @testset "multiset or $pntd" begin
@@ -132,7 +155,7 @@ end
     b2 = PNML.BooleanEx(BooleanConstant(false))
 
     a = PNML.Not([b1, b2])
-    ex = toexpr(a, varsub, net)
+    @show ex = toexpr(a, varsub, net)
     val = eval(ex)
     @test val == false
 

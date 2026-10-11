@@ -16,6 +16,7 @@ using PNML: AbstractPnmlMultiset, BooleanConstant, DotConstant, FEConstant, Fini
     NumberConstant, PnmlExpr, PnmlMultiset, ProductSort, feconstant, mcontains, multiset, operator,
     partitionsort, pnmlmultiset, value, variabledecl, VariableDeclaration,
     elabelT, tparserT, efilterT, lparserT, vsubT, varsT, BagvarT, substT
+using PNML.Sorts
 
 using TermInterface
 
@@ -31,7 +32,7 @@ export Add, Addition, And, Append, Bag, BooleanEx, Cardinality, CardinalityOf, C
     Predecessor, ScalarProduct, SortRefEx, StringGreaterThan, StringGreaterThanOrEqual,
     StringLength, StringLessThan, StringLessThanOrEqual, Sublist, SubstringEx, Subtract,
     Subtraction, Successor, UserOperatorEx, VariableEx,
-    find_vars, pnmlexpr_string
+    find_vars, pnmlexpr_string, substitute
 
 """
 TermInterface boolean expression types.
@@ -52,6 +53,7 @@ abstract type AbstractOpExpr <: PnmlExpr end
 
 # Some expressions are ground terms that have no variables.
 toexpr(::Nothing, ::NamedTuple, _net) = nothing
+toexpr(q::QuoteNode, ::NamedTuple, _net) = q
 toexpr(x::T, ::NamedTuple, _net) where {T <: Number} = identity(x) #! literal
 toexpr(s::Symbol, ::NamedTuple, _net) = QuoteNode(s)
 function toexpr(t::Tuple, vsub::NamedTuple, _net)
@@ -238,11 +240,11 @@ VariableEx
 function toexpr(op::VariableEx, varsub::NamedTuple, net)
     # `op` holds `refid`,  a key into a `VariableDeclaration` dictionary.
     vdecl = variabledecl(net, op.refid)::VariableDeclaration
-    # @warn "toexpr VariableEx" op varsub vdecl
+    @warn "toexpr VariableEx" op varsub vdecl
     @assert op.refid == vdecl.id
     @assert haskey(varsub, op.refid)
     vsub = varsub[op.refid]
-    # @show vsub
+    @show vsub
     if vsub isa Symbol
         # `vsub` is id symbol of a place marking => value of marking
         # vdecl.sort is return type of 0-arity operator
@@ -350,7 +352,7 @@ end
     Bag{E <: Any, M <: Any}
 
 Wraps a `basis`, `element` and `multi`.
-`toexpr` returns `Expr` that calls `pnmlmultiset(basis, x, multi; net)` to construct a [`PnmlMultiset`](@ref).
+`toexpr` returns `Expr` that calls `pnmlmultiset(basis, elenent, multi; net)` to construct a [`PnmlMultiset`](@ref).
 """
 Bag
 
@@ -367,21 +369,24 @@ function toexpr(b::Bag, varsub::NamedTuple, net)
     #@show b varsub Expr(:parameters, Expr(:kw,:net, net))
     #^ Warning: b.element can be: `PnmlMultiset`, `tuple`
     #^ tuples are elements of a `ProductSort`
-    #@warn b
-    #@warn b.element
-    #@warn b.multi
-    if PNML.is_productsort(sortref(b))
-        Expr(:call, pnmlmultiset, # pnmlmultiset(bag.basis, bag.element, bag.multi; net=net)
+    #@warn "toexpr Bag" b
+    basis = unwrap_namedsort(net, sortref(b))
+    if basis isa ProductSort
+        Expr(:call, pnmlmultiset,
             Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
             b.basis,
             toexpr(b.element, varsub, net),
             toexpr(b.multi, varsub, net))
+            # eval(toexpr(b.element, varsub, net)),
+            # eval(toexpr(b.multi, varsub, net)))
     else
-       Expr(:call, pnmlmultiset, # pnmlmultiset(bag.basis, bag.element, bag.multi; net=net)
+        Expr(:call, pnmlmultiset,
             Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
             b.basis,
             toexpr(b.element, varsub, net),
             toexpr(b.multi, varsub, net))
+            # eval(toexpr(b.element, varsub, net)),
+            # eval(toexpr(b.multi, varsub, net)))
     end
 end
 
@@ -476,13 +481,18 @@ basis(a::Add) = basis(first(a.args))
 sortref(a::Add) = sortref(first(a.args))
 expr_sortref(a::Add, net) = expr_sortref(first(a.args), net)::SortRef
 
+# Multiset Operator
 function toexpr(op::Add, varsub::NamedTuple, net)
     @assert length(op.args) >= 2
     #foreach(println, op.args)
     #@warn op.args
     # Expr(:call, sum, [eval(toexpr(arg, varsub, net)) for arg in op.args])
+    @show f = [toexpr(arg, varsub, net) for arg in op.args] # creates PnmlMultiset
+    @show typeof(f)
     #! is eval needed here? YES
-    :(sum(eval(toexpr(arg, $varsub, $net)) for arg in $(op.args))) # creates PnmlMultiset
+    :(PNML.disjointunion($f))
+    #:(sum(toexpr(arg, $varsub, $net)) for arg in $(op.args)) # creates PnmlMultiset
+    # :(sum(eval(toexpr(arg, $varsub, $net)) for arg in $(op.args))) # creates PnmlMultiset
 end
 
 function Base.show(io::IO, x::Add)
@@ -616,7 +626,9 @@ Wraps vector of boolean expressions.
 Or
 
 function toexpr(op::Or, vars::NamedTuple, net)
-    :(any(eval(toexpr(arg, $vars, $net)) for arg in $(op.args)))
+    #@error "toexpr op::Or"  op.args
+    e = [(eval ∘ toexpr)(arg, vars, net) for arg in op.args]
+    :(any($e))
 end
 
 function Base.show(io::IO, x::Or)
@@ -635,8 +647,9 @@ Wraps vector of boolean expressions.
 And
 
 function toexpr(op::And, vars::NamedTuple, net)
-    #@show [eval(toexpr(arg, vars, net)) for arg in op.args]
-    :(all(eval(toexpr(arg, $vars, $net)) for arg in $(op.args)))
+    #@error "toexpr op::And"  op.args
+    e = [(eval ∘ toexpr)(arg, vars, net) for arg in op.args]
+    :(all(eval($e)))
 end
 
 function Base.show(io::IO, x::And)
@@ -656,8 +669,9 @@ Not
 
 # Return true if none of the args are true.
 function toexpr(op::Not, vars::NamedTuple, net)
-    :(!any(eval(toexpr(arg, $vars, $net)) for arg in $(op.args)))
-    #:(!eval(toexpr(first(op.args), $vars, $net)))
+    #@error "toexpr op::Not"  op.args
+    e = [(eval ∘ toexpr)(arg, vars, net) for arg in op.args]
+    :(!any(eval($e)))
 end
 
 function Base.show(io::IO, x::Not)
@@ -1234,7 +1248,8 @@ ListEx
 
 function toexpr(op::ListEx, varsub::NamedTuple, net)
     #@warn "toexpr ListEx" op varsub
-    els = [eval(toexpr(arg, varsub, net)) for arg in op.els]
+    # els = [eval(toexpr(arg, varsub, net)) for arg in op.els]
+    els = [toexpr(arg, varsub, net) for arg in op.els]
     Expr(:vect, els...)
 end
 
@@ -1367,7 +1382,8 @@ function toexpr(op::PnmlTupleEx, varsub::NamedTuple, net)
     # @show args
     # PnmlTuple{psorts}(x...)
     #@warn op
-    args = [(eval ∘ toexpr)(arg, varsub, net) for arg in op.args]
+    args = [toexpr(arg, varsub, net) for arg in op.args]
+    # args = [(eval ∘ toexpr)(arg, varsub, net) for arg in op.args]
     #@warn args
     #println("\n-----------------------------")
    :(tuple(($args)...))
@@ -1414,20 +1430,37 @@ end
 toexpr(exp::LiteralExpr, varsub::NamedTuple, net) = recurse_expr(exp.ex, varsub, net)
 
 """
-    substitute(expr, dict)
+    substitute(expr, varsub, net)
 
-Recursivly substitute a VariableEx with its the value from `var`.
-The values in `var` will be ground terms of a place's sorttype.
+Recursivly substitute variables in `expr` with value from `varsub`.
+The values in `varsub` will be lierals and ground terms of a place's sorttype.
 These values are from the current marking vector.
 ```
 """
-function substitute(expr::PnmlExpr, var::NamedTuple)
-    expr isa VariableEx && return var[expr.refid]
-
+function substitute(expr, varsub::NamedTuple, net::AbstractPnmlNet)
+    if expr isa VariableEx
+        vdecl = variabledecl(net, expr.refid)::VariableDeclaration
+        sref = sortref(vdecl)
+        s = PNML.Sorts.unwrap_namedsort(net, sref)
+        if s isa Union{PNML.Sorts.EnumerationSort,
+                                      PNML.Declarations.PartitionSort}
+            # feconstant operator looks like an identity operator.
+            return QuoteNode(varsub[expr.refid]::Symbol)
+        # elseif s isa Union{PNML.Sorts.FiniteIntRangeSort,
+        #                                   PNML.Sorts.NumberSort}
+        #      return varsub[expr.refid]::Int
+        else # MultisetSort, ProductSort, PartitionSort
+             return QuoteNode(varsub[expr.refid])
+        end
+        # Replace the VariableEx with literal value (from marking).
+        # Symbols are operators.
+        # The expr.refid maps to variabledecl with name, sort.
+        # Sorts that use operators: enumerated
+    end
     if iscall(expr) # all @matchable structs
         #~ Always substitute operation and arguments.
-        op = substitute(operation(expr), var) #? is operation ever an expression?
-        args = map(x->substitute(x, var), arguments(expr))
+        op = substitute(operation(expr), varsub, net) #? is operation ever an expression?
+        args = map(x->substitute(x, varsub, net), arguments(expr)) #! XXX
 
         #~ Rewrite term after substitutions
         maketerm(typeof(expr), op, args, metadata(expr))
@@ -1446,6 +1479,7 @@ function find_vars(expr::PnmlExpr)
         push!(vars, expr.refid)
     elseif expr isa PnmlTupleEx
         for y in expr.args
+            # union is maximum of multiplicities
             vars = union(vars, find_vars(y))
         end
     else
