@@ -241,12 +241,6 @@ Return iterator over REFID => inscription(arc) pairs of `net`. This is the same 
 """
 function inscriptions end
 function inscriptions(net::AbstractPnmlNet)
-    # empty varible substitutions
-    Iterators.map((arc_id, a) -> arc_id => inscription_value(a, NamedTuple()), pairs(arcdict(net)))
-end
-
-function inscriptions(net::PnmlNet{HighLevelPNML}) #TODO! non-ground terms for HL
-    @error "high level net $(pid(net)) needs variable substitution"
     varsubs = NamedTuple()
     Iterators.map((arc_id, a) -> arc_id => inscription_value(a, varsubs), pairs(arcdict(net)))
 end
@@ -264,6 +258,9 @@ end
 
 function conditions(net::PnmlNet{HighLevelPNML}) #TODO! non-ground terms for HL
     @error "high level net $(pid(net)) needs variable substitution"
+    varsubs = NamedTuple()
+    #Iterators.map((arc_id, a) -> arc_id => inscription_value(a, varsubs), pairs(arcdict(net)))
+    Iterators.map((tr_id, t)->tr_id => condition(t, varsubs), pairs(transitiondict(net)))
 end
 
 function rates(net::AbstractPnmlNet)

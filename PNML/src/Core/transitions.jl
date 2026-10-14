@@ -6,7 +6,7 @@ $(TYPEDFIELDS)
 """
 mutable struct Transition{N <: AbstractPnmlNet, T <: PnmlExpr}  <: AbstractPnmlNode
     id::Symbol
-    condition::Labels.Condition{N, T} #! booleran expression label
+    condition::Labels.Condition{N, T} #! boolean expression label
     namelabel::Maybe{Name}
     graphics::Maybe{Graphics}
     toolspecinfos::Maybe{Vector{ToolInfo}}

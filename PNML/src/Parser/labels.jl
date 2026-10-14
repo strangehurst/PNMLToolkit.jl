@@ -123,7 +123,7 @@ function parse_label_content(node::XMLNode, @nospecialize(termparser), net::Abst
         if tag == "text"
             text = parse_text(child)
         elseif tag == "structure"
-            (; exp, ref) = termparser(child, net)::TermJunk #collects variables
+            (; exp, ref) = termparser(child, net)::Term #collects variables
         elseif tag == "graphics"
             graphics = parse_graphics(child, pntd_of(net))
         elseif tag == "toolspecific"
@@ -338,7 +338,7 @@ function (pmt::ParseMarkingTerm)(marknode::XMLNode, net::AbstractPnmlNet)
     #     @warn("$(pntd_of(net)) ParseMarkingTerm sort mismatch",
     #             ref,
     #             placetype(pmt),
-    #             mark_tj::TermJunk)
+    #             mark_tj::Term)
     # end
     return mark_tj
 
@@ -573,7 +573,7 @@ function parse_sorttype_term(typenode::XMLNode, net::AbstractPnmlNet)
     sort_type = parse_sort(sort_node, net, nothing, "")#::SortRef
     is_multisetsort(sort_type) &&
         error("multiset sort not allowed for place <type>")
-    return TermJunk(SortRefEx(sort_type),
+    return Term(SortRefEx(sort_type),
                               sort_type) # Not a term; has no variables.
 end
 
@@ -586,7 +586,7 @@ function parse_structure(node::XMLNode, net::AbstractPnmlNet)
     check_nodename(node, "structure")
     @warn "parse_structure is not implemented for $(pntd_of(net)) " xmldict(node)
     #error("parse_structure is not implemented for $(pntd_of(net))")
-    return TermJunk(SortRefEx(UserSortRef(:int)), UserSortRef(:int))
+    return Term(SortRefEx(UserSortRef(:int)), UserSortRef(:int))
 end
 
 """

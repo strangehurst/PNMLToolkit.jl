@@ -66,7 +66,7 @@ function eval_cond_term(c::Condition, varsub::NamedTuple)
     isa(term(c), BooleanEx) || @warn term(c) varsub  #! debug
     t = substitute(term(c), varsub, c.net)::PnmlExpr
     @warn t
-    eval(toexpr(t, varsub, c.net))::eltype(c) # Bool isa Number
+    eval(toexpr(t, c.net))::eltype(c) # Bool isa Number
 end
 
 

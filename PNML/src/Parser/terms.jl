@@ -6,12 +6,12 @@
 A triple representing an expression, its output sort and variable ids of its arguments.
 Returned by `parse_term`.
 """
-struct TermJunk{T <: PnmlExpr}
+struct Term{T <: PnmlExpr}
     exp::T
     ref::SortRef
     #!vars::BagvarT
 end
-#TermJunk(e, r) = TermJunk(e, r, BagvarT())
+#Term(e, r) = Term(e, r, BagvarT())
 
 # See `TermInterface.jl`, `Metatheory.jl`
 """
@@ -36,10 +36,10 @@ function parse_term(node::XMLNode, net::AbstractPnmlNet #=; vars::BagvarT=#)
     tag = Symbol(EzXML.nodename(node))
     @infiltrate false
     tag === :namedoperator && error("namedoperator is a declaration, not a term!")
-    tj = parse_term(Val(tag), node, net)::TermJunk
+    tj = parse_term(Val(tag), node, net)::Term
     # Collects varible REFIDs in `vars`. `length(vars) == 0` means is a ground term.
     # Ensure that there is a `toexpr(::PnmlExpr, ::NamedTuple, ::AbstractPnmlNet)` method.
-    if !isa(which(toexpr, (typeof(tj.exp), NamedTuple, AbstractPnmlNet)), Method)
+    if !isa(which(toexpr, (typeof(tj.exp), AbstractPnmlNet)), Method)
         error("No `toexpr` method for expression in $tj")
     end
     return tj
@@ -56,7 +56,7 @@ function subterms(node, net::AbstractPnmlNet)
         check_nodename(subterm, "subterm")
         tag, stnode = unwrap_subterm(subterm) # Used to dispatch on `Val(tag)`.
 
-        subterm_tj = parse_term(Val(tag), stnode, net)::TermJunk
+        subterm_tj = parse_term(Val(tag), stnode, net)::Term
         isnothing(subterm_tj) && throw(MalformedException("subterm_tj is nothing"))
         push!(sts, subterm_tj.exp::PnmlExpr)
     end
@@ -69,7 +69,7 @@ end
 #         check_nodename(subterm, "subterm")
 #         tag, stnode = unwrap_subterm(subterm) # Used to dispatch on `Val(tag)`.
 
-#         subterm_tj = parse_term(Val(tag), stnode, net)::TermJunk
+#         subterm_tj = parse_term(Val(tag), stnode, net)::Term
 #         isnothing(subterm_tj) && throw(MalformedException("subterm_tj is nothing"))
 #         push!(sts, subterm_tj.exp::PnmlExpr)
 #     end
@@ -183,14 +183,14 @@ function parse_term(::Val{:variable}, node::XMLNode, net::AbstractPnmlNet)
     #^ Done inside `<declaration>`
     var_ex = VariableEx(Symbol(attribute(node, "refvariable")))
     usort = sortref(variabledecl(net, var_ex.refid))
-    return TermJunk(var_ex, usort)
+    return Term(var_ex, usort)
 end
 
 #----------------------------------------------------------------------------------------
 # Has value "true"|"false" and is BoolSort.
 function parse_term(::Val{:booleanconstant}, node::XMLNode, net::AbstractPnmlNet)
     bc = BooleanConstant(attribute(node, "value"))
-    return TermJunk(BooleanEx(bc), UserSortRef(:bool)) #TODO make into literal
+    return Term(BooleanEx(bc), UserSortRef(:bool)) #TODO make into literal
 end
 
 # Has a value that is a subsort of NumberSort (<:Number).
@@ -214,12 +214,12 @@ function parse_term(::Val{:numberconstant}, node::XMLNode, net::AbstractPnmlNet)
         nv > 0 || throw(ArgumentError("not a Positive Number: $nv"))
     end
     nc = NumberEx(sortref, nv) #! expression
-    return TermJunk(nc, sortref)
+    return Term(nc, sortref)
 end
 
 # Dot is the high-level concept of an integer 1.
 function parse_term(::Val{:dotconstant}, _node::XMLNode, _net::AbstractPnmlNet)
-    return TermJunk(DotConstantEx(), NamedSortRef(:dot))
+    return Term(DotConstantEx(), NamedSortRef(:dot))
 end
 
 
@@ -242,7 +242,7 @@ function parse_term(::Val{:all}, node::XMLNode, net::AbstractPnmlNet)
     @assert is_namedsort(refsort)
     #! @assert isfinitesort(refsort) #^ Only expect finite sorts here.
 
-    return TermJunk(Bag(refsort), refsort) # :all
+    return Term(Bag(refsort), refsort) # :all
 end
 
 function parse_term(::Val{:empty}, node::XMLNode, net::AbstractPnmlNet)
@@ -253,13 +253,13 @@ function parse_term(::Val{:empty}, node::XMLNode, net::AbstractPnmlNet)
     #! ePNK uses <integer/>. Could be inlined productsort.
     x = first(sortelements(refsort, net)) # So Multiset can do eltype(basis) == typeof(x)
     # Can handle non-finite sets here.
-    return TermJunk(Bag(refsort, x, 0), refsort) # :empty
+    return Term(Bag(refsort, x, 0), refsort) # :empty
 end
 
 function parse_term(::Val{:add}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) >= 2
-    return TermJunk(Add(sts), basis(first(sts))::SortRef)
+    return Term(Add(sts), basis(first(sts))::SortRef)
     # All are of same sort so we use the basis sort of first multiset.
 end
 
@@ -267,7 +267,7 @@ end
 function parse_term(::Val{:subtract}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Subtract(sts[1]::Bag, sts[2]::Bag),
+    return Term(Subtract(sts[1]::Bag, sts[2]::Bag),
                     basis(first(sts)::Bag)::SortRef)
 end
 
@@ -294,12 +294,12 @@ end
 # As well as the 2nd being a multiset rather than a sort.
 function parse_term(::Val{:scalarproduct}, node::XMLNode, net::AbstractPnmlNet)
     tag1, stnode1 = unwrap_subterm(EzXML.firstelement(node))
-    product1_tj = parse_term(Val(tag1), stnode1, net)::TermJunk # scalar
+    product1_tj = parse_term(Val(tag1), stnode1, net)::Term # scalar
 
     tag2, stnode2 = unwrap_subterm(EzXML.nextelement(node))
-    product2_tj = parse_term(Val(tag2), stnode2, net)::TermJunk # bag
+    product2_tj = parse_term(Val(tag2), stnode2, net)::Term # bag
 
-    return TermJunk(ScalarProduct(product1_tj.exp, product2_tj.exp),
+    return Term(ScalarProduct(product1_tj.exp, product2_tj.exp),
                     basis(product2_tj.exp)::SortRef)
 end
 
@@ -351,14 +351,14 @@ function parse_term(::Val{:numberof}, node::XMLNode, net::AbstractPnmlNet)
     for st in EzXML.eachelement(node)
         tag, stnode = unwrap_subterm(st)
         if tag === :numberconstant && isnothing(multiplicity)
-            multi_tj = parse_term(Val(tag), stnode, net)::TermJunk
+            multi_tj = parse_term(Val(tag), stnode, net)::Term
             multiplicity = multi_tj.exp
             # RealSort as first numberconstant might confuse `Multiset.jl`.
             # Negative integers will cause problems. Don't do that either.
         else
             # If 2 numberconstants, first is `multiplicity`, this is `instance`.
             EzXML.nodename(stnode)
-            inst_tj = parse_term(stnode, net)::TermJunk
+            inst_tj = parse_term(stnode, net)::Term
             instance = inst_tj.exp # may be a bag
             isort = inst_tj.ref
         end
@@ -374,16 +374,16 @@ function parse_term(::Val{:numberof}, node::XMLNode, net::AbstractPnmlNet)
     # Return of a sort is required because the sort may not be deducable from the expression,
     # Consider NaturalSort vs PositiveSort.
     # D()&& @show  isort instance multiplicity Bag(isort, instance, multiplicity)::PnmlExpr
-    return TermJunk(Bag(isort, instance, multiplicity)::PnmlExpr, isort) # :numberof
+    return Term(Bag(isort, instance, multiplicity)::PnmlExpr, isort) # :numberof
 end
 
 function parse_term(::Val{:cardinality}, node::XMLNode, net::AbstractPnmlNet)
     subterm = EzXML.firstelement(node) # single argument subterm
     _, stnode = unwrap_subterm(subterm)
     isnothing(stnode) && throw(MalformedException("<cardinality> missing argument subterm"))
-    (; exp) = parse_term(stnode, net)::TermJunk
+    (; exp) = parse_term(stnode, net)::Term
 
-    return TermJunk(Cardinality(exp::Bag)::PnmlExpr, NamedSortRef(:natural))
+    return Term(Cardinality(exp::Bag)::PnmlExpr, NamedSortRef(:natural))
 end
 
 # rhs multiset is contained in lhs multiset
@@ -394,7 +394,7 @@ function parse_term(::Val{:contains}, node::XMLNode, net::AbstractPnmlNet)
     @show pe = Contains(sts...) #! We have PnmlExpr elements at this point.
     #@show first(sts).refpartition Iterators.map(x->x.refpartition, sts)
     #@assert all(==(first(sts).refpartition), Iterators.map(x->x.refpartition, sts))
-    return TermJunk(pe, NamedSortRef(:bool))
+    return Term(pe, NamedSortRef(:bool))
 end
 
 
@@ -405,37 +405,37 @@ end
 function parse_term(::Val{:or}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     length(sts) >= 1 || @warn"or length wrong" sts # standard says 2, real world has 1
-    return TermJunk(Or(sts), NamedSortRef(:bool))
+    return Term(Or(sts), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:and}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     length(sts) >= 2 || @warn "and length wrong" sts
-    return TermJunk(And(sts), NamedSortRef(:bool))
+    return Term(And(sts), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:not}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) >= 1 # OCL says 1, framework code wants >= 1
-    return TermJunk(Not(sts), NamedSortRef(:bool))
+    return Term(Not(sts), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:imply}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Imply(sts[1], sts[2]), NamedSortRef(:bool))
+    return Term(Imply(sts[1], sts[2]), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:equality}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Equality(sts[1], sts[2]), NamedSortRef(:bool))
+    return Term(Equality(sts[1], sts[2]), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:inequality}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Inequality(sts[1], sts[2]), NamedSortRef(:bool))
+    return Term(Inequality(sts[1], sts[2]), NamedSortRef(:bool))
 end
 
 #&#########################################################################
@@ -445,13 +445,13 @@ end
 function parse_term(::Val{:successor}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 1
-    return TermJunk(Successor(sts[1]), NamedSortRef(:bool)) #! wrong sort
+    return Term(Successor(sts[1]), NamedSortRef(:bool)) #! wrong sort
 end
 
 function parse_term(::Val{:predecessor}, node::XMLNode, net::AbstractPnmlNet)::BagvarT
     sts = subterms(node, net)
     @assert length(sts) == 1
-    return TermJunk(Predecessor(sts[1]), NamedSortRef(:bool)) #! wrong sort
+    return Term(Predecessor(sts[1]), NamedSortRef(:bool)) #! wrong sort
 end
 
 #& FiniteIntRange Operators work on integrs so use that implementation for
@@ -460,56 +460,56 @@ end
 function parse_term(::Val{:addition}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Addition(sts[1], sts[2]), NamedSortRef(:bool))#! wrong sort
+    return Term(Addition(sts[1], sts[2]), NamedSortRef(:bool))#! wrong sort
 end
 
 function parse_term(::Val{:subtraction}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Subtraction(sts[1], sts[2]), NamedSortRef(:bool))#! wrong sort
+    return Term(Subtraction(sts[1], sts[2]), NamedSortRef(:bool))#! wrong sort
 end
 
 function parse_term(::Val{:mult}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Multiplication(sts[1], sts[2]), NamedSortRef(:bool)) #! wrong sort
+    return Term(Multiplication(sts[1], sts[2]), NamedSortRef(:bool)) #! wrong sort
 end
 
 function parse_term(::Val{:division}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Division(sts[1], sts[2]), NamedSortRef(:bool)) #! wrong sort
+    return Term(Division(sts[1], sts[2]), NamedSortRef(:bool)) #! wrong sort
 end
 
 # FiniteIntRangeSort
 function parse_term(::Val{:greaterthan}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(GreaterThan(sts[1], sts[2]), NamedSortRef(:bool))
+    return Term(GreaterThan(sts[1], sts[2]), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:lessthan}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(LessThan(sts[1], sts[2]), NamedSortRef(:bool))
+    return Term(LessThan(sts[1], sts[2]), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:lessthanorequal}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(LessThanOrEqual(sts[1], sts[2]), NamedSortRef(:bool))
+    return Term(LessThanOrEqual(sts[1], sts[2]), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:greaterthanorequal}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(GreaterThanOrEqual(sts[1], sts[2]), NamedSortRef(:bool))
+    return Term(GreaterThanOrEqual(sts[1], sts[2]), NamedSortRef(:bool))
 end
 
 function parse_term(::Val{:modulo}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     @assert length(sts) == 2
-    return TermJunk(Modulo(sts[1], sts[2]), NamedSortRef(:bool) )#! wrong sort
+    return Term(Modulo(sts[1], sts[2]), NamedSortRef(:bool) )#! wrong sort
 end
 
 
@@ -544,7 +544,7 @@ function parse_term(::Val{:tuple}, node::XMLNode, net::AbstractPnmlNet)
 
     prod_sort = ProductSort(tuple((expr_sortref.(sts, Ref(net)))...), net)
 
-    # Look for an existing declaration for prod_sort. Return a NamedSortRef to it in TermJunk.
+    # Look for an existing declaration for prod_sort. Return a NamedSortRef to it in Term.
     # Find matching sort REFID
     sorttag = nothing
     for (id,ps::ProductSort) in pairs(productsorts(net))
@@ -573,7 +573,7 @@ function parse_term(::Val{:tuple}, node::XMLNode, net::AbstractPnmlNet)
         ProductSortRef(sorttag)
     end
     @assert is_productsort(sortref) "expected product sort, found $sortref"
-    return TermJunk(tuple_expr, sortref)
+    return Term(tuple_expr, sortref)
 end
 
 # <structure>
@@ -584,7 +584,7 @@ function parse_term(::Val{:useroperator}, node::XMLNode, net::AbstractPnmlNet)
     errmsg = "<useroperator> missing declaration attribute"
     uo = UserOperatorEx(Symbol(attribute(node, "declaration", errmsg)))
     usort = sortref(operator(net, uo.refid))
-    return TermJunk(uo, usort)
+    return Term(uo, usort)
 end
 
 function parse_term(::Val{:finiteintrangeconstant}, node::XMLNode, net::AbstractPnmlNet)
@@ -611,7 +611,7 @@ function parse_term(::Val{:finiteintrangeconstant}, node::XMLNode, net::Abstract
     Sorts.start(fir_sort) <= value <= Sorts.stop(fir_sort) ||
         throw(ArgumentError("finite integer value $value not in range $fir_sort"))
 
-    return TermJunk(NumberEx(sort_ref, value), sort_ref)
+    return Term(NumberEx(sort_ref, value), sort_ref)
 end
 
 #====================================================================================#
@@ -624,7 +624,7 @@ function parse_term(::Val{:partitionelementof}, node::XMLNode, net::AbstractPnml
     sts = subterms(node, net)
     @assert length(sts) == 1
     peo = PartitionElementOf(first(sts), ref_partition)
-    return TermJunk(peo, PartitionSortRef(ref_partition))
+    return Term(peo, PartitionSortRef(ref_partition))
 end
 
 # `<ltp>` Partition element less than.
@@ -633,7 +633,7 @@ function parse_term(::Val{:ltp}, node::XMLNode, net::AbstractPnmlNet)
     @assert length(sts) == 2
     @assert sts[1].refpartition == sts[2].refpartition "all partitions must be of the same sort"
     plt = PartitionLessThan(sts...)
-    return TermJunk(plt, PartitionSortRef(sts[1].refpartition))
+    return Term(plt, PartitionSortRef(sts[1].refpartition))
 end
 
 # `<gtp>` Partition element greater than.
@@ -642,7 +642,7 @@ function parse_term(::Val{:gtp}, node::XMLNode, net::AbstractPnmlNet)
     @assert length(sts) == 2
     @assert sts[1].refpartition == sts[2].refpartition "all partitions must be of the same sort"
     pgt = PartitionGreaterThan(sts...)
-    return TermJunk(pgt, PartitionSortRef(sts[1].refpartition))
+    return Term(pgt, PartitionSortRef(sts[1].refpartition))
 end
 
 #====================================================================================#
@@ -658,7 +658,7 @@ function parse_term(::Val{:makelist}, node::XMLNode, net::AbstractPnmlNet)
         nname = EzXML.nodename(child)
         if nname == "subterm"
             tag, stnode = unwrap_subterm(child) # Used to dispatch on `Val(tag)`.
-            tj = parse_term(Val(tag), stnode, net)::TermJunk
+            tj = parse_term(Val(tag), stnode, net)::Term
             isnothing(tj) && throw(MalformedException("a <makelist> subterm is nothing"))
             push!(sts, tj.exp)
         else
@@ -677,5 +677,5 @@ function parse_term(::Val{:makelist}, node::XMLNode, net::AbstractPnmlNet)
     lex = ListEx(list_sortref, sts) #! We have PnmlExpr elements at this point.
     #@show first(sts).refpartition Iterators.map(x->x.refpartition, sts)
     #@assert all(==(first(sts).refpartition), Iterators.map(x->x.refpartition, sts))
-    return TermJunk(lex, list_sortref) #todo! when can we map to partition
+    return Term(lex, list_sortref) #todo! when can we map to partition
 end

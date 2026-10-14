@@ -114,9 +114,10 @@ Used to initialize a marking vector that will then be updated by firing a transi
 (mark::Marking)() = evaluate_mark(mark)
 #@memoize
 function evaluate_mark(mark::Marking)
-    @warn "evaluate_mark" term(mark) toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net)
-    expr = toexpr(term(mark)::PnmlExpr, NamedTuple(), mark.net)
-    eval(expr)
+    t = term(mark)
+    ex = toexpr(t, mark.net)
+    @warn "evaluate_mark" t ex eval(ex)
+    eval(ex)
 end
 
 basis(mark::Marking) = sortref(term(mark))::SortRef

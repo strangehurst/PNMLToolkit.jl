@@ -214,8 +214,8 @@ parameters(no::NamedOperator) = no.parameters
 #todo @memoize Dict function evaluate(no::NamedOperator, vars)
 (no::NamedOperator)(vars) = invoke_namedop(no, vars)
 function invoke_namedop(no::NamedOperator, vars)
-    e = PNML.Expressions.substitute(no.def, vars, no.net)
-    f = eval(toexpr(e, vars, no.net))
+    @show e = PNML.Expressions.substitute(no.def, vars, no.net)::PnmlExpr
+    @show f = eval(toexpr(e, no.net))
     f(parameters(no)...)
 end
 

@@ -144,14 +144,12 @@ has_operator(dd::DeclDicts, id::Symbol) = any(opdict -> haskey(opdict, id), _ops
 """
     operator(dd::DeclDicts, id::Symbol) -> AbstractOperator
 
-Return operator TermInterface expression for `id`.
-    `toexpr(::AbstractOpExpr, varsub, ddict) = :(useroperator(ddict, REFID)(varsub))`
-
+Return operator expression for `id`.
 Operator Declarations include:
 :namedoperator, :feconstant, :partitionelement, :arbitraryoperator
 with types
 `NamedOperator`, `FEConstant`, `PartitionElement`, `ArbitraryOperator`.
-These define operators of different types that are placed into separate dictionaries.
+These define operators of different types that are placed into seperate dictionaries.
 
 
 #! AbstractDeclarations and AbstractTerms are "parallel" semi-overlapping hierarchies
@@ -175,7 +173,7 @@ These define operators of different types that are placed into separate dictiona
 useroperator(REFID) is used to locate the operator definition,
 when it is found in `feconstants()`, is a callable returning a `FEConstant` literal.
 
-    `toexpr(::FEConstantEx, varsub, ddict) = :(useroperator(ddict, REFID)(varsub))`
+    `toexpr(::FEConstantEx, net) = :(useroperator(ddict, REFID)(varsub))`
 
 The FEConstant operators defined by the declaration do not have a distinct type name in the standard.
 Note that a FEConstant's value in the standard is its identity.
@@ -184,7 +182,7 @@ Output sort of op is FEConstant.
 
 Other `OperatorDeclaration` dictionarys also hold `TermInterface` expressions accessed by
 
-    `toexpr(::PnmlExpr, varsub, ddict) = :(useroperator(ddict, REFID)(varsub))`
+    `toexpr(::PnmlExpr, net) = :(useroperator(ddict, REFID)(varsub))`
 
 where `PnmlExpr` is the `TermInterface` to match `OperatorDeclaration`.
 With output sort to match `OperatorDeclaration` .

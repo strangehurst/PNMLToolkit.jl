@@ -27,7 +27,9 @@ sortref(i::Priority) = expr_sortref(term(i), i.net)::SortRef
 
 #todo @memoize Dict function evaluate(priority::Priority, varsub)
 function (priority::Priority)(varsub::NamedTuple=NamedTuple())
-    eval(toexpr(term(priority), varsub, priority.net))::value_type(Priority)
+    e = substitute(term(priority), varsub, priority.net)::PnmlExpr
+    @warn "priority" e value_type(Priority) toexpr(e, priority.net)
+    eval(toexpr(e, priority.net))::value_type(Priority)
 end
 
 value(r::Priority) = r()

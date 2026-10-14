@@ -57,6 +57,9 @@ function enabled(net::PnmlNet{T}, marking::Vector) where {T <: PNMLVariant}
         @show substT; println()
         @show BagvarT; println()
         @show typeof(net.varsubs); println()
+        @show marking; println()
+        println("# # # # # # # # # # # # # # # #\n")
+
     end
 
     #~ Map of transition_id to its marking value.
@@ -369,7 +372,6 @@ end
 # Assume no variables
 function __compare_mi_impl(net::PnmlNet{T}, mark, cond, a::Arc, ::ERContext) where {T <: PNMLVariant}
     # evaluate condition expression
-    #eval(toexpr(cond_term, NamedTuple(), net)) || return false  #! XXX CACHE eval
     PNML.Labels.eval_cond_term(cond, NamedTuple()) ||
         return false  #! XXX CACHE eval
     inscription_val = inscription_value(a, NamedTuple()) # collective tokens have no variables

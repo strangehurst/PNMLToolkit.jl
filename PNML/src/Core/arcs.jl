@@ -40,21 +40,21 @@ function inscription_value(a::Arc, varsub)
 end
 # DiscretePNML || ContinupusPNML
 function inscription_value(::AbstractPNTD, a::Arc, varsub)
-    return eval(toexpr(term(inscription(a)), varsub, a.net))
+    return eval(toexpr(term(inscription(a)), a.net))
 end
 # :pt_hlpng
 function inscription_value(::PT_HLPNG, a::Arc, varsub)
     #! @show a inscription(a) term(inscription(a))
-    val = eval(toexpr(term(inscription(a)), varsub, a.net))
+    val = eval(toexpr(term(inscription(a)), a.net))
     return cardinality(val)
 end
 # HighLevelPNML
 function inscription_value(::AbstractHLPNTD, a::Arc, varsub)
     @show term(inscription(a))
     @show t = substitute(term(inscription(a)), varsub, a.net)
-    e = toexpr(t, varsub, a.net)
+    e = toexpr(t,a.net)
     @show e typeof(e)
-    val = eval(e) #toexpr(term(inscription(a)), varsub, a.net))
+    val = eval(e)
     @warn "inscription_value" t val
     if val isa PnmlMultiset
         return multiset(val)

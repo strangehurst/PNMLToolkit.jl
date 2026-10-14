@@ -30,7 +30,8 @@ Functor evaluating a PnmlExpr. Expected to be a `Real`.
 """
 function (time::Time)(varsub::NamedTuple=NamedTuple())
     #todo @memoize
-    eval(toexpr(term(time), varsub, time.net))::value_type(Time)
+    t = substitute(term(time), varsub, time.net)::PnmlExpr
+    eval(toexpr(t, time.net))::value_type(Time)
 end
 
 value(t::Time) = t()

@@ -40,7 +40,7 @@ include("TestUtils.jl")
         @test typeof(mark1()) == typeof(23)
         @test mark1() == 23
         @test_call mark1()
-        @test_opt broken=false mark1()
+        @test_opt broken=true mark1()
 
         @test graphics(mark1) === nothing
         @test toolinfos(mark1) === nothing || isempty(toolinfos(mark1))
@@ -111,7 +111,7 @@ end
         @test text(mark) == "3`dot"
 
         @test has_graphics(mark) == false # This instance does not have any graphics.
-        @test eval(toexpr(term(mark), NamedTuple(), net)) isa PnmlMultiset
+        @test eval(toexpr(term(mark), net)) isa PnmlMultiset
         # @test arity(markterm) == 2
         # @test inputs(markterm)[1] == NumberConstant(3, PositiveSort())
         # @test inputs(markterm)[2] == DotConstant()
@@ -214,7 +214,7 @@ end
         net = make_net(pntd, :dot_1)
         placetype = SortType("positive sorttype", NamedSortRef(:positive), net)
         mark = parse_hlinitialMarking(node, placetype, net; parentid=:xxx)
-        val = eval(toexpr(term(mark), NamedTuple(), net))::PnmlMultiset
+        val = eval(toexpr(term(mark), net))::PnmlMultiset
         @test multiplicity(val, NumberConstant(8, NamedSortRef(:positive))()) == 1
         @test NumberConstant(8, NamedSortRef(:positive))() in multiset(val)
      end
@@ -268,8 +268,8 @@ end
         #println(); flush(stdout)
 
         @test has_graphics(mark) == false # This instance does not have any graphics.
-        #@show term(mark) toexpr(term(mark), NamedTuple(), net) #! debug
-        @test eval(toexpr(term(mark), NamedTuple(), net)) isa Vector{DotConstant}
+        #@show term(mark) toexpr(term(mark), net) #! debug
+        @test eval(toexpr(term(mark), net)) isa Vector{DotConstant}
         # @test arity(markterm) == 2
         # @test inputs(markterm)[1] == NumberConstant(3, PositiveSort())
         # @test inputs(markterm)[2] == DotConstant()

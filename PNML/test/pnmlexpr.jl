@@ -15,7 +15,6 @@ using PNML: mcontains
 @testset "pnmlexpr" begin
     pntd = :hlcore
     net = make_net(pntd, :pnmlexpr_net)
-    varsub = NamedTuple()
 
     node = xml"""
     <declaration>
@@ -52,20 +51,20 @@ parse_declaration!(net, [node])
     b5 = @inferred Bag(NamedSortRef(:pro), 4, NumberEx(NamedSortRef(:natural), 1))
 
     a = @inferred PNML.Add([b1, b2, b3])
-    ex = toexpr(a, varsub, net)
+    ex = toexpr(a, net)
     val = eval(ex)
     println("---------------------------------------------------------------------")
-#    @show toexpr(b1, varsub, net)
-    #@show toexpr(b2, varsub, net)
-    #@show toexpr(b3, varsub, net)
-    #@show eval(toexpr(b1, varsub, net))
-    #@show eval(toexpr(b2, varsub, net))
-    #@show eval(toexpr(b3, varsub, net))
+#    @show toexpr(b1, net)
+    #@show toexpr(b2, net)
+    #@show toexpr(b3, net)
+    #@show eval(toexpr(b1, net))
+    #@show eval(toexpr(b2, net))
+    #@show eval(toexpr(b3, net))
     #println("---------------------------------------------------------------------")
-    #val = eval(toexpr(a, varsub, net))
-    e = eval(toexpr(b1, varsub, net)) +
-        eval(toexpr(b2, varsub, net)) +
-        eval(toexpr(b3, varsub, net))
+    #val = eval(toexpr(a, net))
+    e = eval(toexpr(b1, net)) +
+        eval(toexpr(b2, net)) +
+        eval(toexpr(b3, net))
     # @show val::PnmlMultiset e::PnmlMultiset
     # @show val == e
     # @show val.basis_ref == e.basis_ref
@@ -83,8 +82,8 @@ end
     b5 = Bag(NamedSortRef(:pro), 4, NumberEx(NamedSortRef(:natural), 1))
 
     println("add b1, b2, b3")
-    @show aex = toexpr(PNML.Add([b1, b2, b4]), varsub, net)
-    @show bex = toexpr(PNML.Add([b1, b2, b5]), varsub, net)
+    @show aex = toexpr(PNML.Add([b1, b2, b4]), net)
+    @show bex = toexpr(PNML.Add([b1, b2, b5]), net)
 
     @show a = eval(aex)
     @show b = eval(bex)
@@ -93,11 +92,11 @@ end
     # is bag(a) contains bag(b) or bag(b) issubset bag(a)
     println("Contains")
     c = @inferred Contains(Bag(a), Bag(b))
-    @show ex = @inferred toexpr(c, varsub, net)
+    @show ex = @inferred toexpr(c, net)
     @test eval(ex) == true
 
     @show c2 = Contains(Bag(b), Bag(a))
-    @test eval(toexpr(c2, varsub, net)) == false
+    @test eval(toexpr(c2, net)) == false
 
     println()
 end
@@ -109,12 +108,12 @@ end
     b4 = BooleanEx(BooleanConstant(false))
 
     a = PNML.And([b1, b2, b3, b4])
-    ex = toexpr(a, varsub, net)
+    ex = toexpr(a, net)
     val = eval(ex)
-    e = eval(toexpr(b1, varsub, net)) &
-            eval(toexpr(b2, varsub, net)) &
-            eval(toexpr(b3, varsub, net)) &
-            eval(toexpr(b3, varsub, net))
+    e = eval(toexpr(b1, net)) &
+            eval(toexpr(b2, net)) &
+            eval(toexpr(b3, net)) &
+            eval(toexpr(b3, net))
 
     @show a ex val e
     @test val == e
@@ -127,12 +126,12 @@ end
     b4 = PNML.BooleanEx(BooleanConstant(false))
 
     a = PNML.Or([b1, b2, b3, b4])
-    ex = toexpr(a, varsub, net)
+    ex = toexpr(a, net)
     val = eval(ex)
-    @test val == eval(toexpr(b1, varsub, net)) |
-                 eval(toexpr(b2, varsub, net)) |
-                 eval(toexpr(b3, varsub, net)) |
-                 eval(toexpr(b3, varsub, net))
+    @test val == eval(toexpr(b1, net)) |
+                 eval(toexpr(b2, net)) |
+                 eval(toexpr(b3, net)) |
+                 eval(toexpr(b3, net))
 end
 
 #^ Boolean Expression tests
@@ -155,13 +154,13 @@ end
     b2 = PNML.BooleanEx(BooleanConstant(false))
 
     a = PNML.Not([b1, b2])
-    @show ex = toexpr(a, varsub, net)
+    @show ex = toexpr(a, net)
     val = eval(ex)
     @test val == false
 
-    @test eval(toexpr(PNML.Not([b2, b1]), varsub, net)) == false
-    @test eval(toexpr(PNML.Not([b1, b1]), varsub, net)) == false
-    @test eval(toexpr(PNML.Not([b2, b2]), varsub, net)) == true
+    @test eval(toexpr(PNML.Not([b2, b1]), net)) == false
+    @test eval(toexpr(PNML.Not([b1, b1]), net)) == false
+    @test eval(toexpr(PNML.Not([b2, b2]), net)) == true
 end
 end
 # And, Or

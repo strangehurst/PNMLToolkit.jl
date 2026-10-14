@@ -52,22 +52,22 @@ abstract type AbstractOpExpr <: PnmlExpr end
 ##################################################################
 
 # Some expressions are ground terms that have no variables.
-toexpr(::Nothing, ::NamedTuple, _net) = nothing
-toexpr(q::QuoteNode, ::NamedTuple, _net) = q
-toexpr(x::T, ::NamedTuple, _net) where {T <: Number} = identity(x) #! literal
-toexpr(s::Symbol, ::NamedTuple, _net) = QuoteNode(s)
-function toexpr(t::Tuple, vsub::NamedTuple, _net)
-    isempty(vsub) || @error "variable substitutions NOT Empty: " t vsub
+toexpr(::Nothing, _net) = nothing
+toexpr(q::QuoteNode, _net) = q
+toexpr(x::T, _net) where {T <: Number} = identity(x) #! literal
+#
+toexpr(s::Symbol, _net) = QuoteNode(s)
+toexpr(s::Symbol) = s
+function toexpr(t::Tuple, _net)
+    return @show toexpr.(t) #todo QuoteNode?
+end
+function toexpr(t::Multiset, _net)
     return t
 end
-function toexpr(t::Multiset, vsub::NamedTuple, _net)
-    isempty(vsub) || @error "variable substitutions NOT Empty: " t vsub
-    return t
-end
-toexpr(nc::NumberConstant, ::NamedTuple, _net) = value(nc)
-toexpr(c::FiniteIntRangeConstant, ::NamedTuple, _net) = value(c)
-toexpr(::DotConstant, ::NamedTuple, _net) = DotConstant()
-toexpr(c::BooleanConstant, ::NamedTuple, _net) = value(c)
+toexpr(nc::NumberConstant, _net) = value(nc)
+toexpr(c::FiniteIntRangeConstant, _net) = value(c)
+toexpr(::DotConstant, _net) = DotConstant()
+toexpr(c::BooleanConstant, _net) = value(c)
 
 """
     expr_sortref(v::PnmlExpr, net) -> SortRef
@@ -100,8 +100,8 @@ variables: store in dictionary named "variables", key is PNML ID: maketerm(Expr,
 
 ===================================#
 #! From SymbolicUtils.jl NOTE: this is NOT TermInterface (a.k.a. PnmlExpr)
-recurse_expr(ex::Expr, varsub::NamedTuple, _net) = Expr(ex.head, recurse_expr.(ex.args, (varsub,))...)
-recurse_expr(ex::Any, varsub::NamedTuple, net) = toexpr(ex, varsub, net)
+recurse_expr(ex::Expr, _net) = Expr(ex.head, recurse_expr.(ex.args)...)
+recurse_expr(ex::Any, net) = toexpr(ex, net)
 
 #recurse_expr(ex::PnmlExpr, sub) = Expr(ex.head, recurse_expr.(ex.args, (sub,))...)
 
@@ -217,7 +217,7 @@ Wraps a SortRef.
 """
 SortRefEx
 
-toexpr(sr::SortRefEx, _::NamedTuple, _) = QuoteNode(sr.ref)
+toexpr(sr::SortRefEx, _) = QuoteNode(sr.ref)
 expr_sortref(sr::SortRefEx, _) = sr.ref
 function Base.show(io::IO, x::SortRefEx)
     print(io, "SortRefEx(", x.ref, ")" )
@@ -237,24 +237,16 @@ A Symbol value is interperted to be an operator id.
 """
 VariableEx
 
-function toexpr(op::VariableEx, varsub::NamedTuple, net)
+function toexpr(op::VariableEx, net)
     # `op` holds `refid`,  a key into a `VariableDeclaration` dictionary.
     vdecl = variabledecl(net, op.refid)::VariableDeclaration
-    @warn "toexpr VariableEx" op varsub vdecl
+    @warn "toexpr VariableEx" op vdecl
     @assert op.refid == vdecl.id
-    @assert haskey(varsub, op.refid)
-    vsub = varsub[op.refid]
-    @show vsub
-    if vsub isa Symbol
-        # `vsub` is id symbol of a place marking => value of marking
-        # vdecl.sort is return type of 0-arity operator
-        #TODO other operators
-        Expr(:call, feconstant, QuoteNode(net), QuoteNode(vsub))
-    elseif vsub isa Union{Expr, QuoteNode}
-        vsub
-    else # literal
-        QuoteNode(vsub)
-    end
+    #@assert haskey(varsub, op.refid)
+    #vsub = varsub[op.refid]
+    #@show vsub
+    # if vsub isa Symbol
+    QuoteNode{nothing}
 end
 
 expr_sortref(v::VariableEx, net) = sortref(variabledecl(net, v.refid))::SortRef
@@ -282,22 +274,20 @@ Wraps a operator id.
 UserOperatorEx
 
 
-function toexpr(op::UserOperatorEx, varsub::NamedTuple, net)
-    # @warn("toexpr(op::UserOperatorEx, varsub::NamedTuple)",
-    #         op,
-    #         varsub,
-    #         operator(net, op.refid))
+function toexpr(op::UserOperatorEx, net)
     # Lookup operator
-    o = operator(net, op.refid)
-    # named or builtin operator. FEConstant are constant functors.
-    if o isa ConstantOperator
-        #@warn op o()
-        QuoteNode(o())
+    result = operator(net, op.refid)
+    @warn("toexpr UserOperatorEx", op,
+                    operator(net, op.refid),
+                    result)
+
+   # named or builtin operator. FEConstant are constant functors.
+    if result isa ConstantOperator
+        @show result()
+        QuoteNode(result())
     else
-        #! what about parameters and variabe substitutions
-        :(o($varsub))
+        #! What about parameters?
     end
-    #!Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #TODO! ass varsub
 end
 
 function expr_sortref(o::UserOperatorEx, net)
@@ -322,7 +312,7 @@ Wraps a operator id.
 """
 NamedOperatorEx
 
-function toexpr(op::NamedOperatorEx, varsub::NamedTuple, net)
+function toexpr(op::NamedOperatorEx, net)
     Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #
 end
 
@@ -365,8 +355,8 @@ sortref(b::Bag) = b.basis
 basis(b::Bag) = b.basis
 expr_sortref(b::Bag, _net) = sortref(b)::SortRef # also basis
 
-function toexpr(b::Bag, varsub::NamedTuple, net)
-    #@show b varsub Expr(:parameters, Expr(:kw,:net, net))
+function toexpr(b::Bag, net)
+    #@show b Expr(:parameters, Expr(:kw,:net, net))
     #^ Warning: b.element can be: `PnmlMultiset`, `tuple`
     #^ tuples are elements of a `ProductSort`
     #@warn "toexpr Bag" b
@@ -375,18 +365,14 @@ function toexpr(b::Bag, varsub::NamedTuple, net)
         Expr(:call, pnmlmultiset,
             Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
             b.basis,
-            toexpr(b.element, varsub, net),
-            toexpr(b.multi, varsub, net))
-            # eval(toexpr(b.element, varsub, net)),
-            # eval(toexpr(b.multi, varsub, net)))
+            toexpr(b.element, net),
+            toexpr(b.multi, net))
     else
         Expr(:call, pnmlmultiset,
             Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
             b.basis,
-            toexpr(b.element, varsub, net),
-            toexpr(b.multi, varsub, net))
-            # eval(toexpr(b.element, varsub, net)),
-            # eval(toexpr(b.multi, varsub, net)))
+            toexpr(b.element, net),
+            toexpr(b.multi, net))
     end
 end
 
@@ -407,7 +393,7 @@ Wraps `basis` and `element`.
 """
 NumberEx # Need to avoid @matchable to have docstring
 
-toexpr(b::NumberEx{T}, _var::NamedTuple, _net) where {T<:Number} = b.element
+toexpr(b::NumberEx{T}, _net) where {T<:Number} = b.element
 
 basis(x::NumberEx) = x.basis
 sortref(x::NumberEx) = x.basis
@@ -428,7 +414,7 @@ end
 """
 BooleanEx # Need to avoid @matchable to have docstring
 
-function toexpr(b::BooleanEx, var::NamedTuple, net)
+function toexpr(b::BooleanEx, _net)
     @assert b.element isa BooleanConstant
     QuoteNode(value(b.element))
 end
@@ -450,7 +436,7 @@ basis(::DotConstantEx) = UserSortRef(:dot)
 sortref(::DotConstantEx) = UserSortRef(:dot)
 expr_sortref(x::DotConstantEx, _net) = basis(x)::SortRef
 
-function toexpr(::DotConstantEx, _var::NamedTuple, _net)
+function toexpr(::DotConstantEx, _net)
     QuoteNode(DotConstant())
 end
 
@@ -482,17 +468,14 @@ sortref(a::Add) = sortref(first(a.args))
 expr_sortref(a::Add, net) = expr_sortref(first(a.args), net)::SortRef
 
 # Multiset Operator
-function toexpr(op::Add, varsub::NamedTuple, net)
+function toexpr(op::Add, net)
     @assert length(op.args) >= 2
     #foreach(println, op.args)
-    #@warn op.args
-    # Expr(:call, sum, [eval(toexpr(arg, varsub, net)) for arg in op.args])
-    @show f = [toexpr(arg, varsub, net) for arg in op.args] # creates PnmlMultiset
+    @warn "toexpr Add" op.args
+    # Expr(:call, sum, [eval(toexpr(arg, net)) for arg in op.args])
+    @show f = [toexpr(arg, net) for arg in op.args] # creates PnmlMultiset
     @show typeof(f)
-    #! is eval needed here? YES
     :(PNML.disjointunion($f))
-    #:(sum(toexpr(arg, $varsub, $net)) for arg in $(op.args)) # creates PnmlMultiset
-    # :(sum(eval(toexpr(arg, $varsub, $net)) for arg in $(op.args))) # creates PnmlMultiset
 end
 
 function Base.show(io::IO, x::Add)
@@ -515,8 +498,8 @@ basis(a::Subtract) = basis(a.lhs)
 sortref(a::Subtract) = sortref(a.lhs)
 expr_sortref(a::Subtract, net) = expr_sortref(a.lhs, net)::SortRef
 
-function toexpr(op::Subtract, var::NamedTuple, net)
-    Expr(:call, :(-), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Subtract, net)
+    Expr(:call, :(-), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Subtract)
@@ -540,10 +523,10 @@ basis(a::ScalarProduct) = basis(a.bag)
 sortref(a::ScalarProduct) = sortref(a.bag)
 expr_sortref(a::ScalarProduct, net) = expr_sortref(a.bag, net)::SortRef
 
-function toexpr(op::ScalarProduct, var::NamedTuple, net)
+function toexpr(op::ScalarProduct, net)
     # TODO can type parameters be inferred?
     Expr(:call, PnmlMultiset, basis(op.bag)::SortRef,
-        Expr(:call, :(*), toexpr(op.n, var, net), toexpr(op.bag, var, net)))
+        Expr(:call, :(*), toexpr(op.n, net), toexpr(op.bag, net)))
 end
 
 function Base.show(io::IO, x::ScalarProduct)
@@ -565,8 +548,8 @@ basis(::Cardinality) = UserSortRef(:natural)
 sortref(::Cardinality) = UserSortRef(:natural)
 expr_sortref(a::Cardinality, _net) = sortref(a)::SortRef
 
-function toexpr(op::Cardinality, var::NamedTuple, net)
-    Expr(:call, :cardinality, toexpr(op.bag, var, net))
+function toexpr(op::Cardinality, net)
+    Expr(:call, :cardinality, toexpr(op.bag, net))
 end
 
 function Base.show(io::IO, x::Cardinality)
@@ -584,8 +567,8 @@ Wraps `ms::Bag` and `refid::Symbol`.
 """
 CardinalityOf
 
-function toexpr(op::CardinalityOf, var::NamedTuple, net)
-    Expr(:call, :multiplicity, toexpr(op.ms, var, net), op.refid)
+function toexpr(op::CardinalityOf, net)
+    Expr(:call, :multiplicity, toexpr(op.ms, net), op.refid)
 end
 
 function Base.show(io::IO, x::CardinalityOf)
@@ -605,8 +588,8 @@ Does multiset `lhs` contain `rhs`.
 """
 Contains
 
-function toexpr(op::Contains, var::NamedTuple, net)
-    Expr(:call, :mcontains, toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Contains, net)
+    Expr(:call, :mcontains, toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Contains)
@@ -625,9 +608,9 @@ Wraps vector of boolean expressions.
 """
 Or
 
-function toexpr(op::Or, vars::NamedTuple, net)
+function toexpr(op::Or, net)
     #@error "toexpr op::Or"  op.args
-    e = [(eval ∘ toexpr)(arg, vars, net) for arg in op.args]
+    e = [(eval ∘ toexpr)(arg, net) for arg in op.args]
     :(any($e))
 end
 
@@ -646,9 +629,9 @@ Wraps vector of boolean expressions.
 """
 And
 
-function toexpr(op::And, vars::NamedTuple, net)
+function toexpr(op::And, net)
     #@error "toexpr op::And"  op.args
-    e = [(eval ∘ toexpr)(arg, vars, net) for arg in op.args]
+    e = [(eval ∘ toexpr)(arg, net) for arg in op.args]
     :(all(eval($e)))
 end
 
@@ -668,9 +651,9 @@ Wraps vector of boolean expressions.
 Not
 
 # Return true if none of the args are true.
-function toexpr(op::Not, vars::NamedTuple, net)
+function toexpr(op::Not, net)
     #@error "toexpr op::Not"  op.args
-    e = [(eval ∘ toexpr)(arg, vars, net) for arg in op.args]
+    e = [(eval ∘ toexpr)(arg, net) for arg in op.args]
     :(!any(eval($e)))
 end
 
@@ -690,8 +673,8 @@ Wraps lhs, rhs boolean expressions.
 """
 Imply
 
-function toexpr(op::Imply, var::NamedTuple, net)
-    Expr(:call, :(||), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Imply, net)
+    Expr(:call, :(||), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Imply)
@@ -709,8 +692,8 @@ Wraps lhs, rhs expressions.
 `toexpr` returns `Expr` that calls `==(lhs, rhs)`.
 """
 Equality
-function toexpr(op::Equality, var::NamedTuple, net)
-    Expr(:call, :(==), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Equality, net)
+    Expr(:call, :(==), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Equality)
@@ -729,8 +712,8 @@ Wraps lhs, rhs expressions.
 """
 Inequality
 
-function toexpr(op::Inequality, var::NamedTuple, net)
-    Expr(:call, :(!=), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Inequality, net)
+    Expr(:call, :(!=), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Inequality)
@@ -751,7 +734,7 @@ Wraps #!TBD
 """
 Successor
 
-toexpr(op::Successor, var::NamedTuple, net) = error("implement me arg ", repr(op.arg))
+toexpr(op::Successor, net) = error("implement me arg ", repr(op.arg))
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
 #! Expr(:call, toexpr(c, m.head), toexpr.(Ref(c), m.args)...)
 
@@ -771,7 +754,7 @@ Wraps #!TBD
 """
 Predecessor
 
-toexpr(op::Predecessor, var::NamedTuple, net) = error("implement me arg ", repr(op.arg))
+toexpr(op::Predecessor, net) = error("implement me arg ", repr(op.arg))
 
 function Base.show(io::IO, x::Predecessor)
     print(io, "Predecessor(", x.arg, ")" )
@@ -796,8 +779,8 @@ Addition
 
 expr_sortref(a::Addition, net) = expr_sortref(a.lhs, net)::SortRef
 
-function toexpr(op::Addition, var::NamedTuple, net)
-    Expr(:call, :(+), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Addition, net)
+    Expr(:call, :(+), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Addition)
@@ -819,8 +802,8 @@ Subtraction
 
 expr_sortref(a::Subtraction, net) = expr_sortref(a.lhs, net)::SortRef
 
-function toexpr(op::Subtraction, var::NamedTuple, net)
-    Expr(:call, :(-), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Subtraction, net)
+    Expr(:call, :(-), toexpr(op.lhs,  net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Subtraction)
@@ -842,9 +825,9 @@ Multiplication
 
 expr_sortref(a::Multiplication, net) = expr_sortref(a.lhs, net)::SortRef
 
-function toexpr(op::Multiplication, var::NamedTuple, net)# <gtp>
+function toexpr(op::Multiplication, net)# <gtp>
 
-    Expr(:call, :(*), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+    Expr(:call, :(*), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Multiplication)
@@ -866,8 +849,8 @@ Division
 
 expr_sortref(a::Division, net) = expr_sortref(a.lhs, net)::SortRef
 
-function toexpr(op::Division, var::NamedTuple, net)
-    Expr(:call, :div, toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Division, net)
+    Expr(:call, :div, toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Division)
@@ -888,8 +871,8 @@ Wraps `lhs` , `rhs` expressions.
 """
 GreaterThan
 
-function toexpr(op::GreaterThan, var::NamedTuple, net)
-    Expr(:call, :(>), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::GreaterThan, net)
+    Expr(:call, :(>), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::GreaterThan)
@@ -909,8 +892,8 @@ Wraps `lhs` , `rhs` expressions.
 """
 GreaterThanOrEqual
 
-function toexpr(op::GreaterThanOrEqual, var::NamedTuple, net)
-    Expr(:call, :(>=), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::GreaterThanOrEqual, net)
+    Expr(:call, :(>=), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::GreaterThanOrEqual)
@@ -930,8 +913,8 @@ Wraps `lhs` , `rhs` expressions.
 """
 LessThan
 
-function toexpr(op::LessThan, var::NamedTuple, net)
-    Expr(:call, :(<), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::LessThan, net)
+    Expr(:call, :(<), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::LessThan)
@@ -951,8 +934,8 @@ Wraps `lhs` , `rhs` expressions.
 """
 LessThanOrEqual
 
-function toexpr(op::LessThanOrEqual, var::NamedTuple, net)
-    Expr(:call, :(<=), toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::LessThanOrEqual, net)
+    Expr(:call, :(<=), toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::LessThanOrEqual)
@@ -972,10 +955,10 @@ Wraps `lhs` , `rhs` expressions.
 """
 Modulo
 
-expr_sortref(a::Modulo, net) = sortref(a.lhs)::SortRef
+expr_sortref(a::Modulo, _net) = sortref(a.lhs)::SortRef
 
-function toexpr(op::Modulo, var::NamedTuple, net)
-    Expr(:call, :mod, toexpr(op.lhs, var, net), toexpr(op.rhs, var, net))
+function toexpr(op::Modulo, net)
+    Expr(:call, :mod, toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Modulo)
@@ -1001,7 +984,7 @@ PartitionElementOp
 
 expr_sortref(a::PartitionElementOp, net) = sortref(partitionsort(net, a.partition))::SortRef
 
-toexpr(op::PartitionElementOp, var::NamedTuple, net) = error("implement me ", repr(op))
+toexpr(op::PartitionElementOp, _net) = error("implement me ", repr(op))
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
 
 function Base.show(io::IO, x::PartitionElementOp)
@@ -1030,7 +1013,7 @@ PartitionLessThan
 #     return false #! lhs < rhs # ivalidation trigger
 # end
 
-toexpr(op::PartitionLessThan, var::NamedTuple, net) = error("implement me ", repr(op))
+toexpr(op::PartitionLessThan, _net) = error("implement me ", repr(op))
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
 
 function Base.show(io::IO, x::PartitionLessThan)
@@ -1057,11 +1040,10 @@ function gtp_impl(lhs, rhs)
     return false #! lhs > rhs invalidation trigger
 end
 
-function toexpr(op::PartitionGreaterThan, varsub::NamedTuple, net)
-    #@warn "toexpr PartitionGreaterThan" op varsub
-    Expr(:call, gtp_impl, toexpr(op.lhs, varsub, net), toexpr(op.rhs, varsub, net))
+function toexpr(op::PartitionGreaterThan, net)
+    #@warn "toexpr PartitionGreaterThan" op
+    Expr(:call, gtp_impl, toexpr(op.lhs, net), toexpr(op.rhs, net))
 end
-#! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
 
 function Base.show(io::IO, x::PartitionGreaterThan)
     print(io, "PartitionGreaterThan(", x.lhs, ", ", x.rhs, ")" )
@@ -1102,9 +1084,9 @@ function partitionelementof_impl(fec::FEConstant, refpart, net)
     end
 end
 
-function toexpr(op::PartitionElementOf, varsub::NamedTuple, net)
-    #@warn "toexpr PartitionElementOf" op varsub
-    Expr(:call, partitionelementof_impl, toexpr(op.arg, varsub, net), QuoteNode(op.refpartition), net)
+function toexpr(op::PartitionElementOf, net)
+    #@warn "toexpr PartitionElementOf" op
+    Expr(:call, partitionelementof_impl, toexpr(op.arg, net), QuoteNode(op.refpartition), net)
 end
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
 
@@ -1246,10 +1228,10 @@ Wraps `basis::SortRef`, `els::Vector`.`
 """
 ListEx
 
-function toexpr(op::ListEx, varsub::NamedTuple, net)
-    #@warn "toexpr ListEx" op varsub
-    # els = [eval(toexpr(arg, varsub, net)) for arg in op.els]
-    els = [toexpr(arg, varsub, net) for arg in op.els]
+function toexpr(op::ListEx, net)
+    #@warn "toexpr ListEx" op
+    # els = [eval(toexpr(arg, net)) for arg in op.els]
+    els = [toexpr(arg, net) for arg in op.els]
     Expr(:vect, els...)
 end
 
@@ -1356,11 +1338,11 @@ function expr_sortref(tup::PnmlTupleEx, net)
     error("no productsort for tuple expression $(tup)")
 end
 
-function toexpr(op::PnmlTupleEx, varsub::NamedTuple, net)
-    @assert length(op.args) >= 2
-    # @warn("toexpr PnmlTupleEx", op.args, varsub,
-    #         toexpr.(op.args, Ref(varsub)),
-    #         (eval ∘ toexpr).(op.args, Ref(varsub)),)
+function toexpr(op::PnmlTupleEx, net)
+    # args may be empty
+    @warn("toexpr PnmlTupleEx", op.args,
+            toexpr.(op.args, net),
+            (eval ∘ toexpr).(op.args),)
     #~ Must allow for mixed constant (0-ary operator) and variable expressions.
     #? Do input arc inscriptions ever have constant expressions?
     #* Defaults for example.
@@ -1382,13 +1364,13 @@ function toexpr(op::PnmlTupleEx, varsub::NamedTuple, net)
     # @show args
     # PnmlTuple{psorts}(x...)
     #@warn op
-    args = [toexpr(arg, varsub, net) for arg in op.args]
-    # args = [(eval ∘ toexpr)(arg, varsub, net) for arg in op.args]
-    #@warn args
+    args = [toexpr(arg, net) for arg in op.args]
+    # args = [(eval ∘ toexpr)(arg, net) for arg in op.args]
+    @warn "TupleEx args" args
     #println("\n-----------------------------")
    :(tuple(($args)...))
 end
- # :(sum(eval(toexpr(arg, $varsub, $net)) for arg in $(op.args))) # creates PnmlMultiset
+ # :(sum(eval(toexpr(arg, $net)) for arg in $(op.args))) # creates PnmlMultiset
 
 # ? Would this be a candidate for rewriting?
 # _deref_variable(v::Any) = identity(v) # Bet that it is an operator  expression -> FEConstant!
@@ -1427,7 +1409,7 @@ Literally `ex`, an `Expr`. `toexpr` on `LiteralExpr` recursively calls
 struct LiteralExpr
     ex
 end
-toexpr(exp::LiteralExpr, varsub::NamedTuple, net) = recurse_expr(exp.ex, varsub, net)
+toexpr(exp::LiteralExpr, net) = recurse_expr(exp.ex, net)
 
 """
     substitute(expr, varsub, net)
