@@ -49,7 +49,8 @@ $(METHODLIST)
 function enabled end
 
 function enabled(net::PnmlNet{T}, marking::Vector) where {T <: PNMLVariant}
-    ER()&& println("\n#-- enabled ", pntdsym(net), " id ", pid(net))
+    ER()&& println("\n#- -#- -#- -#- -#- -#- -#- -#- -#- -#- -#- -#- -#- -#- -#- -#\n",
+                         "#-- enabled ", pntdsym(net), " id ", pid(net))
 
     if ER()
         @show PNML.vsubT; println()
@@ -57,7 +58,7 @@ function enabled(net::PnmlNet{T}, marking::Vector) where {T <: PNMLVariant}
         @show substT; println()
         @show BagvarT; println()
         @show typeof(net.varsubs); println()
-        @show marking; println()
+        foreach(println, marking)
         println("# # # # # # # # # # # # # # # #\n")
 
     end
@@ -438,8 +439,8 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond, a::Arc,
             # Check guard condition expression that may contain variables.
             # Must be evaluated for each candidate_parms.
             ER()&& @error cond tr_vsub
-            @show c = PNML.Labels.eval_cond_term(cond, tr_vsub)
-            if c
+            @show guard = PNML.Labels.eval_cond_term(cond, tr_vsub)
+            if guard
                 inscription_val = inscription_value(a, tr_vsub) # bag
                 mark = unwrap_pmset(mark)
                 if issubset(inscription_val, mark)

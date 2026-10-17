@@ -271,8 +271,8 @@ function initial_markings(net::PnmlNet{HighLevelPNML})
         #            Multiset{Tuple{Vararg{Int}}}}
 
         ivec = Any[]
-        for p in PNML.places(net)
-            @show p imark = initial_marking(p)
+        for place in PNML.places(net)
+            @show place imark = initial_marking(place)
             if imark isa PnmlMultiset
                 @show imark = multiset(imark)
             elseif imark isa Tuple
@@ -281,9 +281,6 @@ function initial_markings(net::PnmlNet{HighLevelPNML})
             push!(ivec, imark)
         end
         @show ivec
-        # [(multiset ∘ initial_marking)(p) for p in PNML.places(net)]
-        # LoadError: MethodError: no method matching
-        # Multisets.Multiset{Union{Int64, Symbol, Tuple{Vararg{Union{Int64, Symbol}}}}}(::Multisets.Multiset{Symbol})
     end
     #! FIFO places use queues, will co-exist with multisets from regular HL places.
     # Use <fifoinitialMarking><structure><makelist> expression for initial queue contents.

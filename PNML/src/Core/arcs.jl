@@ -51,11 +51,11 @@ end
 # HighLevelPNML
 function inscription_value(::AbstractHLPNTD, a::Arc, varsub)
     @show term(inscription(a))
-    @show t = substitute(term(inscription(a)), varsub, a.net)
-    e = toexpr(t,a.net)
-    @show e typeof(e)
-    val = eval(e)
-    @warn "inscription_value" t val
+    @show iterm = substitute(term(inscription(a)), varsub, a.net)
+    expr = toexpr(iterm,a.net)
+    @show expr typeof(expr)
+    val = eval(expr)
+    @warn "inscription_value" iterm val
     if val isa PnmlMultiset
         return multiset(val)
     elseif val isa Tuple

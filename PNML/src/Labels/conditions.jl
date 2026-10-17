@@ -61,12 +61,12 @@ end
 
 # color function?
 #todo @memoize Dict function evaluate(c::Condition, varsub)::eltype(c)
-function eval_cond_term(c::Condition, varsub::NamedTuple)
-    # BooleanEx is a literal. AbstractBoolExpr <: PnmlExpr can be non-literal (non-ground term).
-    isa(term(c), BooleanEx) || @warn term(c) varsub  #! debug
-    t = substitute(term(c), varsub, c.net)::PnmlExpr
-    @warn t
-    eval(toexpr(t, c.net))::eltype(c) # Bool isa Number
+function eval_cond_term(cond::Condition, varsub::NamedTuple)
+    isa(term(cond), BooleanEx) ||
+        @warn "eval_cond_term" term(cond) varsub  #! debug
+    cterm = substitute(term(cond), varsub, cond.net)::PnmlExpr
+    @warn "eval_cond_term" term(cond) cterm toexpr(cterm, cond.net)
+    eval(toexpr(cterm, cond.net))::eltype(cond) # Bool isa Number
 end
 
 

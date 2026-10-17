@@ -114,10 +114,10 @@ Used to initialize a marking vector that will then be updated by firing a transi
 (mark::Marking)() = evaluate_mark(mark)
 #@memoize
 function evaluate_mark(mark::Marking)
-    t = term(mark)
-    ex = toexpr(t, mark.net)
-    @warn "evaluate_mark" t ex eval(ex)
-    eval(ex)
+    mterm = term(mark)
+    expr = toexpr(mterm, mark.net)
+    @warn "evaluate_mark" mterm expr eval(expr)
+    eval(expr)
 end
 
 basis(mark::Marking) = sortref(term(mark))::SortRef
