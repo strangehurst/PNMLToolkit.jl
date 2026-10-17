@@ -34,17 +34,14 @@ import DataStructures
 import ExproniconLite
 import FunctionWrappers
 import MacroTools
-PrecompileTools.@recompile_invalidations begin
-    import EzXML
-    import Metatheory
-    import Moshi
-    import Moshi.Data: @data, is_data_type, isa_variant, variant_type
-    import Moshi.Derive: @derive
-    import Moshi.Match: @match
-    import Multisets: Multisets, Multiset
-end
+import EzXML
+import Metatheory
+import Moshi
+import Moshi.Data: @data, is_data_type, isa_variant, variant_type
+import Moshi.Derive: @derive
+import Moshi.Match: @match
+import Multisets: Multisets, Multiset
 import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
-import SciMLPublic: @public
 import StructEquality: @struct_hash_equal
 import XMLDict
 
@@ -69,11 +66,11 @@ export @xml_str, APN, AbstractPnmlMultiset, AbstractPnmlNet, ArbitrarySortRef, A
     initial_marking, inscription, narcs, npages, nplaces, ntransitions, place, pnmlmodel,
     pntdsym, refid_of, transition, xmlnode, ConstantOperator
 
-@public PnmlException, MissingIDException, DuplicateIDException, MalformedException
-@public namedsort, productsort, Coordinate
-@public basis, conditions, decldicts, inscriptions, name, rates, mcontains, nrefplaces, nreftransitions, to_sort, inscription_value
-@public is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
-@public src_arcs, tgt_arcs, source, target
+public PnmlException, MissingIDException, DuplicateIDException, MalformedException
+public namedsort, productsort, Coordinate
+public basis, conditions, decldicts, inscriptions, name, rates, mcontains, nrefplaces, nreftransitions, to_sort, inscription_value
+public is_usersort, is_namedsort, is_partitionsort, is_productsort, is_multisetsort, is_arbitrarysort
+public src_arcs, tgt_arcs, source, target
 
 Multisets.set_key_value_show()
 

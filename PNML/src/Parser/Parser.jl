@@ -13,14 +13,12 @@ import OrderedCollections: LittleDict, OrderedDict, OrderedSet, freeze
 import PNML: adjacent_place, elements, refid_of, source, target,
     sortdefinition, sortelements, sortref, tag, verify!
 import XMLDict
-PrecompileTools.@recompile_invalidations begin
-    import EzXML
-    import Metatheory
-    import Moshi
-    import Multisets
-    using Moshi.Data: @data, is_data_type, isa_variant
-    using Moshi.Match: @match
-end
+import EzXML
+import Metatheory
+import Moshi
+import Multisets
+using Moshi.Data: @data, is_data_type, isa_variant
+using Moshi.Match: @match
 
 using Infiltrator
 
