@@ -25,7 +25,8 @@ A "multiset sort over a basis sort is interpreted as
 end
 
 # Evaluate expression
-initial_marking(place::Place) = (place.initialMarking)()
+initial_marking(place::Place) = Labels.evaluate_mark(place.initialMarking)
+
 net(place::Place) = place.net
 sortref(place::Place) = sortref(place.sorttype)::SortRef
 

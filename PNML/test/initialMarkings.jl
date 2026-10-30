@@ -31,16 +31,16 @@ include("TestUtils.jl")
         mark = @test_logs(match_mode=:any, (:warn, r"^ignoring unexpected child"),
                     parse_initialMarking(node, placetype, net; parentid=:xxx)::Marking)
         #@test typeof(value(mark)) <: Union{Int,Float64}
-        @test mark()::Union{Int,Float64} == 123
+        @test evaluate_mark(mark) == 123 #Literal(123)
 
         # Integer
         mark1 = Marking(23, net, :xxx)
         @test_opt broken=false Marking(23, net, :xxx)
         @test_call Marking(23, net, :xxx)
-        @test typeof(mark1()) == typeof(23)
-        @test mark1() == 23
-        @test_call mark1()
-        @test_opt broken=true mark1()
+        @test evaluate_mark(mark1) isa typeof(23) #Literal(23))
+        @test evaluate_mark(mark1) == 23 #Literal(23)
+        @test_call evaluate_mark(mark1)
+        @test_opt broken=true evaluate_mark(mark1)
 
         @test graphics(mark1) === nothing
         @test toolinfos(mark1) === nothing || isempty(toolinfos(mark1))
@@ -69,15 +69,16 @@ include("TestUtils.jl")
         # Parse ignoring unexpected child
         mark = @test_logs(match_mode=:any, (:warn, r"^ignoring unexpected child"),
                     parse_initialMarking(node, placetype, net; parentid=:xxx)::Marking)
-        @test mark()::Union{Int,Float64} == 123
+        @test evaluate_mark(mark) == 123.0 #Literal(123.0)
 
         # Floating point
         mark2 = Marking(3.5, net, :xxx)
         @test_opt broken=false Marking(3.5, net, :xxx)
-        @test mark2() ≈ 3.5
+        m2value = evaluate_mark(mark2)
+        @test m2value ≈ 3.5
         @test_call Marking(3.5, net, :xxx)
-        @test typeof(mark2()) == typeof(3.5)
-        @test_call mark2()
+        @test typeof(m2value) == typeof(3.5)
+        @test_call evaluate_mark(mark2)
         @test graphics(mark2) === nothing
         @test toolinfos(mark2) === nothing || isempty(toolinfos(mark2))
    end

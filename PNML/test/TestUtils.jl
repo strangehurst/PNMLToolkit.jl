@@ -25,7 +25,7 @@ using PNML: AbstractDeclaration, AbstractOperator, ConstantOperator, AbstractTer
     place_ids, arc_ids, transition_ids, reftransition_ids, refplace_ids
 using PNML.Sorts
 using PNML.Labels
-using PNML.Labels: get_label
+using PNML.Labels: get_label, evaluate_mark
 using PNML.Parser
 using PNML.Parser: allchildren, anyelement, default, firstchild, parse_arc,
     parse_declaration!, parse_declarations!, parse_fifoinitialMarking, parse_graphics,
