@@ -48,7 +48,7 @@ end
 """
 $(TYPEDSIGNATURES)
 
-Parse each `<subterm>` child of `node` into a vector of [expressions](@ref PnmlExpr),
+Parse each `<subterm>` child of `node` into a vector of [PnmlExpr](@ref),
 """
 function subterms(node, net::AbstractPnmlNet)
     sts = Vector{PnmlExpr}()
@@ -56,26 +56,12 @@ function subterms(node, net::AbstractPnmlNet)
         check_nodename(subterm, "subterm")
         tag, stnode = unwrap_subterm(subterm) # Used to dispatch on `Val(tag)`.
 
-        subterm_tj = parse_term(Val(tag), stnode, net)::Term
-        isnothing(subterm_tj) && throw(MalformedException("subterm_tj is nothing"))
-        push!(sts, subterm_tj.exp::PnmlExpr)
+        term = parse_term(Val(tag), stnode, net)::Term
+        isnothing(term) && throw(MalformedException("term is nothing"))
+        push!(sts, term.exp::PnmlExpr)
     end
     return sts
 end
-
-# function subterms_novars(node, net::AbstractPnmlNet)
-#     sts = Vector{PnmlExpr}(), vars
-#     for subterm in EzXML.eachelement(node)
-#         check_nodename(subterm, "subterm")
-#         tag, stnode = unwrap_subterm(subterm) # Used to dispatch on `Val(tag)`.
-
-#         subterm_tj = parse_term(Val(tag), stnode, net)::Term
-#         isnothing(subterm_tj) && throw(MalformedException("subterm_tj is nothing"))
-#         push!(sts, subterm_tj.exp::PnmlExpr)
-#     end
-
-#     return sts
-# end
 
 #=
     ePNK-master/pnml-examples/org.pnml.tools.epnk.examples_1.2.0/hlpng/technical
@@ -213,7 +199,7 @@ function parse_term(::Val{:numberconstant}, node::XMLNode, net::AbstractPnmlNet)
     elseif sorttag === :positive
         nv > 0 || throw(ArgumentError("not a Positive Number: $nv"))
     end
-    nc = NumberEx(sortref, nv) #! expression
+    nc = NumberEx(sortref, Literal(nv)) #! expression
     return Term(nc, sortref)
 end
 
@@ -532,11 +518,10 @@ function parse_term(::Val{:tuple}, node::XMLNode, net::AbstractPnmlNet)
     sts = subterms(node, net)
     # Expect elements of tuple to be an operator or variable (a.k.a. term)
     @assert length(sts) > 0 # allow tuple of 1 item?
-    #@warn "parse_term :tuple" sts vars
     tuple_expr = PnmlTupleEx(sts)
     # When turned into expressions and evaluated, each tuple element will have a sort,
     # the combination of element sorts must have a matching product sort.
-    #@warn "parse_term :tuple" tuple_expr find_vars(tuple_expr)
+    D()&& @warn "parse_term :tuple" sts tuple_expr find_vars(tuple_expr)
     #pnmlexpr_string(tuple_expr)
     # VariableEx can lookup sort.
     # UserOperatorEx (constant?) also has enclosing sort.
@@ -611,7 +596,7 @@ function parse_term(::Val{:finiteintrangeconstant}, node::XMLNode, net::Abstract
     Sorts.start(fir_sort) <= value <= Sorts.stop(fir_sort) ||
         throw(ArgumentError("finite integer value $value not in range $fir_sort"))
 
-    return Term(NumberEx(sort_ref, value), sort_ref)
+    return Term(NumberEx(sort_ref, Literal(value)), sort_ref)
 end
 
 #====================================================================================#
@@ -623,7 +608,7 @@ function parse_term(::Val{:partitionelementof}, node::XMLNode, net::AbstractPnml
     ref_partition = Symbol(attribute(node, "refpartition"))
     sts = subterms(node, net)
     @assert length(sts) == 1
-    peo = PartitionElementOf(first(sts), ref_partition)
+    peo = PartitionElementOf(first(sts), Literal(ref_partition))
     return Term(peo, PartitionSortRef(ref_partition))
 end
 
