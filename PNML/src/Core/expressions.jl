@@ -12,10 +12,11 @@ using DocStringExtensions
 using Metatheory: @matchable
 using Multisets: Multiset
 using PNML
-using PNML: AbstractPnmlMultiset, BooleanConstant, DotConstant, FEConstant, FiniteIntRangeConstant,
-    NumberConstant, PnmlExpr, PnmlMultiset, ProductSort, feconstant, mcontains, multiset, operator,
-    partitionsort, pnmlmultiset, value, variabledecl, VariableDeclaration,
-    elabelT, tparserT, efilterT, lparserT, vsubT, varsT, BagvarT, substT
+using PNML: AbstractPnmlMultiset, BagvarT, BooleanConstant, DotConstant, FEConstant,
+    FiniteIntRangeConstant, NumberConstant, PnmlExpr, PnmlMultiset, ProductSort,
+    VariableDeclaration, efilterT, elabelT, feconstant, lparserT, mcontains, multiset,
+    operator, partitionsort, pnmlmultiset, substT, tparserT, value, variabledecl, varsT,
+    vsubT
 using PNML.Sorts
 
 using TermInterface
@@ -27,7 +28,7 @@ export AbstractBoolExpr, AbstractOpExpr, PnmlExpr
 export Add, Addition, And, Append, Bag, BooleanEx, Cardinality, CardinalityOf, Concatenation,
     Contains, Division, DotConstantEx, Equality, GreaterThan, GreaterThanOrEqual, Imply,
     Inequality, LessThan, LessThanOrEqual, ListAppend, ListConcatenation, ListEx,
-    ListLength, MemberAtIndex, Modulo, Multiplication, Not, NumberEx, Or,
+    ListLength, Literal, MemberAtIndex, Modulo, Multiplication, Not, NumberEx, Or,
     PartitionElementOf, PartitionGreaterThan, PartitionLessThan, PnmlTupleEx,
     Predecessor, ScalarProduct, SortRefEx, StringGreaterThan, StringGreaterThanOrEqual,
     StringLength, StringLessThan, StringLessThanOrEqual, Sublist, SubstringEx, Subtract,
@@ -59,7 +60,8 @@ toexpr(x::T, _net) where {T <: Number} = identity(x) #! literal
 toexpr(s::Symbol, _net) = QuoteNode(s)
 toexpr(s::Symbol) = s
 function toexpr(t::Tuple, _net)
-    return @show toexpr.(t) #todo QuoteNode?
+    @error "toexpr(t::Tuple" t
+    return @show :($(toexpr.(t))) #todo QuoteNode?
 end
 function toexpr(t::Multiset, _net)
     return t
@@ -99,12 +101,6 @@ Variables in input inscription, output inscription and conditions are associated
 variables: store in dictionary named "variables", key is PNML ID: maketerm(Expr, :ref, [:variables, :pid])
 
 ===================================#
-#! From SymbolicUtils.jl NOTE: this is NOT TermInterface (a.k.a. PnmlExpr)
-recurse_expr(ex::Expr, _net) = Expr(ex.head, recurse_expr.(ex.args)...)
-recurse_expr(ex::Any, net) = toexpr(ex, net)
-
-#recurse_expr(ex::PnmlExpr, sub) = Expr(ex.head, recurse_expr.(ex.args, (sub,))...)
-
 "@matchable TermInterface expressions"
 function TermInterface.maketerm(::Type{<:PnmlExpr}, head, children, _metadata = nothing)
   head(children...)
@@ -204,6 +200,59 @@ function pnmlexpr_string(e::PnmlExpr, level::Int)
     end
  end
 
+
+##########################################################################################
+# LiteralExpr from SymbolicUtils code.jl. Used by
+# ModelingToolkit src/structural_transformation/codegen.jl and Symbolics.
+# The "Literal" here is a reference to being non-Symbolic.
+#
+# Any term rewriting should be done before toexpr is called.
+# For `st` we use variable substitution dictionary (or NamedTuple)
+#
+# ModelingToolkit has a Differential Equation focus,
+# supports Real, Complex, (and maybe Quarterions, Octions).
+# And Linear Algebra.
+# PNML is doing high-level petri nets with a multi-sorted algebra and a XML markup language.
+#
+# code.jl also uses @matchable, calling toexpr on the likes of
+#   Assignment, Let, Func, MakeArray, etc.
+#
+##########################################################################################
+
+"""
+    Literal(ex)
+
+`toexpr` on `Literal` returns wrapped value.
+"""
+Literal
+@matchable struct Literal{T} <: PnmlExpr
+    ex::T
+end
+
+function toexpr(lit::Literal{T}, _net=nothing) where T
+    @error "toexpr lit::Literal" lit
+    return lit.ex
+end
+function toexpr(lit::Literal{Symbol}, _net=nothing)
+    return QuoteNode(lit.ex)
+end
+function toexpr(lit::Literal{Int}, _net=nothing)
+    @error "toexpr lit::Literal" lit
+    return QuoteNode(lit.ex)
+    #return lit.ex
+end
+function toexpr(lit::Literal{Float64}, _net=nothing)
+    @error "toexpr lit::Literal" lit
+    return QuoteNode(lit.ex)
+    #return lit.ex
+end
+
+Base.convert(::Type{Symbol}, lit::Literal{Symbol}) = lit.ex
+Base.convert(::Type{Int}, lit::Literal{Int}) = lit.ex
+Base.convert(::Type{Float64}, lit::Literal{Float64}) = lit.ex
+Base.convert(::Type{BooleanConstant}, lit::Literal{BooleanConstant}) = lit.ex
+Base.convert(::Type{SortRef}, lit::Literal{SortRef}) = lit.ex
+
 ###################################################################################
 # Expression holding a SortRef
 @matchable struct SortRefEx <: PnmlExpr
@@ -238,15 +287,11 @@ A Symbol value is interperted to be an operator id.
 VariableEx
 
 function toexpr(op::VariableEx, net)
-    # `op` holds `refid`,  a key into a `VariableDeclaration` dictionary.
     vdecl = variabledecl(net, op.refid)::VariableDeclaration
-    @warn "toexpr VariableEx" op vdecl
-    @assert op.refid == vdecl.id
-    #@assert haskey(varsub, op.refid)
-    #vsub = varsub[op.refid]
-    #@show vsub
-    # if vsub isa Symbol
-    QuoteNode{nothing}
+    isnothing(vdecl) &&
+        throw(ArgumentError("$op not found in variable declarations"))
+    # @warn "toexpr VariableEx" op vdecl
+    return QuoteNode(op.refid)
 end
 
 expr_sortref(v::VariableEx, net) = sortref(variabledecl(net, v.refid))::SortRef
@@ -269,25 +314,23 @@ end
     UserOperatorEx(refid:Symbol)
 
 Wraps a operator id.
-`toexpr` returns `Expr` that calls `operator`.
+`toexpr` returns `Expr` that calls `operator(net, id)`.
 """
 UserOperatorEx
 
 
-function toexpr(op::UserOperatorEx, net)
+function toexpr(opex::UserOperatorEx, net)
     # Lookup operator
-    result = operator(net, op.refid)
-    @warn("toexpr UserOperatorEx", op,
-                    operator(net, op.refid),
-                    result)
-
-   # named or builtin operator. FEConstant are constant functors.
-    if result isa ConstantOperator
-        @show result()
-        QuoteNode(result())
-    else
-        #! What about parameters?
-    end
+    #!op = operator(net::PnmlNet, opex.refid)
+    @warn("toexpr UserOperatorEx", opex)
+    @show op = operator(net, opex.refid)
+    # named or builtin operator. FEConstant are constant functors.
+    op isa ConstantOperator ||
+        error("not a constant operator $opex")
+    @show QuoteNode(op())
+    #! What about non-constant operators, parameters?
+    #@show :(operator($net, $(opex.refid))())
+    #@show :(QuoteNode($(operator(net, opex.refid)())))
 end
 
 function expr_sortref(o::UserOperatorEx, net)
@@ -313,6 +356,7 @@ Wraps a operator id.
 NamedOperatorEx
 
 function toexpr(op::NamedOperatorEx, net)
+    @warn "toexpr(op::NamedOperatorEx" op
     Expr(:call, operator, QuoteNode(net), QuoteNode(op.refid)) #
 end
 
@@ -338,7 +382,7 @@ end
     #     new(b, x, m)
     # end h
 end
-"""@matchable
+"""
     Bag{E <: Any, M <: Any}
 
 Wraps a `basis`, `element` and `multi`.
@@ -359,13 +403,30 @@ function toexpr(b::Bag, net)
     #@show b Expr(:parameters, Expr(:kw,:net, net))
     #^ Warning: b.element can be: `PnmlMultiset`, `tuple`
     #^ tuples are elements of a `ProductSort`
-    #@warn "toexpr Bag" b
     basis = unwrap_namedsort(net, sortref(b))
+    D()&& @warn "toexpr Bag" b basis b.element typeof(b.element) typeof(b.multi) toexpr(b.multi, net)
     if basis isa ProductSort
+        els = b.element
+        D()&& println("\nproduct sort ", basis, "els =", els)
+        e = if els isa Vector{Expr} || els isa Vector{<: QuoteNode}
+            #:(tuple($(els...)))
+            QuoteNode(tuple(els...))
+        elseif els isa PnmlTupleEx
+            t = toexpr.(els.args, Ref(net))
+            #:(tuple(($t)...))
+            QuoteNode(tuple(t...))
+        elseif els isa Vector{PnmlExpr}
+            t = toexpr.(els, Ref(net))
+            :(tuple(($t)...))
+        else
+            error("only expected PnmlTupleEx, Vector{Union{QuoteNode, Expr, PnmlExpr}}, found $els")
+        end
+        D()&& @show e eval(e)
+        D()&& dump(e)
         Expr(:call, pnmlmultiset,
             Expr(:parameters, Expr(:kw, :net, net)), # keyword arguments
             b.basis,
-            toexpr(b.element, net),
+            e, #!toexpr(b.element, net),
             toexpr(b.multi, net))
     else
         Expr(:call, pnmlmultiset,
@@ -383,7 +444,7 @@ end
 ###################################################################################
 @matchable struct NumberEx{T<:Number} <: PnmlExpr
     basis::SortRef # Wraps a sort REFID.
-    element::T #
+    element::T
 end
 """
     NumberEx
@@ -392,7 +453,8 @@ Wraps `basis` and `element`.
 `toexpr` returns `element` of `basis` sort.
 """
 NumberEx # Need to avoid @matchable to have docstring
-
+NumberEx(b::Literal{SortRef}, e::Literal{N}) where {N <: Number} = NumberEx(b.ex, e.ex)
+NumberEx(b::SortRef, e::Literal{N}) where {N <: Number} = NumberEx(b, e.ex)
 toexpr(b::NumberEx{T}, _net) where {T<:Number} = b.element
 
 basis(x::NumberEx) = x.basis
@@ -470,12 +532,11 @@ expr_sortref(a::Add, net) = expr_sortref(first(a.args), net)::SortRef
 # Multiset Operator
 function toexpr(op::Add, net)
     @assert length(op.args) >= 2
-    #foreach(println, op.args)
-    @warn "toexpr Add" op.args
+    D()&& @warn "toexpr Add" op.args
     # Expr(:call, sum, [eval(toexpr(arg, net)) for arg in op.args])
-    @show f = [toexpr(arg, net) for arg in op.args] # creates PnmlMultiset
-    @show typeof(f)
-    :(PNML.disjointunion($f))
+    exprs = [toexpr(arg, net) for arg in op.args] # creates PnmlMultiset
+    D()&& @show exprs typeof(exprs)
+    :(PNML.disjointunion($exprs))
 end
 
 function Base.show(io::IO, x::Add)
@@ -610,8 +671,8 @@ Or
 
 function toexpr(op::Or, net)
     #@error "toexpr op::Or"  op.args
-    e = [(eval ∘ toexpr)(arg, net) for arg in op.args]
-    :(any($e))
+    e = [toexpr(arg, net) for arg in op.args]
+    :(any(eval.($e)))
 end
 
 function Base.show(io::IO, x::Or)
@@ -681,9 +742,9 @@ function Base.show(io::IO, x::Imply)
     print(io, "Imply(", x.lhs, ", ", x.rhs, ")" )
 end
 
-@matchable struct Equality <: AbstractBoolExpr #^ Uses `==` operator.
-    lhs::Any # expression evaluating to a T
-    rhs::Any # expression evaluating to a T
+@matchable struct Equality{L <: PnmlExpr, R <: PnmlExpr} <: AbstractBoolExpr #^ Uses `==` operator.
+    lhs::L # expression evaluating to a T
+    rhs::R # expression evaluating to a T
 end
 """
     Equality
@@ -693,7 +754,10 @@ Wraps lhs, rhs expressions.
 """
 Equality
 function toexpr(op::Equality, net)
-    Expr(:call, :(==), toexpr(op.lhs, net), toexpr(op.rhs, net))
+    @warn "Equality" op
+    @show Expr(:call, :(==),
+                toexpr(op.lhs, net),
+                toexpr(op.rhs, net))
 end
 
 function Base.show(io::IO, x::Equality)
@@ -1051,8 +1115,11 @@ end
 
 # 0-arity despite the refpartition
 @matchable struct PartitionElementOf{T <: PnmlExpr} <: PnmlExpr
-    arg::T # TODO variable that should be a feconstant
-    refpartition::Symbol # TODO! wrap in PartitionSortRef
+    value::T # TODO variable/expression that should be a feconstant, aka symbol,
+    # Substution replaces variables with literal values (from marking).
+    # These literals are QuoteNode and Expr or Tuples of those types.
+    #
+    refpartition::Literal{Symbol} # TODO! wrap in PartitionSortRef
 end
 """
     PartitionElementOf
@@ -1066,32 +1133,35 @@ Otherwise throw an exception.
 `toexpr` returns `Expr` that calls #! TBD
 """
 PartitionElementOf
+PnmlExpr
+expr_sortref(a::PartitionElementOf, net) = sortref(partitionsort(net, a.refpartition.ex))::SortRef
 
-expr_sortref(a::PartitionElementOf, net) = sortref(partitionsort(net, a.refpartition))::SortRef
-
-function partitionelementof_impl(fec::FEConstant, refpart, net)
-    #@warn "peo_impl" fec refpart PNML.pid(net)
-    p = partitionsort(net, refpart)
-    isnothing(p) &&
+function partitionelementof_impl(fec::Symbol, refpart::Symbol, net)
+    psort = partitionsort(net, refpart)
+    isnothing(psort) &&
         throw(ArgumentError("did not find PartitionSort with id $refpart"))
-    return let fec_val = fec()
-        partition_element = first(Iterators.filter(Fix2(PNML.Declarations.contains, fec_val),
-                                      PNML.Declarations.sortelements(p, net)))
-        isnothing(partition_element) &&
-            throw(ArgumentError("fec value $fec_val not in PartitionSort $refpart"))
-        #@show partition_element
-        partition_element::PNML.Declarations.PartitionElement
+    @warn "partitionelementof_impl" fec psort
+    for element in PNML.Declarations.sortelements(psort, net)
+        if fec in element.terms
+            println("contains($(element.terms), $(repr(fec)) = ",
+                     PNML.Declarations.contains(element, fec))
+            return element::PNML.Declarations.PartitionElement
+        end
     end
+    throw(ArgumentError("$fec not in PartitionSort $refpart"))
 end
 
 function toexpr(op::PartitionElementOf, net)
     #@warn "toexpr PartitionElementOf" op
-    Expr(:call, partitionelementof_impl, toexpr(op.arg, net), QuoteNode(op.refpartition), net)
+    Expr(:call, partitionelementof_impl,
+                toexpr(op.value, net),
+                toexpr(op.refpartition, net),
+                QuoteNode(net))
 end
 #! Expr(:call, :(||), toexpr(op.lhs, var), toexpr(op.rhs, var))
 
 function Base.show(io::IO, x::PartitionElementOf)
-    print(io, "PartitionElementOf(", x.arg, ", ", x.refpartition, ")" )
+    print(io, "PartitionElementOf(", x.value, ", ", x.refpartition, ")" )
 end
 
 #& Strings
@@ -1299,11 +1369,11 @@ Wraps #! TBD
 MemberAtIndex
 
 #--------------------------------------------------------------
-@matchable struct PnmlTupleEx <: PnmlExpr #{N, T<:PnmlExpr}
-    args::Vector{Any} # >=2 subterms
+@matchable struct PnmlTupleEx{T} <: PnmlExpr #{N, T<:PnmlExpr}
+    args::T # Vector{PnmlExpr} # >=2 subterms
 end
 """
-    PnmlTupleEx(args::Vector)
+    PnmlTupleEx(args)
 
 `PnmlTupleEx` `TermInterface` expression object wraps an ordered collection of `PnmlExpr` objects.
 There is a related `ProductSort`: an ordered collection of sorts.
@@ -1340,37 +1410,36 @@ end
 
 function toexpr(op::PnmlTupleEx, net)
     # args may be empty
-    @warn("toexpr PnmlTupleEx", op.args,
-            toexpr.(op.args, net),
-            (eval ∘ toexpr).(op.args),)
-    #~ Must allow for mixed constant (0-ary operator) and variable expressions.
-    #? Do input arc inscriptions ever have constant expressions?
-    #* Defaults for example.
-    #! Start by assuming tuples are either all constants or all variables.
-    # foreach(Fix2(getproperty, :refid), op.args)
-    # Extract tuple of sort REFIDs from expressions.  Map to ProductSort
-
-    # @show psorts = tuple((expr_sortref.(op.args, net))...)
-    # args = if all(Fix2(isa, Symbol), op.args)
-    #     map(vexp -> feconstant(vexp.refid), op.args)
-
-    #args = op.args
-    # if all(Fix2(isa, VariableEx), op.args)
-    #     # toexpr is to QuoteNode holding REFID.
-    #     map(vexp -> feconstant(vexp.refid), op.args)
-    # else
-    #     op.args
-    # end
-    # @show args
-    # PnmlTuple{psorts}(x...)
-    #@warn op
-    args = [toexpr(arg, net) for arg in op.args]
-    # args = [(eval ∘ toexpr)(arg, net) for arg in op.args]
-    @warn "TupleEx args" args
-    #println("\n-----------------------------")
-   :(tuple(($args)...))
+    @warn("toexpr PnmlTupleEx", op.args)
+    args = []
+    for arg in op.args
+        @show typeof(arg)
+        if arg isa Expr
+            push!(args, arg)
+        elseif arg isa QuoteNode
+            push!(args, arg.value)
+        elseif arg isa PnmlExpr
+            @show ex = PNML.Expressions.toexpr(arg, net)
+            if ex isa QuoteNode
+                println("QuoteNode")
+                push!(args, ex)
+                #~push!(args, ex.value)
+            elseif ex isa Expr
+                println("Expr")
+                push!(args, ex)
+            else
+                error("only Expr and QuoteNode expected")
+            end
+        else
+            error("only PnmlExpr, Expr and QuoteNode expected")
+        end
+    end
+    expr = :(tuple($(args...)))
+    @warn "toexpr PnmlTupleEx args" args
+    dump(args)
+    dump(expr)
+    return expr
 end
- # :(sum(eval(toexpr(arg, $net)) for arg in $(op.args))) # creates PnmlMultiset
 
 # ? Would this be a candidate for rewriting?
 # _deref_variable(v::Any) = identity(v) # Bet that it is an operator  expression -> FEConstant!
@@ -1381,75 +1450,97 @@ function Base.show(io::IO, x::PnmlTupleEx)
 end
 
 
-
-##########################################################################################
-# LiteralExpr from SymbolicUtils code.jl. Used by
-# ModelingToolkit src/structural_transformation/codegen.jl and Symbolics.
-# The "Literal" here is a reference to being non-Symbolic.
-#
-# Any term rewriting should be done before toexpr is called.
-# For `st` we use variable substitution dictionary (or NamedTuple)
-#
-# ModelingToolkit has a Differential Equation focus,
-# supports Real, Complex, (and maybe Quarterions, Octoions).
-# And Linear Algebra.
-# PNML is doing high-level petri nets with a multi-sorted algebra and a XML markup language.
-#
-# code.jl also uses @matchable, calling toexpr on the likes of
-#   Assignment, Let, Func, MakeArray, etc.
-#
-##########################################################################################
-
+#! From SymbolicUtils.jl code.js NOTE: this is NOT TermInterface (a.k.a. PnmlExpr)
 """
     LiteralExpr(ex)
 
 Literally `ex`, an `Expr`. `toexpr` on `LiteralExpr` recursively calls
 `toexpr` on any interpolated symbolic expressions.
 """
-struct LiteralExpr
+struct LiteralExpr <: PnmlExpr
     ex
 end
-toexpr(exp::LiteralExpr, net) = recurse_expr(exp.ex, net)
 
+recurse_expr(ex::Expr, st) = Expr(ex.head, recurse_expr.(ex.args, (st,))...)
+recurse_expr(ex, st) = toexpr(ex, st)
+
+function toexpr(exp::LiteralExpr, st)
+    recurse_expr(exp.ex, st)
+end
+
+
+# See SymbolicUtils code.jl substitute_in_ir methods
+# and related functions.
 """
     substitute(expr, varsub, net)
 
 Recursivly substitute variables in `expr` with value from `varsub`.
-The values in `varsub` will be lierals and ground terms of a place's sorttype.
+The values in `varsub` will be literals of the place's sorttype.
 These values are from the current marking vector.
-```
 """
-function substitute(expr, varsub::NamedTuple, net::AbstractPnmlNet)
-    if expr isa VariableEx
-        vdecl = variabledecl(net, expr.refid)::VariableDeclaration
-        sref = sortref(vdecl)
-        s = PNML.Sorts.unwrap_namedsort(net, sref)
-        if s isa Union{PNML.Sorts.EnumerationSort,
-                                      PNML.Declarations.PartitionSort}
-            # feconstant operator looks like an identity operator.
-            return QuoteNode(varsub[expr.refid]::Symbol)
-        # elseif s isa Union{PNML.Sorts.FiniteIntRangeSort,
-        #                                   PNML.Sorts.NumberSort}
-        #      return varsub[expr.refid]::Int
-        else # MultisetSort, ProductSort, PartitionSort
-             return QuoteNode(varsub[expr.refid])
-        end
-        # Replace the VariableEx with literal value (from marking).
-        # Symbols are operators.
-        # The expr.refid maps to variabledecl with name, sort.
-        # Sorts that use operators: enumerated
+function substitute(expr::PnmlExpr, varsub::NamedTuple, net::AbstractPnmlNet)
+    #@error "subtitute"  expr varsub
+    sub_val = _sub(expr, varsub::NamedTuple, net::AbstractPnmlNet)::PnmlExpr
+    return sub_val
+end
+
+function _sub(expr::Literal, ::NamedTuple, ::AbstractPnmlNet)
+    #@error("_sub(expr::Literal: $expr")
+    return expr
+end
+function _sub(expr::Any, ::NamedTuple, ::AbstractPnmlNet)
+    D()&& @info("_sub(expr::Any: $expr")
+    return expr
+end
+function _sub(expr::Symbol, ::NamedTuple, ::AbstractPnmlNet)
+    #@error("sub(expr::Symbol: $expr")
+    return Literal(expr)
+end
+function _sub(expr::Union{Vector, Tuple}, varsub::NamedTuple, net::AbstractPnmlNet)
+
+    @warn "_sub(expr::Union{Vector, Tuple}" expr
+    ex = (e isa Union{PnmlExpr, Expr, QuoteNode} ? e : QuoteNode(e) for e in expr)
+    @show ex
+    _sub.(ex, Ref(varsub), Ref(net))
+end
+
+function _sub(expr::VariableEx, varsub::NamedTuple, net::AbstractPnmlNet)
+    # Lookup variable sort.
+    vdecl = variabledecl(net, expr.refid)::VariableDeclaration
+    sref = sortref(vdecl)
+    sub_sort = PNML.Sorts.unwrap_namedsort(net, sref)
+
+    if sub_sort isa PNML.Sorts.EnumerationSort
+        # Evaluate feconstant 0ary operator
+        # feconstant refid symbol used to map to name string if needed.
+        #? Can distinct enumerations have elements that should be equal values?
+        return Literal(varsub[expr.refid])
+    elseif sub_sort isa Union{PNML.Sorts.FiniteIntRangeSort, PNML.Sorts.NumberSort}
+        @error "FiniteIntRangeSort, NumberSort" varsub[expr.refid]  eltype(sub_sort)
+        #todo assert for bringup?
+        #@assert sub_val isa eltype(sub_sort)
+        return Literal(varsub[expr.refid])
+    else
+        error("$sub_sort not expected")
     end
-    if iscall(expr) # all @matchable structs
+    # Replace the VariableEx with literal value (from marking).
+    # Symbols are reference ids of operators.
+    # The expr.refid maps to variabledecl with name, sort.
+end
+
+function _sub(expr::PnmlExpr, varsub::NamedTuple, net::AbstractPnmlNet)
+    if iscall(expr) # all @matchable structs are iscall
         #~ Always substitute operation and arguments.
-        op = substitute(operation(expr), varsub, net) #? is operation ever an expression?
-        args = map(x->substitute(x, varsub, net), arguments(expr)) #! XXX
+        op = operation(expr) #, varsub, net
+        args = map(x->_sub(x, varsub, net), arguments(expr)) #! XXX
 
         #~ Rewrite term after substitutions
-        maketerm(typeof(expr), op, args, metadata(expr))
+        return maketerm(typeof(expr), op, args, metadata(expr))
     else
-        expr #~ not a call, leave it alone
+        return expr #~ not a call, leave it alone
     end
 end
+
 
 """
 $(TYPEDSIGNATURES)
