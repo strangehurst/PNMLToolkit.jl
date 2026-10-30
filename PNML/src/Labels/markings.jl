@@ -39,7 +39,7 @@ end
 
 # Allow any Number subtype, only a few concrete subtypes are expected.
 function Marking(mark::Number, net::AbstractPnmlNet, place::Symbol)
-    Marking(; term=NumberEx(sortref(mark)::SortRef, mark), net, place)
+    Marking(; term=NumberEx(sortref(mark)::SortRef, Literal(mark)), net, place)
 end
 
 term(mark::Marking) = mark.term
@@ -111,12 +111,12 @@ The basis may be a ProductSort. Then the marking value is a multiset of tuples.
 
 Used to initialize a marking vector that will then be updated by firing a transition.
 """
-(mark::Marking)() = evaluate_mark(mark)
-#@memoize
 function evaluate_mark(mark::Marking)
-    mterm = term(mark)
-    expr = toexpr(mterm, mark.net)
-    @warn "evaluate_mark" mterm expr eval(expr)
+    D()&& println("## evaluate_mark ", term(mark))
+    markterm = substitute(term(mark), NamedTuple(), mark.net)
+    D()&& @error "evaluate_mark term"  markterm
+    expr = toexpr(markterm, mark.net)
+    D()&& @warn "evaluate_mark returns" expr eval(expr)
     eval(expr)
 end
 

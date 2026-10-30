@@ -321,9 +321,9 @@ function default(::Type{<:Marking}, net::AbstractPnmlNet, place::Symbol, placety
         el = def_sort_element(placetype) # el used for its type
         Bag(sortref(placetype), el, 0)
     elseif is_continuous(pntd)
-        NumberEx(NamedSortRef(:real), zero(Float64))
+        NumberEx(NamedSortRef(:real), Literal(zero(Float64)))
     else
-        NumberEx(NamedSortRef(:natural), zero(Int))
+        NumberEx(NamedSortRef(:natural), Literal(zero(Int)))
     end
 
     Marking(; term = ex, net, place) # not high-level!
@@ -345,9 +345,9 @@ function default(::Type{<:Inscription}, net::AbstractPnmlNet, placetype::Maybe{S
         basis = sortref(placetype)::SortRef
         Bag(basis, def_sort_element(placetype), 1)
     elseif pntd === :continuous
-        NumberEx(NamedSortRef(:real), one(Float64))
+        NumberEx(NamedSortRef(:real), Literal(one(Float64)))
     else
-        NumberEx(NamedSortRef(:positive), one(Int))
+        NumberEx(NamedSortRef(:positive), Literal(one(Int)))
     end
     #@warn "default inscription" ex find_vars(ex)
     Inscription(; term, net)

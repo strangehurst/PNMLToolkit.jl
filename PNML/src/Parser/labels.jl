@@ -196,7 +196,7 @@ function parse_initialMarking(node::XMLNode, placetype::SortType, net::PnmlNet{P
     value isa placeT ||
         error("initial marking value $value expected to be a $placeT, found: $(typeof(value))")
     # We ate the label's <text> to make the expression's value.
-    term = NumberEx(sortref(placetype), value)
+    term = NumberEx(sortref(placetype), Literal(value))
     Marking(; term, l.toolspecinfos, net, place=parentid)
 end
 
@@ -379,7 +379,7 @@ function parse_inscription(node::XMLNode, _source::Symbol, _target::Symbol, net:
     if isnothing(value)
         value = one(value_type(Inscription, pntd_of(net)))
     end
-    term = NumberEx(sortref(value), value)
+    term = NumberEx(sortref(value), Literal(value))
     #@warn "parse_inscription" term find_vars(term)
     Inscription(; term, graphics, toolspecinfos, net)
 end
@@ -628,7 +628,7 @@ function parse_rate(node::XMLNode, net::AbstractPnmlNet, parentid)
         value = one(value_type(Rate, pntd_of(net)))
     end
 
-    term = NumberEx(sortref(value), value)
+    term = NumberEx(sortref(value), Literal(value))
     return Rate(; term, graphics, toolspecinfos, net)
 end
 
@@ -671,6 +671,6 @@ function parse_priority(node::XMLNode, net::AbstractPnmlNet, parentid)
         value = one(value_type(Priority, pntd_of(net)))
     end
 
-    term = NumberEx(sortref(value), value)
+    term = NumberEx(sortref(value), Literal(value))
     return Priority(; term, graphics, toolspecinfos, net)
 end
