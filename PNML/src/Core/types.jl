@@ -289,9 +289,10 @@ Should there be a pair for each variable instance when place multiplicity >1?
 Or do we query the multiplicity?
 
 """
-const substT = Vector{Pair{Symbol, Any #=variable_sort_eltype=#}}
-#const substT = Multiset{Pair{Symbol, variable_sort_eltype}}
-#const substT = Pair{Symbol, Multiset{variable_sort_eltype}}
+const substT = Vector{Any #= named tuple  variable_id => value =#}
+# const substT = Vector{Pair{Symbol, Any #=variable_sort_eltype=#}}
+# const substT = Multiset{Pair{Symbol, variable_sort_eltype}}
+# const substT = Pair{Symbol, Multiset{variable_sort_eltype}}
 
 """
 Map variable id to multiset of substitution value bindings.
