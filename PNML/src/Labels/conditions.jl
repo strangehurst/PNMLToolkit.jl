@@ -62,11 +62,15 @@ end
 # color function?
 #todo @memoize Dict function evaluate(c::Condition, varsub)::eltype(c)
 function eval_cond_term(cond::Condition, varsub::NamedTuple)
-    isa(term(cond), BooleanEx) ||
-        @warn "eval_cond_term" term(cond) varsub  #! debug
+    #term(cond) isa BooleanEx ||
+    D()&& @warn "eval_cond_term" term(cond) varsub  #! debug
     cterm = substitute(term(cond), varsub, cond.net)::PnmlExpr
-    @warn "eval_cond_term" term(cond) cterm toexpr(cterm, cond.net)
-    eval(toexpr(cterm, cond.net))::eltype(cond) # Bool isa Number
+    D()&& println("*************************************************")
+    tterm = toexpr(cterm, cond.net)
+    D()&& println("*************************************************")
+    D()&& @warn "eval_cond_term" cterm typeof(cterm) tterm eval(tterm)
+    D()&& dump(tterm)
+    eval(tterm)::eltype(cond) # Bool isa Number
 end
 
 

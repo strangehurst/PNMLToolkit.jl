@@ -223,7 +223,7 @@ function pnmlmultiset end
 
 # Constructor call
 function pnmlmultiset(basis::SortRef, ms::Multiset, ::Nothing; net::AbstractPnmlNet)
-    println("pnmlmultiset ", basis, " ", ms)
+    D()&& println("pnmlmultiset ", basis, " ", ms)
     PnmlMultiset{eltype(ms)}(basis, ms)
 end
 
@@ -232,7 +232,7 @@ function pnmlmultiset(basis::SortRef, element, multi::Int=1; net::AbstractPnmlNe
     # NOTE: This is legal and used.
     # Seem to recall something about singleton-multisets serving as "numbers".
     # Should we test `is_singletonmultiset` here?
-    println("pnmlmultiset ", basis, " ", element, " ", multi)
+    D()&& println("pnmlmultiset ", basis, " ", element, " ", multi)
     if isa(basis, MultisetSort)
         #^ Where/how is absence of sort loop checked?
         throw(ArgumentError("Cannot be a MultisetSort: found $basis for $element"))
@@ -243,12 +243,12 @@ function pnmlmultiset(basis::SortRef, element, multi::Int=1; net::AbstractPnmlNe
     # end
     M = Multiset{typeof(element)}()
     M[element] = multi
-    @show PnmlMultiset{eltype(M)}(basis, M)
+    PnmlMultiset{eltype(M)}(basis, M)
 end
 
 # For <all> only the basis is needed.
 function pnmlmultiset(basis::SortRef, ::Nothing, ::Nothing; net::AbstractPnmlNet)
-    println("pnmlmultiset ", basis)
+    D()&& println("pnmlmultiset ", basis)
     if is_multisetsort(basis)
         throw(ArgumentError("Cannot have MultisetSort basis of $(repr(basis))"))
     end
@@ -269,7 +269,7 @@ Sum multiplicities of multisets over the same sort.
 """
 function disjointunion(a::Vector{Expr})
     b = eval.(a)::Vector{<:PnmlMultiset}
-    @warn "disjointunion" a b typeof(b)
+    D()&& @warn "disjointunion" a b typeof(b)
     @assert b isa Vector{<:PnmlMultiset}
     head, rest = Iterators.peel(b)
     M = deepcopy(head)
@@ -278,6 +278,5 @@ function disjointunion(a::Vector{Expr})
             push!(multiset(M), k, multiset(i)[k])
         end
     end
-    #@show M
     return M
 end

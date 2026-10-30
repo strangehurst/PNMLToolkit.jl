@@ -81,24 +81,24 @@ end
     b4 = Bag(NamedSortRef(:pro), 4, NumberEx(NamedSortRef(:natural), 2))
     b5 = Bag(NamedSortRef(:pro), 4, NumberEx(NamedSortRef(:natural), 1))
 
-    println("add b1, b2, b3")
-    @show aex = toexpr(PNML.Add([b1, b2, b4]), net)
-    @show bex = toexpr(PNML.Add([b1, b2, b5]), net)
+    #println("add b1, b2, b3")
+    aex = toexpr(PNML.Add([b1, b2, b4]), net)
+    bex = toexpr(PNML.Add([b1, b2, b5]), net)
 
-    @show a = eval(aex)
-    @show b = eval(bex)
+    a = eval(aex)
+    b = eval(bex)
     #@show Bag(a) # 1'1 2'1 3'2 4'2
     #@show Bag(b) # 1'1 2'1 3'2 4'1
     # is bag(a) contains bag(b) or bag(b) issubset bag(a)
-    println("Contains")
+    #println("Contains")
     c = @inferred Contains(Bag(a), Bag(b))
-    @show ex = @inferred toexpr(c, net)
+    ex = @inferred toexpr(c, net)
     @test eval(ex) == true
 
-    @show c2 = Contains(Bag(b), Bag(a))
+    c2 = Contains(Bag(b), Bag(a))
     @test eval(toexpr(c2, net)) == false
 
-    println()
+    #println()
 end
 
 @testset "multiset and $pntd" begin
@@ -115,7 +115,7 @@ end
             eval(toexpr(b3, net)) &
             eval(toexpr(b3, net))
 
-    @show a ex val e
+    #@show a ex val e
     @test val == e
 end
 
@@ -154,7 +154,7 @@ end
     b2 = PNML.BooleanEx(BooleanConstant(false))
 
     a = PNML.Not([b1, b2])
-    @show ex = toexpr(a, net)
+    ex = toexpr(a, net)
     val = eval(ex)
     @test val == false
 

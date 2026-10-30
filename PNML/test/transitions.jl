@@ -89,7 +89,7 @@ end
     """
     net = make_net(pntd, :refrans_net)
 
-    @show rtrans = parse_refTransition(node, net)::RefTransition
+    rtrans = parse_refTransition(node, net)::RefTransition
     @test pid(rtrans) === :rt1
     @test PNML.refid_of(rtrans) === :t1
     @test PNML.CONFIG.omit_graphics ||

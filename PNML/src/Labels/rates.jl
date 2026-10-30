@@ -26,7 +26,7 @@ value(r::Rate) = r()
 #todo @memoize Dict function evaluate(rate::Rate, varsub)
 function (rate::Rate)(varsub::NamedTuple=NamedTuple())
     e = substitute(term(rate), varsub, rate.net)::PnmlExpr
-    @warn "rate" e value_type(Rate) toexpr(e, rate.net)
+    D()&& @warn "rate" e value_type(Rate) toexpr(e, rate.net)
     eval(toexpr(e, rate.net))::value_type(Rate)
 end
 

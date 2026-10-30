@@ -156,7 +156,6 @@ end
 # end
 
 function output_matrix!(omatrix::Matrix{T}, net::AbstractPnmlNet) where T
-    @show T
     varsub = NamedTuple() #todo! add Symmetric and HL support, variables
     for (p, place_id) in enumerate(place_ids(net))
         for (t, transition_id) in enumerate(transition_ids(net))
@@ -272,15 +271,18 @@ function initial_markings(net::PnmlNet{HighLevelPNML})
 
         ivec = Any[]
         for place in PNML.places(net)
-            @show place imark = initial_marking(place)
-            if imark isa PnmlMultiset
-                @show imark = multiset(imark)
+            imark = initial_marking(place)
+            @warn "initial_markings" pid(place) imark
+            m = if imark isa PnmlMultiset
+                multiset(imark)
             elseif imark isa Tuple
-                @show imark = multiset.(imark)
+                multiset.(imark)
+            else
+                error("not PnmlMultiset or PnmlMultiset: $imark")
             end
-            push!(ivec, imark)
+            push!(ivec, m)
         end
-        @show ivec
+        ivec
     end
     #! FIFO places use queues, will co-exist with multisets from regular HL places.
     # Use <fifoinitialMarking><structure><makelist> expression for initial queue contents.
