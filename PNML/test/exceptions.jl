@@ -57,18 +57,23 @@ end
         pnmlmodel(xml"""
             <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
             <net type="http://www.pnml.org/version-2009/grammar/pnmlcore" id="n1">
-                <page id="pg1">
-                    <toolspecific/>
-                </page>
+            <page id="pg1">
+                <toolspecific/>
+            </page>
             </net>
             </pnml>
             """))
 
     # println("-- 3")
     @test_throws("MalformedException: attribute type missing",
-        pnmlmodel(xml"""<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-                        <net id="4712"/>"""))
-
+        pnmlmodel(xml"""
+            <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+            <net id="4712">
+            <page id="pg1">
+                <toolspecific/>
+            </page>
+            </net>
+            </pnml>"""))
 
     @test_throws("MalformedException: attribute type missing",
         pnmlmodel(xml"""
