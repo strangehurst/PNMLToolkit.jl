@@ -1,6 +1,6 @@
 # Enabling Rule
 "Debug print switch for enabline rule."
-ER() = true
+ER() = false
 using PNML: elabelT, tparserT, efilterT, lparserT, vsubT, varsT, BagvarT, substT
 
 """
@@ -328,7 +328,7 @@ function get_arc_vbs_impl!(arc_vars::Multiset, placesort::SortRef, mark::Multise
                     # Select the tuple member(s) matching variable sort
                     # to add to `arc_var_binding_sets` of `v`.
                     for i in indxV
-                        #@show element[i] typeof(element[i])
+                        @show element[i] typeof(element[i])
                         push!(arc_binding_sets[v], element[i])
                     end
                 else
@@ -355,15 +355,15 @@ Update varsubs with feasible variable substitution named tuples.
 The firing rule will select from one transition's feasible substutions in its varsubs.
 """
 function comp_mark_inscription end
-function comp_mark_inscription(net::PnmlNet{T}, mark_dict::AbstractDict, transition_id::Symbol,
-                                cond, erc::ERContext) where {T <: PNMLVariant}
+function comp_mark_inscription(net::PnmlNet, mark_dict::AbstractDict, transition_id::Symbol,
+                                cond, erc::ERContext)
     ER()&& println("\n#-- comp_mark_inscription! ",
                     "$(pntdsym(net)) $(pid(net)) ", transition_id)
     for place_id in preset(net, transition_id)
         # eltype(sortof(place(net, place_id)))
         mark = mark_dict[place_id]
         a = arc(net, place_id, transition_id)::Arc
-        if !__compare_mi_impl(net, mark, cond, a, erc)
+        if !__compare_mi_impl(vartype(net), mark, cond, a, erc)
             return false
         end
     end
@@ -371,7 +371,7 @@ function comp_mark_inscription(net::PnmlNet{T}, mark_dict::AbstractDict, transit
 end
 
 # Assume no variables
-function __compare_mi_impl(net::PnmlNet{T}, mark, cond, a::Arc, ::ERContext) where {T <: PNMLVariant}
+function __compare_mi_impl(::Type{PNMLVariant}, mark, cond, a::Arc, ::ERContext)
     # evaluate condition expression
     PNML.Labels.eval_cond_term(cond, NamedTuple()) ||
         return false  #! XXX CACHE eval
@@ -380,8 +380,7 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond, a::Arc, ::ERContext) whe
  end
 
 # Variables supported for High-level nets
-function __compare_mi_impl(net::PnmlNet{T}, mark, cond, a::Arc,
-                           erc::ERContext) where {T <: HighLevelPNML}
+function __compare_mi_impl(::Type{HighLevelPNML}, mark, cond, a::Arc, erc::ERContext)
     ER()&& println("\n#-- __compare_mi_impl ")
     if ER()
         println()
@@ -407,7 +406,6 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond, a::Arc,
         # Use the transition-level variable substitution binding map `tr_var_binding_set`.
         # Iterate over the cartesian product to produce a list of candidate firings.
         # A candidate firing is a NamedTuple variable_id => marking_value of substitutions.
-        #!var_ids = Tuple{Vararg{Symbol}}(keys(erc.tr_var_binding_set)...) # Tuple of variable ids
         var_ids = tuple(keys(erc.tr_var_binding_set)...) # Tuple of variable ids
         ER()&& @show typeof(var_ids) var_ids
         ER()&& println()
@@ -440,10 +438,14 @@ function __compare_mi_impl(net::PnmlNet{T}, mark, cond, a::Arc,
             # Must be evaluated for each candidate_parms.
             ER()&& @error cond tr_vsub
             @show guard = PNML.Labels.eval_cond_term(cond, tr_vsub)
+            println("-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --")
+
             if guard
                 inscription_val = inscription_value(a, tr_vsub) # bag
                 mark = unwrap_pmset(mark)
                 if issubset(inscription_val, mark)
+                    # candidate_parms is a valid substitution.
+                    #! What should the symbol be? transition_id
                     push!(erc.tr_varsubs, tr_vsub)
                 else
                     ER()&& @warn "not a valid substitution" inscription_val mark
