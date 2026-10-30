@@ -35,19 +35,29 @@ Multisets.set_key_value_show()
     #TODO more tests
     @show m₀ = initial_markings(n)
     @show e = enabled(n, m₀)
-    @test_broken any(e)
+    @test any(e)
     #! incidence matrix, input matrix, output matrix do not handle variables. WILL ERROR!
     #@show C  = PNML.incidence_matrix(n) # Matrix of PnmlMultiset
     #@show m₁ = fire2(C, n, m₀)
     #@test PNML.verify(net, true)
 end
 
-println("\n-----------------------------------------")
+println()
+println()
+println()
+println()
+println("-----------------------------------------")
+println("-----------------------------------------")
+println("-----------------------------------------")
+println("-----------------------------------------")
+println("-----------------------------------------")
 println("Sudoku-COL-BN01.pnml")
 # productsort, tuple, finiteintrangeconstant, or, and, equality
 @testset let fname=joinpath(@__DIR__, "data", "MCC/Sudoku-COL-BN01.pnml")
     model = pnmlmodel(fname)::PnmlModel
     summary(stdout, model) #first(PNML.nets(model)))
+    #io = IOContext(stdout, :limit => false)
+    println(IOContext(stdout, :limit => false), model)
     n = first(PNML.nets(model))::PnmlNet
     @show m₀ = initial_markings(n)
     @show e = enabled(n, m₀)
